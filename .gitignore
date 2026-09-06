@@ -39,3 +39,16 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Local runtime and private group data
+.tools/
+.run/
+backend/.venv/
+backend/data/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+playwright-report/
+test-results/
+ios/Pods/
+ios/build/
