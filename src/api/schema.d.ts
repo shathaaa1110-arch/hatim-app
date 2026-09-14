@@ -11,8 +11,26 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Health */
-    get: operations["health_api_health_get"];
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     delete?: never;
@@ -28,8 +46,26 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Experiences */
-    get: operations["experiences_api_experiences_get"];
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Experience"][];
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     delete?: never;
@@ -47,8 +83,32 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Create Group */
-    post: operations["create_group_api_groups_post"];
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["CreateGroup"];
+          "text/json": components["schemas"]["CreateGroup"];
+          "application/*+json": components["schemas"]["CreateGroup"];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["GroupCreated"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -62,8 +122,28 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get Group */
-    get: operations["get_group_api_groups__group_id__get"];
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          group_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["GroupView"];
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     delete?: never;
@@ -80,8 +160,34 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update Settings */
-    put: operations["update_settings_api_groups__group_id__settings_put"];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          group_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Settings"];
+          "text/json": components["schemas"]["Settings"];
+          "application/*+json": components["schemas"]["Settings"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["GroupView"];
+          };
+        };
+      };
+    };
     post?: never;
     delete?: never;
     options?: never;
@@ -97,8 +203,34 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update Organizer */
-    put: operations["update_organizer_api_groups__group_id__profile_put"];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          group_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Preferences"];
+          "text/json": components["schemas"]["Preferences"];
+          "application/*+json": components["schemas"]["Preferences"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["GroupView"];
+          };
+        };
+      };
+    };
     post?: never;
     delete?: never;
     options?: never;
@@ -116,8 +248,29 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Remove Member */
-    delete: operations["remove_member_api_groups__group_id__members__member_id__delete"];
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          group_id: string;
+          member_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["GroupView"];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -130,8 +283,28 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Invite */
-    get: operations["invite_api_invites__code__get"];
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          code: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InviteView"];
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     delete?: never;
@@ -149,8 +322,34 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Join Group */
-    post: operations["join_group_api_invites__code__members_post"];
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          code: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Preferences"];
+          "text/json": components["schemas"]["Preferences"];
+          "application/*+json": components["schemas"]["Preferences"];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["MemberCreated"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -164,10 +363,56 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get My Preferences */
-    get: operations["get_my_preferences_api_invites__code__me_get"];
-    /** Update My Preferences */
-    put: operations["update_my_preferences_api_invites__code__me_put"];
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          code: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Member"];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          code: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Preferences"];
+          "text/json": components["schemas"]["Preferences"];
+          "application/*+json": components["schemas"]["Preferences"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Member"];
+          };
+        };
+      };
+    };
     post?: never;
     delete?: never;
     options?: never;
@@ -179,256 +424,134 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    /** CreateGroup */
+    /** @enum {unknown} */
+    Allergen:
+      | "مكسرات"
+      | "فول سوداني"
+      | "حليب"
+      | "قمح"
+      | "سمسم"
+      | "قشريات"
+      | "سمك"
+      | "بيض"
+      | "صويا";
+    /** @enum {unknown} */
+    Category: "مطابخ جديدة" | "كنوز مخفية" | "افتتاحات" | "طبق ولحظة";
     CreateGroup: {
-      /**
-       * Title
-       * @default لَمّتنا في الرياض
-       */
+      /** @default لَمّتنا في الرياض */
       title: string;
       preferences: components["schemas"]["Preferences"];
     };
-    /** Decision */
+    /** @enum {unknown} */
+    Cuisine: "سعودي" | "ياباني" | "إيطالي" | "شامي" | "آسيوي" | "قهوة وحلى";
     Decision: {
-      /** Experience Id */
       experience_id: string;
-      /**
-       * Priority
-       * @enum {string}
-       */
-      priority: "ركيزة" | "أساسية" | "مرنة";
-      /** Reason */
+      priority: components["schemas"]["Priority"];
       reason: string;
-      /** Adaptations */
-      adaptations?: string[];
-      /** Score */
+      adaptations: string[];
+      /** Format: double */
       score: number;
     };
-    /** Experience */
     Experience: {
-      /** Id */
       id: string;
-      /** Title */
       title: string;
-      /** Venue */
       venue: string;
-      /** Neighborhood */
       neighborhood: string;
-      /**
-       * Category
-       * @enum {string}
-       */
-      category: "مطابخ جديدة" | "كنوز مخفية" | "افتتاحات" | "طبق ولحظة";
-      /**
-       * Cuisine
-       * @enum {string}
-       */
-      cuisine: "سعودي" | "ياباني" | "إيطالي" | "شامي" | "آسيوي" | "قهوة وحلى";
-      /** Description */
+      category: components["schemas"]["Category"];
+      cuisine: components["schemas"]["Cuisine"];
       description: string;
-      /** Why */
       why: string;
-      /** Image */
       image: string;
-      /** Price */
+      /** Format: int32 */
       price: number;
-      /** Minutes */
+      /** Format: int32 */
       minutes: number;
-      /** Editorial */
+      /** Format: int32 */
       editorial: number;
-      /**
-       * Vegetarian
-       * @default false
-       */
-      vegetarian: boolean;
-      /** Vegetarian Option */
-      vegetarian_option?: string | null;
-      /**
-       * Spicy
-       * @default false
-       */
-      spicy: boolean;
-      /** Mild Option */
-      mild_option?: string | null;
-      /** Allergens */
-      allergens?: (
-        | "مكسرات"
-        | "فول سوداني"
-        | "حليب"
-        | "قمح"
-        | "سمسم"
-        | "قشريات"
-        | "سمك"
-        | "بيض"
-        | "صويا"
-      )[];
-      /** Verified Free Of */
-      verified_free_of?: (
-        | "مكسرات"
-        | "فول سوداني"
-        | "حليب"
-        | "قمح"
-        | "سمسم"
-        | "قشريات"
-        | "سمك"
-        | "بيض"
-        | "صويا"
-      )[];
+      vegetarian?: boolean;
+      vegetarian_option?: null | string;
+      spicy?: boolean;
+      mild_option?: null | string;
+      allergens?: components["schemas"]["Allergen"][];
+      verified_free_of?: components["schemas"]["Allergen"][];
     };
-    /** GroupCreated */
     GroupCreated: {
-      /** Organizer Token */
       organizer_token: string;
       group: components["schemas"]["GroupView"];
     };
-    /** GroupView */
     GroupView: {
-      /** Id */
       id: string;
-      /** Title */
       title: string;
-      /** Invite Code */
       invite_code: string;
       settings: components["schemas"]["Settings"];
-      /** Members */
       members: components["schemas"]["Member"][];
       plan: components["schemas"]["Plan"];
     };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
-    /** InviteView */
     InviteView: {
-      /** Title */
       title: string;
-      /** Member Names */
       member_names: string[];
-      /** Slots */
+      /** Format: int32 */
       slots: number;
-      /** Selected */
       selected: components["schemas"]["Decision"][];
-      /** Anchor Issue */
-      anchor_issue?: string | null;
-      /** Consumed */
+      anchor_issue: null | string;
+      /** Format: int32 */
       consumed: number;
     };
-    /** Member */
     Member: {
-      /** Id */
       id: string;
       preferences: components["schemas"]["Preferences"];
-      /**
-       * Organizer
-       * @default false
-       */
+      /** @default false */
       organizer: boolean;
     };
-    /** MemberCreated */
     MemberCreated: {
-      /** Member Token */
       member_token: string;
       member: components["schemas"]["Member"];
     };
-    /** Plan */
     Plan: {
-      /** Selected */
       selected: components["schemas"]["Decision"][];
-      /** Pocket */
       pocket: components["schemas"]["PocketItem"][];
-      /** Anchor Issue */
-      anchor_issue?: string | null;
-      /** Consumed */
+      anchor_issue: null | string;
+      /** Format: int32 */
       consumed: number;
-      /** Available */
+      /** Format: int32 */
       available: number;
-      /** Unfilled */
+      /** Format: int32 */
       unfilled: number;
     };
-    /** PocketItem */
     PocketItem: {
-      /** Experience Id */
       experience_id: string;
-      /** Reason */
       reason: string;
-      /**
-       * Blocked
-       * @default false
-       */
+      /** @default false */
       blocked: boolean;
     };
-    /** Preferences */
     Preferences: {
-      /** Name */
       name: string;
+      /** @default مقيم */
+      role: components["schemas"]["Role"];
+      cuisines?: components["schemas"]["Cuisine"][];
+      allergies?: components["schemas"]["Allergen"][];
+      vegetarian?: boolean;
+      mild?: boolean;
       /**
-       * Role
-       * @default مقيم
-       * @enum {string}
-       */
-      role: "مقيم" | "زائر";
-      /** Cuisines */
-      cuisines?: (
-        "سعودي" | "ياباني" | "إيطالي" | "شامي" | "آسيوي" | "قهوة وحلى"
-      )[];
-      /** Allergies */
-      allergies?: (
-        | "مكسرات"
-        | "فول سوداني"
-        | "حليب"
-        | "قمح"
-        | "سمسم"
-        | "قشريات"
-        | "سمك"
-        | "بيض"
-        | "صويا"
-      )[];
-      /**
-       * Vegetarian
-       * @default false
-       */
-      vegetarian: boolean;
-      /**
-       * Mild
-       * @default false
-       */
-      mild: boolean;
-      /**
-       * Budget
+       * Format: int32
        * @default 200
        */
       budget: number;
     };
-    /** Settings */
+    /** @enum {unknown} */
+    Priority: "ركيزة" | "أساسية" | "مرنة";
+    /** @enum {unknown} */
+    Role: "مقيم" | "زائر";
     Settings: {
       /**
-       * Slots
+       * Format: int32
        * @default 9
        */
       slots: number;
-      /**
-       * Anchor Id
-       * @default fire
-       */
-      anchor_id: string | null;
-      /** Pocket Ids */
+      /** @default fire */
+      anchor_id: null | string;
       pocket_ids?: string[];
-      /** Completed Ids */
       completed_ids?: string[];
-    };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-      /** Input */
-      input?: unknown;
-      /** Context */
-      ctx?: Record<string, never>;
     };
   };
   responses: never;
@@ -438,355 +561,4 @@ export interface components {
   pathItems: never;
 }
 export type $defs = Record<string, never>;
-export interface operations {
-  health_api_health_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  experiences_api_experiences_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Experience"][];
-        };
-      };
-    };
-  };
-  create_group_api_groups_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateGroup"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["GroupCreated"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  get_group_api_groups__group_id__get: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["GroupView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  update_settings_api_groups__group_id__settings_put: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Settings"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["GroupView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  update_organizer_api_groups__group_id__profile_put: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        group_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Preferences"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["GroupView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  remove_member_api_groups__group_id__members__member_id__delete: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        group_id: string;
-        member_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["GroupView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  invite_api_invites__code__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["InviteView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  join_group_api_invites__code__members_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Preferences"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["MemberCreated"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  get_my_preferences_api_invites__code__me_get: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Member"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  update_my_preferences_api_invites__code__me_put: {
-    parameters: {
-      query?: never;
-      header?: {
-        authorization?: string | null;
-      };
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Preferences"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Member"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-}
+export type operations = Record<string, never>;

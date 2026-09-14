@@ -9,6 +9,7 @@
     "expo": "~57.0.20",
     "expo-blur": "~57.0.2",
     "expo-clipboard": "~57.0.1",
+    "expo-device": "~57.0.2",
     "expo-font": "~57.0.3",
     "expo-glass-effect": "~57.0.1",
     "expo-linear-gradient": "~57.0.1",
@@ -37,14 +38,16 @@
     "ios:release": "expo run:ios --configuration Release",
     "web:build": "expo export --platform web",
     "typecheck": "tsc --noEmit",
-    "api": "uv run --project backend uvicorn hatim.main:app --app-dir backend --host 127.0.0.1 --port 8000",
-    "test:api": "uv run --project backend pytest backend/tests -q",
+    "api": "dotnet run --project backend/Hatim.Api --no-launch-profile",
+    "test:api": "dotnet test backend/Hatim.slnx",
     "test:e2e": "playwright test",
     "types:api": "node scripts/generate-types.mjs",
     "check": "npm run typecheck && npm run test:api",
     "public:test": "node scripts/public-test.mjs",
     "format": "prettier --write App.tsx src tests scripts/*.mjs playwright.config.ts",
-    "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts"
+    "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts",
+    "format:api": "dotnet format backend/Hatim.slnx",
+    "format:api:check": "dotnet format backend/Hatim.slnx --verify-no-changes"
   },
   "private": true,
   "overrides": {

@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.1.1",
   "info": {
     "title": "Hatim API",
     "version": "1.0.0"
@@ -7,15 +7,14 @@
   "paths": {
     "/api/health": {
       "get": {
-        "summary": "Health",
-        "operationId": "health_api_health_get",
+        "tags": [
+          "Api"
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {}
-              }
+              "application/json": {}
             }
           }
         }
@@ -23,19 +22,19 @@
     },
     "/api/experiences": {
       "get": {
-        "summary": "Experiences",
-        "operationId": "experiences_api_experiences_get",
+        "tags": [
+          "Api"
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Experience"
-                  },
-                  "type": "array",
-                  "title": "Response Experiences Api Experiences Get"
+                  }
                 }
               }
             }
@@ -45,11 +44,22 @@
     },
     "/api/groups": {
       "post": {
-        "summary": "Create Group",
-        "operationId": "create_group_api_groups_post",
+        "tags": [
+          "Api"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroup"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroup"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateGroup"
               }
@@ -59,21 +69,11 @@
         },
         "responses": {
           "201": {
-            "description": "Successful Response",
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupCreated"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -83,52 +83,26 @@
     },
     "/api/groups/{group_id}": {
       "get": {
-        "summary": "Get Group",
-        "operationId": "get_group_api_groups__group_id__get",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupView"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -138,62 +112,46 @@
     },
     "/api/groups/{group_id}/settings": {
       "put": {
-        "summary": "Update Settings",
-        "operationId": "update_settings_api_groups__group_id__settings_put",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Settings"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Settings"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Settings"
+              }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupView"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -203,62 +161,46 @@
     },
     "/api/groups/{group_id}/profile": {
       "put": {
-        "summary": "Update Organizer",
-        "operationId": "update_organizer_api_groups__group_id__profile_put",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Preferences"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupView"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -268,16 +210,16 @@
     },
     "/api/groups/{group_id}/members/{member_id}": {
       "delete": {
-        "summary": "Remove Member",
-        "operationId": "remove_member_api_groups__group_id__members__member_id__delete",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Group Id"
+              "type": "string"
             }
           },
           {
@@ -285,44 +227,17 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Member Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupView"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -332,36 +247,26 @@
     },
     "/api/invites/{code}": {
       "get": {
-        "summary": "Invite",
-        "operationId": "invite_api_invites__code__get",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "code",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Code"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InviteView"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -371,46 +276,46 @@
     },
     "/api/invites/{code}/members": {
       "post": {
-        "summary": "Join Group",
-        "operationId": "join_group_api_invites__code__members_post",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "code",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Code"
+              "type": "string"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Preferences"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
-            "description": "Successful Response",
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MemberCreated"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -420,52 +325,26 @@
     },
     "/api/invites/{code}/me": {
       "get": {
-        "summary": "Get My Preferences",
-        "operationId": "get_my_preferences_api_invites__code__me_get",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "code",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Code"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Member"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -473,62 +352,46 @@
         }
       },
       "put": {
-        "summary": "Update My Preferences",
-        "operationId": "update_my_preferences_api_invites__code__me_put",
+        "tags": [
+          "Api"
+        ],
         "parameters": [
           {
             "name": "code",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Code"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
+              "type": "string"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Preferences"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Member"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -539,202 +402,88 @@
   },
   "components": {
     "schemas": {
+      "Allergen": {
+        "enum": [
+          "مكسرات",
+          "فول سوداني",
+          "حليب",
+          "قمح",
+          "سمسم",
+          "قشريات",
+          "سمك",
+          "بيض",
+          "صويا"
+        ]
+      },
+      "Category": {
+        "enum": [
+          "مطابخ جديدة",
+          "كنوز مخفية",
+          "افتتاحات",
+          "طبق ولحظة"
+        ]
+      },
       "CreateGroup": {
+        "required": [
+          "preferences"
+        ],
+        "type": "object",
         "properties": {
           "title": {
-            "type": "string",
             "maxLength": 60,
             "minLength": 1,
-            "title": "Title",
+            "type": "string",
             "default": "لَمّتنا في الرياض"
           },
           "preferences": {
             "$ref": "#/components/schemas/Preferences"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "preferences"
-        ],
-        "title": "CreateGroup"
+        "additionalProperties": false
+      },
+      "Cuisine": {
+        "enum": [
+          "سعودي",
+          "ياباني",
+          "إيطالي",
+          "شامي",
+          "آسيوي",
+          "قهوة وحلى"
+        ]
       },
       "Decision": {
-        "properties": {
-          "experience_id": {
-            "type": "string",
-            "title": "Experience Id"
-          },
-          "priority": {
-            "type": "string",
-            "enum": [
-              "ركيزة",
-              "أساسية",
-              "مرنة"
-            ],
-            "title": "Priority"
-          },
-          "reason": {
-            "type": "string",
-            "title": "Reason"
-          },
-          "adaptations": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Adaptations"
-          },
-          "score": {
-            "type": "number",
-            "title": "Score"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "experience_id",
           "priority",
           "reason",
+          "adaptations",
           "score"
         ],
-        "title": "Decision"
-      },
-      "Experience": {
+        "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
+          "experience_id": {
+            "type": "string"
           },
-          "title": {
-            "type": "string",
-            "title": "Title"
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
           },
-          "venue": {
-            "type": "string",
-            "title": "Venue"
+          "reason": {
+            "type": "string"
           },
-          "neighborhood": {
-            "type": "string",
-            "title": "Neighborhood"
-          },
-          "category": {
-            "type": "string",
-            "enum": [
-              "مطابخ جديدة",
-              "كنوز مخفية",
-              "افتتاحات",
-              "طبق ولحظة"
-            ],
-            "title": "Category"
-          },
-          "cuisine": {
-            "type": "string",
-            "enum": [
-              "سعودي",
-              "ياباني",
-              "إيطالي",
-              "شامي",
-              "آسيوي",
-              "قهوة وحلى"
-            ],
-            "title": "Cuisine"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          },
-          "why": {
-            "type": "string",
-            "title": "Why"
-          },
-          "image": {
-            "type": "string",
-            "title": "Image"
-          },
-          "price": {
-            "type": "integer",
-            "title": "Price"
-          },
-          "minutes": {
-            "type": "integer",
-            "title": "Minutes"
-          },
-          "editorial": {
-            "type": "integer",
-            "title": "Editorial"
-          },
-          "vegetarian": {
-            "type": "boolean",
-            "title": "Vegetarian",
-            "default": false
-          },
-          "vegetarian_option": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Vegetarian Option"
-          },
-          "spicy": {
-            "type": "boolean",
-            "title": "Spicy",
-            "default": false
-          },
-          "mild_option": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mild Option"
-          },
-          "allergens": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "مكسرات",
-                "فول سوداني",
-                "حليب",
-                "قمح",
-                "سمسم",
-                "قشريات",
-                "سمك",
-                "بيض",
-                "صويا"
-              ]
-            },
+          "adaptations": {
             "type": "array",
-            "title": "Allergens"
-          },
-          "verified_free_of": {
             "items": {
-              "type": "string",
-              "enum": [
-                "مكسرات",
-                "فول سوداني",
-                "حليب",
-                "قمح",
-                "سمسم",
-                "قشريات",
-                "سمك",
-                "بيض",
-                "صويا"
-              ]
-            },
-            "type": "array",
-            "title": "Verified Free Of"
+              "type": "string"
+            }
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
+        "additionalProperties": false
+      },
+      "Experience": {
         "required": [
           "id",
           "title",
@@ -749,56 +498,97 @@
           "minutes",
           "editorial"
         ],
-        "title": "Experience"
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "neighborhood": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "cuisine": {
+            "$ref": "#/components/schemas/Cuisine"
+          },
+          "description": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "editorial": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vegetarian": {
+            "type": "boolean"
+          },
+          "vegetarian_option": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "spicy": {
+            "type": "boolean"
+          },
+          "mild_option": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "allergens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allergen"
+            }
+          },
+          "verified_free_of": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allergen"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "GroupCreated": {
+        "required": [
+          "organizer_token",
+          "group"
+        ],
+        "type": "object",
         "properties": {
           "organizer_token": {
-            "type": "string",
-            "title": "Organizer Token"
+            "type": "string"
           },
           "group": {
             "$ref": "#/components/schemas/GroupView"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "organizer_token",
-          "group"
-        ],
-        "title": "GroupCreated"
+        "additionalProperties": false
       },
       "GroupView": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "invite_code": {
-            "type": "string",
-            "title": "Invite Code"
-          },
-          "settings": {
-            "$ref": "#/components/schemas/Settings"
-          },
-          "members": {
-            "items": {
-              "$ref": "#/components/schemas/Member"
-            },
-            "type": "array",
-            "title": "Members"
-          },
-          "plan": {
-            "$ref": "#/components/schemas/Plan"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "id",
           "title",
@@ -807,347 +597,272 @@
           "members",
           "plan"
         ],
-        "title": "GroupView"
-      },
-      "HTTPValidationError": {
+        "type": "object",
         "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "invite_code": {
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          },
+          "members": {
             "type": "array",
-            "title": "Detail"
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          },
+          "plan": {
+            "$ref": "#/components/schemas/Plan"
           }
         },
-        "type": "object",
-        "title": "HTTPValidationError"
+        "additionalProperties": false
       },
       "InviteView": {
-        "properties": {
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "member_names": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Member Names"
-          },
-          "slots": {
-            "type": "integer",
-            "title": "Slots"
-          },
-          "selected": {
-            "items": {
-              "$ref": "#/components/schemas/Decision"
-            },
-            "type": "array",
-            "title": "Selected"
-          },
-          "anchor_issue": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Anchor Issue"
-          },
-          "consumed": {
-            "type": "integer",
-            "title": "Consumed"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "title",
           "member_names",
           "slots",
           "selected",
+          "anchor_issue",
           "consumed"
         ],
-        "title": "InviteView"
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "member_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "slots": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "selected": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            }
+          },
+          "anchor_issue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "consumed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "Member": {
+        "required": [
+          "id",
+          "preferences"
+        ],
+        "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "title": "Id"
+            "type": "string"
           },
           "preferences": {
             "$ref": "#/components/schemas/Preferences"
           },
           "organizer": {
             "type": "boolean",
-            "title": "Organizer",
             "default": false
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "id",
-          "preferences"
-        ],
-        "title": "Member"
+        "additionalProperties": false
       },
       "MemberCreated": {
+        "required": [
+          "member_token",
+          "member"
+        ],
+        "type": "object",
         "properties": {
           "member_token": {
-            "type": "string",
-            "title": "Member Token"
+            "type": "string"
           },
           "member": {
             "$ref": "#/components/schemas/Member"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "member_token",
-          "member"
-        ],
-        "title": "MemberCreated"
+        "additionalProperties": false
       },
       "Plan": {
-        "properties": {
-          "selected": {
-            "items": {
-              "$ref": "#/components/schemas/Decision"
-            },
-            "type": "array",
-            "title": "Selected"
-          },
-          "pocket": {
-            "items": {
-              "$ref": "#/components/schemas/PocketItem"
-            },
-            "type": "array",
-            "title": "Pocket"
-          },
-          "anchor_issue": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Anchor Issue"
-          },
-          "consumed": {
-            "type": "integer",
-            "title": "Consumed"
-          },
-          "available": {
-            "type": "integer",
-            "title": "Available"
-          },
-          "unfilled": {
-            "type": "integer",
-            "title": "Unfilled"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "selected",
           "pocket",
+          "anchor_issue",
           "consumed",
           "available",
           "unfilled"
         ],
-        "title": "Plan"
-      },
-      "PocketItem": {
+        "type": "object",
         "properties": {
-          "experience_id": {
-            "type": "string",
-            "title": "Experience Id"
+          "selected": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            }
           },
-          "reason": {
-            "type": "string",
-            "title": "Reason"
+          "pocket": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PocketItem"
+            }
           },
-          "blocked": {
-            "type": "boolean",
-            "title": "Blocked",
-            "default": false
+          "anchor_issue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "consumed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unfilled": {
+            "type": "integer",
+            "format": "int32"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
+        "additionalProperties": false
+      },
+      "PocketItem": {
         "required": [
           "experience_id",
           "reason"
         ],
-        "title": "PocketItem"
-      },
-      "Preferences": {
+        "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 30,
-            "minLength": 1,
-            "title": "Name"
+          "experience_id": {
+            "type": "string"
           },
-          "role": {
-            "type": "string",
-            "enum": [
-              "مقيم",
-              "زائر"
-            ],
-            "title": "Role",
-            "default": "مقيم"
+          "reason": {
+            "type": "string"
           },
-          "cuisines": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "سعودي",
-                "ياباني",
-                "إيطالي",
-                "شامي",
-                "آسيوي",
-                "قهوة وحلى"
-              ]
-            },
-            "type": "array",
-            "maxItems": 6,
-            "title": "Cuisines"
-          },
-          "allergies": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "مكسرات",
-                "فول سوداني",
-                "حليب",
-                "قمح",
-                "سمسم",
-                "قشريات",
-                "سمك",
-                "بيض",
-                "صويا"
-              ]
-            },
-            "type": "array",
-            "maxItems": 9,
-            "title": "Allergies"
-          },
-          "vegetarian": {
+          "blocked": {
             "type": "boolean",
-            "title": "Vegetarian",
             "default": false
-          },
-          "mild": {
-            "type": "boolean",
-            "title": "Mild",
-            "default": false
-          },
-          "budget": {
-            "type": "integer",
-            "maximum": 500.0,
-            "minimum": 30.0,
-            "title": "Budget",
-            "default": 200
           }
         },
-        "additionalProperties": false,
-        "type": "object",
+        "additionalProperties": false
+      },
+      "Preferences": {
         "required": [
           "name"
         ],
-        "title": "Preferences"
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "default": "مقيم",
+            "$ref": "#/components/schemas/Role"
+          },
+          "cuisines": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cuisine"
+            }
+          },
+          "allergies": {
+            "maxItems": 9,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allergen"
+            }
+          },
+          "vegetarian": {
+            "type": "boolean"
+          },
+          "mild": {
+            "type": "boolean"
+          },
+          "budget": {
+            "maximum": 500,
+            "minimum": 30,
+            "type": "integer",
+            "format": "int32",
+            "default": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "Priority": {
+        "enum": [
+          "ركيزة",
+          "أساسية",
+          "مرنة"
+        ]
+      },
+      "Role": {
+        "enum": [
+          "مقيم",
+          "زائر"
+        ]
       },
       "Settings": {
+        "type": "object",
         "properties": {
           "slots": {
+            "maximum": 9,
+            "minimum": 1,
             "type": "integer",
-            "maximum": 9.0,
-            "minimum": 1.0,
-            "title": "Slots",
+            "format": "int32",
             "default": 9
           },
           "anchor_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "null",
+              "string"
             ],
-            "title": "Anchor Id",
             "default": "fire"
           },
           "pocket_ids": {
+            "maxItems": 30,
+            "type": "array",
             "items": {
               "type": "string"
-            },
-            "type": "array",
-            "maxItems": 30,
-            "title": "Pocket Ids"
+            }
           },
           "completed_ids": {
+            "maxItems": 9,
+            "type": "array",
             "items": {
               "type": "string"
-            },
-            "type": "array",
-            "maxItems": 9,
-            "title": "Completed Ids"
+            }
           }
         },
-        "additionalProperties": false,
-        "type": "object",
-        "title": "Settings"
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
-          }
-        },
-        "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
-        "title": "ValidationError"
+        "additionalProperties": false
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Api"
+    }
+  ]
 }

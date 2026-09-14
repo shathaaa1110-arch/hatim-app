@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Hatim.Api.Tests/Hatim.Api.Tests.csproj" />
+  <Project Path="Hatim.Api/Hatim.Api.csproj" />
+</Solution>

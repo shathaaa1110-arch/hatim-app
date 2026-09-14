@@ -45,6 +45,9 @@ yarn-error.*
 .run/
 backend/.venv/
 backend/data/
+**/bin/
+**/obj/
+**/TestResults/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
