@@ -121,8 +121,10 @@ function Invitation({
 
 export function SocialApp({
   inviteCode = null,
+  onExit,
 }: {
   inviteCode?: string | null;
+  onExit?: () => void;
 }) {
   const [session, setSession] = useState<AccountSession | null>(null);
   const [legacy, setLegacy] = useState<Session | null>(null);
@@ -177,7 +179,7 @@ export function SocialApp({
   };
   if (loading || error)
     return (
-      <Page title="نرجع للَمّتكم">
+      <Page title="نرجع للَمّتكم" back={onExit}>
         <ErrorNotice
           error={error}
           retry={() => {
@@ -196,7 +198,7 @@ export function SocialApp({
         open={open}
       />
     );
-  if (!session) return <AuthScreen onAuth={onAuth} />;
+  if (!session) return <AuthScreen onAuth={onAuth} back={onExit} />;
   if (outing)
     return (
       <OutingScreen
@@ -222,6 +224,7 @@ export function SocialApp({
       token={session.token}
       open={open}
       logout={logout}
+      back={onExit}
       claim={
         legacy
           ? async () => {

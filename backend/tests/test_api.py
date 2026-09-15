@@ -113,3 +113,51 @@ def test_settings_persist_and_drive_the_shared_plan(client):
     assert public["slots"] == 1 and len(public["selected"]) == 1
     assert public["selected"][0]["experience_id"] == "fire"
     assert len(client.get(f"/api/groups/{group['id']}", headers=auth).json()["plan"]["pocket"]) == 8
+
+
+def test_start_plan_with_selected_anchor_and_constraints_in_one_request(client):
+    result = client.post(
+        "/api/groups",
+        json={
+            "preferences": {"name": "أمل", "allergies": ["حليب"]},
+            "settings": {"slots": 1, "anchor_id": "fire", "pocket_ids": ["sushi"]},
+        },
+    )
+    assert result.status_code == 201
+    data = result.json()
+    group = data["group"]
+    assert group["settings"]["anchor_id"] == "fire"
+    assert group["settings"]["pocket_ids"] == ["sushi"]
+    assert group["plan"]["anchor_issue"]
+    assert group["plan"]["selected"] == []
+    saved = client.get(
+        f"/api/groups/{group['id']}",
+        headers={"Authorization": "Bearer " + data["organizer_token"]},
+    ).json()
+    assert saved["settings"] == group["settings"]
+    assert saved["members"][0]["preferences"]["allergies"] == ["حليب"]
+
+
+def test_start_plan_without_silent_anchor_and_reject_unknown_experience(client):
+    from hatim.store import connect
+
+    with connect() as db:
+        before = db.execute("SELECT count(*) AS n FROM groups").fetchone()["n"]
+    for settings in ({"anchor_id": "missing"}, {"pocket_ids": ["missing"]}):
+        assert (
+            client.post(
+                "/api/groups", json={"preferences": {"name": "أمل"}, "settings": settings}
+            ).status_code
+            == 422
+        )
+    with connect() as db:
+        assert db.execute("SELECT count(*) AS n FROM groups").fetchone()["n"] == before
+    response = client.post(
+        "/api/groups",
+        json={"preferences": {"name": "أمل"}, "settings": {"anchor_id": None, "slots": 1}},
+    )
+    assert response.status_code == 201
+    group = response.json()["group"]
+    assert group["settings"]["anchor_id"] is None
+    assert len(group["plan"]["selected"]) == 1
+    assert all(d["priority"] != "ركيزة" for d in group["plan"]["selected"])

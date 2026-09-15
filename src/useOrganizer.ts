@@ -26,6 +26,9 @@ export function useOrganizer() {
       if (saved) {
         setSession(saved);
         setGroup(await api.group(saved));
+      } else {
+        setSession(null);
+        setGroup(null);
       }
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) {
@@ -94,9 +97,9 @@ export function useOrganizer() {
     busy,
     error,
     restore,
-    create: (preferences: Preferences) =>
+    create: (preferences: Preferences, settings?: Settings) =>
       run(async () => {
-        const result = await api.create(preferences);
+        const result = await api.create(preferences, settings);
         const next = {
           groupId: result.group.id,
           token: result.organizer_token,

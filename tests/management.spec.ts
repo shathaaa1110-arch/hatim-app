@@ -47,6 +47,7 @@ test("leadership and removal are discoverable, explicit and enforced", async ({
     owner.token,
   );
   await page.goto("/?preview=organizer");
+  await page.getByRole("tab", { name: "قروباتي", exact: true }).click();
   await button(page, "افتح قروب فحص القيادة").click();
   await button(page, "طلعة جديدة").click();
   await page

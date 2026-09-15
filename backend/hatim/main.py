@@ -153,6 +153,7 @@ def experiences():
 
 @app.post("/api/groups", response_model=GroupCreated, status_code=201)
 def create_group(body: CreateGroup):
+    validate_settings(body.settings)
     group_id, owner_token, code = (
         secrets.token_urlsafe(12),
         secrets.token_urlsafe(32),
@@ -161,7 +162,7 @@ def create_group(body: CreateGroup):
     with connect() as db:
         db.execute(
             "INSERT INTO groups(id,title,invite_code,owner_hash,settings) VALUES(%s,%s,%s,%s,%s)",
-            (group_id, body.title, code, digest(owner_token), Jsonb(Settings().model_dump())),
+            (group_id, body.title, code, digest(owner_token), Jsonb(body.settings.model_dump())),
         )
         db.execute(
             "INSERT INTO members(id,group_id,token_hash,preferences,organizer) "
@@ -183,10 +184,7 @@ def get_group(group_id: str, authorization: str | None = Header(default=None)):
         return group_model(db, require_owner(db, group_id, authorization))
 
 
-@app.put("/api/groups/{group_id}/settings", response_model=GroupView)
-def update_settings(
-    group_id: str, body: Settings, authorization: str | None = Header(default=None)
-):
+def validate_settings(body: Settings):
     ids = set(
         body.pocket_ids
         + body.completed_ids
@@ -194,6 +192,13 @@ def update_settings(
     )
     if not ids <= CATALOG_IDS:
         raise HTTPException(422, "تجربة غير موجودة.")
+
+
+@app.put("/api/groups/{group_id}/settings", response_model=GroupView)
+def update_settings(
+    group_id: str, body: Settings, authorization: str | None = Header(default=None)
+):
+    validate_settings(body)
     with connect() as db:
         require_owner(db, group_id, authorization, lock=True)
         db.execute(

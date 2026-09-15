@@ -102,6 +102,7 @@ class Plan(Model):
 class CreateGroup(Model):
     title: str = Field(default="لَمّتنا في الرياض", min_length=1, max_length=60)
     preferences: Preferences
+    settings: Settings = Field(default_factory=Settings)
 
 
 class GroupView(Model):

@@ -23,6 +23,7 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/?preview=organizer");
+  await page.getByRole("tab", { name: "قروباتي", exact: true }).click();
   await register(page, "أمل", `owner_${stamp}`);
   await button(page, "قروب جديد").click();
   await page

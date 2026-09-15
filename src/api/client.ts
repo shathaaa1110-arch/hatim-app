@@ -88,10 +88,10 @@ export async function request<T>(
 
 export const api = {
   catalog: () => request<Experience[]>("/experiences"),
-  create: (preferences: Preferences) =>
+  create: (preferences: Preferences, settings?: Settings) =>
     request<components["schemas"]["GroupCreated"]>("/groups", {
       method: "POST",
-      body: { preferences },
+      body: { preferences, settings },
     }),
   group: (s: Session) =>
     request<Group>(`/groups/${s.groupId}`, { token: s.token }),

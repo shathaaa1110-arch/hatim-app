@@ -2435,6 +2435,9 @@
           },
           "preferences": {
             "$ref": "#/components/schemas/Preferences"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
           }
         },
         "additionalProperties": false,

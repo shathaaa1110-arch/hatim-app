@@ -32,7 +32,7 @@ export function Discover({
   onGroup,
 }: {
   catalog: Experience[];
-  group: Group;
+  group: Group | null;
   onOpen: (e: Experience) => void;
   onSave: (e: Experience) => void;
   onPlan: () => void;
@@ -50,7 +50,9 @@ export function Discover({
         search.trim(),
       ),
   );
-  const pocketIds = new Set(group.plan.pocket.map((x) => x.experience_id));
+  const pocketIds = new Set(
+    group?.plan.pocket.map((x) => x.experience_id) ?? [],
+  );
   return (
     <View style={{ gap: wide ? 35 : 26 }}>
       <View
@@ -65,7 +67,7 @@ export function Discover({
           <Row style={{ gap: 7 }}>
             <View style={s.dot} />
             <T weight="medium" style={s.eyebrow}>
-              لَمّة حلوة تبدأ من هنا
+              تجربتك الجاية تبدأ من هنا
             </T>
           </Row>
           <View>
@@ -80,11 +82,14 @@ export function Discover({
             </T>
           </View>
           <T style={[s.intro, wide && { fontSize: 16, lineHeight: 29 }]}>
-            تجارب تستاهل لَمّتكم. نرتّبها على ذوق كل واحد، وعلى قدّ الوقت اللي
-            عندكم.
+            تجارب أكل مختارة، وخطة تراعي الذوق والقيود. من تسع وجبات إلى عشاء
+            واحد، تعرف وش يبقى وليش.
           </T>
           <View style={{ alignSelf: "flex-end", marginTop: 9 }}>
-            <Button label="نشوف خطّتنا" onPress={onPlan} />
+            <Button
+              label={group ? "نشوف خطّتنا" : "ابدأ خطتك"}
+              onPress={onPlan}
+            />
           </View>
           {wide && (
             <Row style={{ marginTop: 21, gap: 7 }}>
@@ -152,56 +157,58 @@ export function Discover({
           </Pressable>
         )}
       </View>
-      <Pressable
-        onPress={onGroup}
-        accessibilityRole="button"
-        accessibilityLabel="إدارة مجموعتنا"
-        style={[s.groupStrip, !wide && { padding: 17 }]}
-      >
-        <Row style={{ flex: 1, gap: 14 }}>
-          <View style={s.avatars}>
-            {group.members.slice(0, 3).map((member, index) => (
+      {group && (
+        <Pressable
+          onPress={onGroup}
+          accessibilityRole="button"
+          accessibilityLabel="رفقة هذه الطلعة"
+          style={[s.groupStrip, !wide && { padding: 17 }]}
+        >
+          <Row style={{ flex: 1, gap: 14 }}>
+            <View style={s.avatars}>
+              {group.members.slice(0, 3).map((member, index) => (
+                <View
+                  key={member.id}
+                  style={[
+                    s.avatar,
+                    {
+                      backgroundColor: ["#DDE6D6", "#E8DACE", "#E0E5EC"][index],
+                      marginLeft: index ? -10 : 0,
+                      zIndex: 3 - index,
+                    },
+                  ]}
+                >
+                  <T weight="medium" style={{ fontSize: 17 }}>
+                    {member.preferences.name[0]}
+                  </T>
+                </View>
+              ))}
               <View
-                key={member.id}
-                style={[
-                  s.avatar,
-                  {
-                    backgroundColor: ["#DDE6D6", "#E8DACE", "#E0E5EC"][index],
-                    marginLeft: index ? -10 : 0,
-                    zIndex: 3 - index,
-                  },
-                ]}
+                style={[s.avatar, { backgroundColor: c.white, marginLeft: -8 }]}
               >
-                <T weight="medium" style={{ fontSize: 17 }}>
-                  {member.preferences.name[0]}
-                </T>
+                <Users size={16} color={c.green} />
               </View>
-            ))}
-            <View
-              style={[s.avatar, { backgroundColor: c.white, marginLeft: -8 }]}
-            >
-              <Users size={16} color={c.green} />
             </View>
-          </View>
-          <View style={{ flex: 1 }}>
-            <T weight="semibold" style={{ fontSize: 15 }}>
-              كل ذوق له مكان على الطاولة
-            </T>
-            <T style={s.eyebrow}>
-              {ar(group.members.length)} في اللَمّة ·{" "}
-              {ar(group.settings.slots ?? 9)} خانات وجبات
-            </T>
-          </View>
-        </Row>
-        <Row>
-          {wide && (
-            <T weight="medium" style={{ fontSize: 13 }}>
-              اعزم الربع
-            </T>
-          )}
-          <ArrowLeft size={19} color={c.green} />
-        </Row>
-      </Pressable>
+            <View style={{ flex: 1 }}>
+              <T weight="semibold" style={{ fontSize: 15 }}>
+                كل ذوق له مكان على الطاولة
+              </T>
+              <T style={s.eyebrow}>
+                {ar(group.members.length)} في اللَمّة ·{" "}
+                {ar(group.settings.slots ?? 9)} خانات وجبات
+              </T>
+            </View>
+          </Row>
+          <Row>
+            {wide && (
+              <T weight="medium" style={{ fontSize: 13 }}>
+                اعزم الربع
+              </T>
+            )}
+            <ArrowLeft size={19} color={c.green} />
+          </Row>
+        </Pressable>
+      )}
       <View style={{ gap: 19 }}>
         <Row style={{ justifyContent: "space-between" }}>
           <View>
@@ -266,7 +273,7 @@ export function Discover({
                 onSave={() => onSave(e)}
                 saved={pocketIds.has(e.id)}
                 priority={
-                  group.plan.selected.find((d) => d.experience_id === e.id)
+                  group?.plan.selected.find((d) => d.experience_id === e.id)
                     ?.priority
                 }
               />

@@ -39,7 +39,12 @@ test("organizer and invited member coordinate a persistent, shrinking plan", asy
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/?preview=legacy");
-  await page.getByRole("button", { name: "نبدأ لَمّتنا", exact: true }).click();
+  await page
+    .getByRole("button", { name: "اكتشف تجربة على الحطب", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "هذه ركيزة خطتي", exact: true })
+    .click();
   await page.getByRole("textbox", { name: "اسمك" }).fill("منظّم التجربة");
   await page.getByRole("button", { name: "سعودي", exact: true }).click();
   const creation = page.waitForResponse(
@@ -47,10 +52,11 @@ test("organizer and invited member coordinate a persistent, shrinking plan", asy
       response.url().endsWith("/api/groups") &&
       response.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "نبدأ اللَمّة", exact: true }).click();
+  await page.getByRole("button", { name: "ابنِ خطتي", exact: true }).click();
   const created = await (await creation).json();
   const group = created.group;
   const auth = { Authorization: "Bearer " + created.organizer_token };
+  await page.getByRole("tab", { name: "اكتشف", exact: true }).click();
   await expect(page.getByText("الطعم يبقى.", { exact: true })).toBeVisible();
   await page.screenshot({
     path: "test-results/discover-desktop.png",

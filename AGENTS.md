@@ -2,6 +2,10 @@
 
 Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
 
+# Preserve the product's core
+
+The primary unit is a food experience. Discovery, a plan that adapts to meal slots and personal constraints, and the pocket are the core. Open discovery first; do not require an account, persistent group or outing creation merely to browse. Persistent groups, saved members, voting, roles and playful removal are optional additions. Keep direct planning and browser invitations for its companions usable independently, and preserve participants' hard constraints in every planning flow.
+
 # Keep architecture and learning material in sync
 
 For every implemented app feature or behavior change, update the relevant architecture, repository structure explanation, database/ERD, API contract, and Arabic beginner documentation in the same change. Include the affected flow and validation evidence. If a diagram or layer is unaffected, do not rewrite it merely to create a diff.

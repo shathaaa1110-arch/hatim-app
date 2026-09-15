@@ -180,7 +180,7 @@ state تحتوي data/error/busy/loading. refs مثل writing وfetching وepoch
 
 ## 11. ما تغيّر في الملفات القديمة؟
 
-- App.tsx أصبح يفتح SocialApp للهاتف والدعوات الجديدة، ويبقي المعاينة القديمة لاختبار التوافق.
+- في أول تنفيذ للإضافة كان App.tsx يفتح SocialApp افتراضيًا. صُحح ذلك: البداية الآن Organizer والاكتشاف، وSocialApp يفتح من «قروباتي» أو الدعوة. راجعي [الفصل ١٥](15-experiences-first.ar.md).
 - api/client.ts صدّر request لإعادة استخدامها. عنوان المحاكي localhost، وعنوان iPhone الحقيقي من EXPO_PUBLIC_API_URL.
 - main.py ركّبت routers الجديدة قبل مسار ملفات الويب، وأوقفت الكتابة القديمة بعد claim. health تعرض api_generation: 2، وCORS تسمح بـPATCH.
 - pyproject.toml وuv.lock أضافا pwdlib وArgon2 وتبعياتهما. الملفات المولدة OpenAPI وschema.d.ts جُددت من النماذج.

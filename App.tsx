@@ -1,4 +1,5 @@
 import { ActivityIndicator, Platform, View } from "react-native";
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
@@ -13,6 +14,7 @@ import { colors } from "./src/theme";
 import { WebDocument } from "./src/components/WebDocument";
 
 export default function App() {
+  const [groupsOpen, setGroupsOpen] = useState(false);
   const [loaded, fontError] = useFonts({
     IBMPlexSansArabic_400Regular,
     IBMPlexSansArabic_500Medium,
@@ -22,10 +24,9 @@ export default function App() {
   const web = Platform.OS === "web";
   const organizerPreview =
     web &&
-    new URLSearchParams(window.location.search).get("preview") === "organizer";
-  const legacyPreview =
-    web &&
-    new URLSearchParams(window.location.search).get("preview") === "legacy";
+    ["organizer", "legacy"].includes(
+      new URLSearchParams(window.location.search).get("preview") ?? "",
+    );
   const inviteCode = web
     ? (window.location.pathname.match(/^\/join\/([A-Za-z0-9_-]+)\/?$/)?.[1] ??
       null)
@@ -37,12 +38,14 @@ export default function App() {
         <StatusBar style="dark" />
         {!loaded && !fontError ? (
           <ActivityIndicator style={{ flex: 1 }} color={colors.green} />
-        ) : legacyPreview ? (
-          <Organizer />
         ) : web && !organizerPreview && !inviteCode ? (
           <InviteScreen code={null} />
-        ) : (
+        ) : inviteCode ? (
           <SocialApp inviteCode={inviteCode} />
+        ) : groupsOpen ? (
+          <SocialApp onExit={() => setGroupsOpen(false)} />
+        ) : (
+          <Organizer openGroups={() => setGroupsOpen(true)} />
         )}
       </View>
     </SafeAreaProvider>

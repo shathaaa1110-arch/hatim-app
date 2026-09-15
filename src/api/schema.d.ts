@@ -800,6 +800,7 @@ export interface components {
        */
       title: string;
       preferences: components["schemas"]["Preferences"];
+      settings?: components["schemas"]["Settings"];
     };
     /** Credentials */
     Credentials: {

@@ -55,11 +55,12 @@ import { GroupScreen } from "./GroupScreen";
 import { PlanScreen } from "./PlanScreen";
 
 type Tab = "discover" | "plan" | "pocket" | "group";
+type StartIntent = { kind: "anchor" | "pocket"; id: string };
 const tabs = [
   { key: "discover", title: "اكتشف", icon: Compass },
   { key: "plan", title: "خطّتنا", icon: Utensils },
   { key: "pocket", title: "الجيب", icon: Bookmark },
-  { key: "group", title: "لَمّتنا", icon: Users },
+  { key: "circles", title: "قروباتي", icon: Users },
 ] as const;
 
 export function Logo() {
@@ -84,7 +85,7 @@ export function Logo() {
   );
 }
 
-export function Organizer() {
+export function Organizer({ openGroups }: { openGroups: () => void }) {
   const organizer = useOrganizer();
   const { group, loading, busy, error } = organizer;
   const [catalog, setCatalog] = useState<Experience[]>([]);
@@ -92,6 +93,13 @@ export function Organizer() {
   const [tab, setTab] = useState<Tab>("discover");
   const [detail, setDetail] = useState<Experience | null>(null);
   const [profile, setProfile] = useState(false);
+  const [startIntent, setStartIntent] = useState<StartIntent | null>(null);
+  const [initialSlots, setInitialSlots] = useState(9);
+  const startPlanning = (intent: StartIntent | null = null) => {
+    if (error && !group) return;
+    setStartIntent(intent);
+    setProfile(true);
+  };
   const [invite, setInvite] = useState(false);
   const [copied, setCopied] = useState(false);
   useEffect(() => setCopied(false), [invite]);
@@ -130,7 +138,11 @@ export function Organizer() {
     }
   };
   const save = (e: Experience) => {
-    if (!group || busy) return;
+    if (busy) return;
+    if (!group) {
+      startPlanning({ kind: "pocket", id: e.id });
+      return;
+    }
     if (group.settings.anchor_id === e.id) {
       setToast("هذي ركيزتكم. اختاروا ركيزة ثانية أول، عشان ما نضيّع الحلم.");
       return;
@@ -185,64 +197,6 @@ export function Organizer() {
         <T style={{ color: c.muted }}>نرتّب اللَمّة…</T>
       </View>
     );
-  if (!group)
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={s.welcome}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Logo />
-          <Image
-            source={photos.fire}
-            style={{
-              width: "100%",
-              height: 250,
-              borderRadius: 32,
-              marginVertical: 15,
-            }}
-          />
-          <T weight="semibold" style={{ fontSize: 36, textAlign: "center" }}>
-            لَمّة على ذوق الجميع.
-          </T>
-          <T style={{ textAlign: "center", color: c.muted, lineHeight: 27 }}>
-            أنت تختار الركيزة. الربع يضيفون أذواقهم. وحاتم يرتّب الباقي على قدّ
-            وقتكم.
-          </T>
-          {error ? (
-            <>
-              <Notice warning text={error} />
-              <Button label="حاول مرة ثانية" onPress={organizer.restore} />
-            </>
-          ) : (
-            <Button
-              label="نبدأ لَمّتنا"
-              onPress={() => setProfile(true)}
-              icon={Users}
-            />
-          )}
-          <T style={{ color: c.muted, textAlign: "center", fontSize: 11 }}>
-            نسخة تجريبية · تجارب وأسعار توضيحية في الرياض
-          </T>
-        </ScrollView>
-        <Sheet
-          title="أول مكان على الطاولة لك"
-          visible={profile}
-          onClose={() => setProfile(false)}
-        >
-          <PreferencesForm
-            initial={emptyPreferences}
-            onSave={async (p) => {
-              await organizer.create(p);
-              setProfile(false);
-            }}
-            busy={busy}
-            label="نبدأ اللَمّة"
-          />
-        </Sheet>
-      </SafeAreaView>
-    );
-
   const nav = (
     <Row style={{ justifyContent: "space-around", gap: wide ? 24 : 0 }}>
       {tabs.map(({ key, title, icon: Icon }) => (
@@ -251,7 +205,7 @@ export function Organizer() {
           accessibilityRole={Platform.OS === "web" ? "tab" : "button"}
           accessibilityLabel={title}
           accessibilityState={{ selected: tab === key }}
-          onPress={() => navigate(key)}
+          onPress={() => (key === "circles" ? openGroups() : navigate(key))}
           style={[
             s.tab,
             wide && {
@@ -268,7 +222,7 @@ export function Organizer() {
               color={tab === key ? c.green : c.muted}
               strokeWidth={tab === key ? 2 : 1.6}
             />
-            {key === "pocket" && group.plan.pocket.length > 0 && (
+            {key === "pocket" && !!group?.plan.pocket.length && (
               <View style={s.badge}>
                 <T
                   style={{
@@ -278,7 +232,7 @@ export function Organizer() {
                     lineHeight: 12,
                   }}
                 >
-                  {ar(group.plan.pocket.length)}
+                  {ar(group?.plan.pocket.length ?? 0)}
                 </T>
               </View>
             )}
@@ -321,11 +275,11 @@ export function Organizer() {
                 }}
               />
             </View>
-            {wide && (
+            {wide && group && (
               <Pressable
                 onPress={() => navigate("group")}
                 accessibilityRole="button"
-                accessibilityLabel="مجموعتنا"
+                accessibilityLabel="رفقة الطلعة"
                 style={s.profile}
               >
                 <T weight="semibold">{group.members[0]?.preferences.name[0]}</T>
@@ -352,7 +306,18 @@ export function Organizer() {
             gap: 18,
           }}
         >
-          {error && <Notice warning text={error} />}
+          {error && (
+            <>
+              <Notice warning text={error} />
+              {!group && (
+                <Button
+                  secondary
+                  label="حاول مرة ثانية"
+                  onPress={organizer.restore}
+                />
+              )}
+            </>
+          )}
           {catalogError && (
             <>
               <Notice warning text={catalogError} />
@@ -369,25 +334,67 @@ export function Organizer() {
               onGroup={() => navigate("group")}
             />
           )}
-          {tab === "plan" && (
-            <PlanScreen
-              catalog={catalog}
-              group={group}
-              busy={busy}
-              update={update}
-              onOpen={setDetail}
-              onPocket={() => navigate("pocket")}
-            />
+          {!group && tab !== "discover" && (
+            <View style={{ gap: 20, paddingVertical: 20 }}>
+              <T weight="semibold" style={{ fontSize: 34 }}>
+                {tab === "pocket" ? "لها وقتها." : "خطة على قدّ وقتك."}
+              </T>
+              <T style={{ color: c.muted, lineHeight: 28 }}>
+                نبدأ بذوقك وقيودك وخانات وجباتك. اختر تجربة تستاهل تكون الركيزة،
+                ونرتّب الباقي مع أسباب واضحة. تقدر تعزم الرفقة في أي وقت.
+              </T>
+              <Notice text="تقدر تبدأ بنفسك، بدون حساب أو قروب دائم. القروبات خيار لحفظ الربع وطلعاتكم المتكررة." />
+              <Button
+                label="ابنِ خطتك"
+                icon={Sparkles}
+                disabled={!!error}
+                onPress={() => startPlanning()}
+              />
+              <Button
+                secondary
+                label="أكمل اكتشاف التجارب"
+                onPress={() => navigate("discover")}
+              />
+            </View>
           )}
-          {tab === "group" && (
-            <GroupScreen
-              group={group}
-              onInvite={() => setInvite(true)}
-              onEdit={() => setProfile(true)}
-              onRemove={setRemove}
-            />
+          {tab === "plan" && group && (
+            <>
+              <Button
+                secondary
+                small
+                label="رفقة الطلعة وذوقي"
+                icon={Users}
+                onPress={() => navigate("group")}
+              />
+              <PlanScreen
+                catalog={catalog}
+                group={group}
+                busy={busy}
+                update={update}
+                onOpen={setDetail}
+                onPocket={() => navigate("pocket")}
+              />
+            </>
           )}
-          {tab === "pocket" && (
+          {tab === "group" && group && (
+            <>
+              <Button
+                secondary
+                small
+                label="رجوع إلى الخطة"
+                onPress={() => navigate("plan")}
+              />
+              <GroupScreen
+                group={group}
+                onInvite={() => setInvite(true)}
+                onEdit={() => setProfile(true)}
+                onRemove={setRemove}
+              />
+              <Notice text="رفقة هذه الطلعة تقدر تنضم بالرابط بدون حساب. إذا تتكرر طلعاتكم، قروباتي تحفظ أعضاءكم وتضيف التصويت والقرعة." />
+              <Button secondary label="افتح قروباتي" onPress={openGroups} />
+            </>
+          )}
+          {tab === "pocket" && group && (
             <View style={{ gap: 23 }}>
               <View>
                 <T style={{ color: c.muted, fontSize: 12 }}>
@@ -485,106 +492,171 @@ export function Organizer() {
       )}
 
       <Sheet
-        title={detail?.title ?? ""}
-        visible={!!detail}
-        onClose={() => setDetail(null)}
+        title={
+          profile
+            ? group
+              ? "ذوقك له مكان"
+              : "خطتك تبدأ بذوقك"
+            : (detail?.title ?? "")
+        }
+        visible={profile || !!detail}
+        onClose={() => {
+          if (!busy) {
+            setProfile(false);
+            setDetail(null);
+            setStartIntent(null);
+          }
+        }}
       >
-        {detail && (
+        {profile ? (
           <>
-            <Image
-              source={photos[detail.image]}
-              style={{ height: 230, width: "100%", borderRadius: 22 }}
-            />
-            <Row style={{ justifyContent: "space-between" }}>
-              <Chip label={detail.category} />
-              <T style={{ color: c.muted, fontSize: 12 }}>
-                {detail.venue} · {detail.neighborhood}
-              </T>
-            </Row>
-            <T style={{ lineHeight: 29, fontSize: 16 }}>{detail.description}</T>
-            <Row>
-              <Chip label={`${ar(detail.price)} ر.س / شخص`} />
-              <Chip label={`${ar(detail.minutes)} دقيقة`} />
-            </Row>
-            <Notice text={`ليش اخترناها؟ ${detail.why}`} />
-            {group.plan.pocket.find((x) => x.experience_id === detail.id)
-              ?.blocked && (
-              <Notice
-                warning
-                text={
-                  group.plan.pocket.find((x) => x.experience_id === detail.id)!
-                    .reason
-                }
-              />
-            )}
-            {group.plan.selected
-              .find((x) => x.experience_id === detail.id)
-              ?.adaptations?.map((text, i) => (
-                <Notice key={i} text={text} />
-              ))}
-            {!group.settings.completed_ids?.includes(detail.id) && (
+            {!group && (
               <>
-                <Button
-                  label={
-                    group.settings.anchor_id === detail.id
-                      ? "حرّر الركيزة من الخطة"
-                      : "هذه ركيزة لَمّتنا"
-                  }
-                  icon={Sparkles}
-                  busy={busy}
-                  onPress={async () => {
-                    try {
-                      await organizer.settings({
-                        ...group.settings,
-                        anchor_id:
-                          group.settings.anchor_id === detail.id
-                            ? null
-                            : detail.id,
-                        pocket_ids: group.settings.pocket_ids?.filter(
-                          (id) => id !== detail.id,
-                        ),
-                      });
-                      setDetail(null);
-                      navigate("plan");
-                    } catch {}
+                <Notice text="نراعي ذوقك وقيودك قبل ترتيب الخطة. تضيف رفقة هذه الطلعة لاحقًا، والقروب الدائم اختياري." />
+                <T weight="semibold">كم خانة وجبات عندك؟</T>
+                <View
+                  style={{
+                    flexDirection: "row-reverse",
+                    flexWrap: "wrap",
+                    gap: 8,
                   }}
-                />
-                <Button
-                  secondary
-                  label={
-                    group.settings.pocket_ids?.includes(detail.id)
-                      ? "أرجعها للترتيب"
-                      : "خليها في الجيب"
-                  }
-                  icon={Bookmark}
-                  disabled={busy || group.settings.anchor_id === detail.id}
-                  onPress={() => save(detail)}
-                />
+                >
+                  {[1, 3, 5, 9].map((slots) => (
+                    <Chip
+                      key={slots}
+                      label={slots === 1 ? "عشاء واحد" : `${ar(slots)} خانات`}
+                      selected={initialSlots === slots}
+                      onPress={() => setInitialSlots(slots)}
+                    />
+                  ))}
+                </View>
+                {startIntent && (
+                  <Notice
+                    text={`اختيارك محفوظ: ${catalog.find((e) => e.id === startIntent.id)?.title ?? "التجربة"} ${startIntent.kind === "anchor" ? "ستكون الركيزة" : "ستُحفظ في الجيب"}.`}
+                  />
+                )}
               </>
             )}
-            <T style={{ color: c.muted, fontSize: 11, lineHeight: 21 }}>
-              تجربة توضيحية. معلومات الحساسية والتوافر غير موثّقة، ولا يتم إجراء
-              حجز.
-            </T>
+            <PreferencesForm
+              initial={
+                group?.members.find((m) => m.organizer)?.preferences ??
+                emptyPreferences
+              }
+              busy={busy}
+              label={group ? "حفظ ذوقي" : "ابنِ خطتي"}
+              onSave={async (preferences) => {
+                if (group) await organizer.profile(preferences);
+                else {
+                  await organizer.create(preferences, {
+                    slots: initialSlots,
+                    anchor_id:
+                      startIntent?.kind === "anchor" ? startIntent.id : null,
+                    pocket_ids:
+                      startIntent?.kind === "pocket" ? [startIntent.id] : [],
+                    completed_ids: [],
+                  });
+                  navigate(startIntent?.kind === "pocket" ? "pocket" : "plan");
+                }
+                setProfile(false);
+                setDetail(null);
+                setStartIntent(null);
+              }}
+            />
           </>
+        ) : (
+          detail && (
+            <>
+              <Image
+                source={photos[detail.image]}
+                style={{ height: 230, width: "100%", borderRadius: 22 }}
+              />
+              <Row style={{ justifyContent: "space-between" }}>
+                <Chip label={detail.category} />
+                <T style={{ color: c.muted, fontSize: 12 }}>
+                  {detail.venue} · {detail.neighborhood}
+                </T>
+              </Row>
+              <T style={{ lineHeight: 29, fontSize: 16 }}>
+                {detail.description}
+              </T>
+              <Row>
+                <Chip label={`${ar(detail.price)} ر.س / شخص`} />
+                <Chip label={`${ar(detail.minutes)} دقيقة`} />
+              </Row>
+              <Notice text={`ليش اخترناها؟ ${detail.why}`} />
+              {error && <Notice warning text={error} />}
+              {group?.plan.pocket.find((x) => x.experience_id === detail.id)
+                ?.blocked && (
+                <Notice
+                  warning
+                  text={
+                    group?.plan.pocket.find(
+                      (x) => x.experience_id === detail.id,
+                    )!.reason
+                  }
+                />
+              )}
+              {group?.plan.selected
+                .find((x) => x.experience_id === detail.id)
+                ?.adaptations?.map((text, i) => (
+                  <Notice key={i} text={text} />
+                ))}
+              {!group?.settings.completed_ids?.includes(detail.id) && (
+                <>
+                  <Button
+                    label={
+                      group?.settings.anchor_id === detail.id
+                        ? "حرّر الركيزة من الخطة"
+                        : "هذه ركيزة خطتي"
+                    }
+                    icon={Sparkles}
+                    busy={busy}
+                    disabled={!group && !!error}
+                    onPress={async () => {
+                      if (!group) {
+                        startPlanning({ kind: "anchor", id: detail.id });
+                        return;
+                      }
+                      try {
+                        await organizer.settings({
+                          ...group.settings,
+                          anchor_id:
+                            group?.settings.anchor_id === detail.id
+                              ? null
+                              : detail.id,
+                          pocket_ids: group.settings.pocket_ids?.filter(
+                            (id) => id !== detail.id,
+                          ),
+                        });
+                        setDetail(null);
+                        navigate("plan");
+                      } catch {}
+                    }}
+                  />
+                  <Button
+                    secondary
+                    label={
+                      group?.settings.pocket_ids?.includes(detail.id)
+                        ? "أرجعها للترتيب"
+                        : "خليها في الجيب"
+                    }
+                    icon={Bookmark}
+                    disabled={
+                      busy ||
+                      (!group && !!error) ||
+                      group?.settings.anchor_id === detail.id
+                    }
+                    onPress={() => save(detail)}
+                  />
+                </>
+              )}
+              <T style={{ color: c.muted, fontSize: 11, lineHeight: 21 }}>
+                تجربة توضيحية. معلومات الحساسية والتوافر غير موثّقة، ولا يتم
+                إجراء حجز.
+              </T>
+            </>
+          )
         )}
-      </Sheet>
-      <Sheet
-        title="ذوقك له مكان"
-        visible={profile}
-        onClose={() => setProfile(false)}
-      >
-        <PreferencesForm
-          initial={
-            group.members.find((m) => m.organizer)?.preferences ??
-            emptyPreferences
-          }
-          onSave={async (p) => {
-            await organizer.profile(p);
-            setProfile(false);
-          }}
-          busy={busy}
-        />
       </Sheet>
       <Sheet
         title="لكم مكان على الطاولة"
@@ -657,14 +729,6 @@ export function Organizer() {
 
 const s = StyleSheet.create({
   loading: { flex: 1, alignItems: "center", justifyContent: "center", gap: 20 },
-  welcome: {
-    padding: 27,
-    gap: 17,
-    maxWidth: 520,
-    alignSelf: "center",
-    width: "100%",
-    paddingBottom: 50,
-  },
   header: {
     paddingHorizontal: 22,
     borderBottomWidth: 1,

@@ -1,12 +1,14 @@
 # حاتم · Hatim
 
-An Arabic-first React Native app for a group choosing food experiences within a limited number of meal slots. The organizer uses the iPhone app; invited members use a browser link.
+An Arabic-first React Native app for choosing food experiences within a limited number of meal slots. Discovery, an adaptable plan and the pocket are the core; persistent groups are an optional feature. The organizer uses the iPhone app; invited members use a browser link.
 
-This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The new group API lives under `/api/v2`; legacy group endpoints remain available for groups that have not been linked to an account. The original planner is reused.
+This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The persistent-group API lives under `/api/v2`; direct planning endpoints work without an account or persistent group. Both use the same planner.
 
-For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes 13 lessons, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). The 48-file codebook preserves revision `59d45d3`; the [new social-features chapter](docs/learning-python-postgres/13-social-groups.ar.md) explains the current implementation separately.
+For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes the original lessons plus chapters on subsequent changes, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). The 48-file codebook preserves revision `59d45d3`; newer chapters describe later code explicitly.
 
-Implemented here: accounts, persistent groups with saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
+The iPhone opens discovery without asking for an account. Starting a plan, choosing an anchor or saving a pocket item opens preferences and meal slots. **قروباتي** opens the saved-group feature with a route back to discovery. See [the core-flow explanation](docs/learning-python-postgres/15-experiences-first.ar.md) and [direct planning API](docs/api-planning.ar.md).
+
+Optional group features: accounts, saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
 
 ## Start locally
 
@@ -45,7 +47,7 @@ The script starts a temporary Cloudflare tunnel, saves its HTTPS origin in the r
 
 Leave the terminal open. Ctrl+C stops only the API/tunnel processes started by the script; PostgreSQL keeps running. If cloudflared is not on PATH, `.tools/cloudflared` is also supported. Only the HTTP API is tunneled, never the PostgreSQL port.
 
-In the native app use **لَمّاتي → القروب → اعزم الربع** to copy the real `/join/<random-code>` link. The root website is the invitation entry, not organizer administration. The Mac, database, API, and tunnel must remain running. Quick Tunnel origins change on restart: rebuild the native app with the new origin and share the refreshed invitation URL. Group IDs and invitation codes remain in PostgreSQL.
+For the current plan use **خطّتنا → رفقة الطلعة وذوقي → اعزم الربع**. For a persistent group use **قروباتي → القروب → اعزم الربع**. Both copy a real `/join/<random-code>` link; direct companions do not need accounts, while persistent-group members do. The root website remains the invitation entry. The Mac, database, API, and tunnel must remain running. Quick Tunnel origins change on restart: rebuild the native app with the new origin and share the refreshed invitation URL. IDs and invitation codes remain in PostgreSQL.
 
 ## iPhone and Simulator
 

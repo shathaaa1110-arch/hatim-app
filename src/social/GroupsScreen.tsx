@@ -29,12 +29,14 @@ export function GroupsScreen({
   open,
   logout,
   claim,
+  back,
 }: {
   token: string;
   account: Account;
   open: (id: string) => void;
   logout: () => Promise<void>;
   claim?: () => Promise<string>;
+  back?: () => void;
 }) {
   const read = useCallback(() => social.groups(token), [token]);
   const remote = useRemote(read);
@@ -47,6 +49,7 @@ export function GroupsScreen({
     <Page
       title={`يا هلا، ${account.name}`}
       subtitle="نفس الربع. طلعة جديدة كل مرة."
+      back={back}
       action={
         <IconButton
           icon={LogOut}
