@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import { isDevice } from "expo-device";
 import type { components } from "./schema";
 
 export type Preferences = components["schemas"]["Preferences"];
@@ -10,13 +11,19 @@ export type Decision = components["schemas"]["Decision"];
 export type Invite = components["schemas"]["InviteView"];
 export type Session = { groupId: string; token: string };
 
-// Web shares the API origin. Native is configured with the tunnel/LAN origin at build time.
+const configuredOrigin =
+  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
+
+// The iOS simulator reaches the Mac directly, even when the public tunnel stops.
 export const API_ORIGIN =
   Platform.OS === "web"
     ? ""
-    : (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000");
+    : Platform.OS === "ios" && !isDevice
+      ? "http://localhost:8000"
+      : configuredOrigin;
+// Invitations still need the public address, including when copied in the simulator.
 export const PUBLIC_ORIGIN =
-  Platform.OS === "web" ? window.location.origin : API_ORIGIN;
+  Platform.OS === "web" ? window.location.origin : configuredOrigin;
 
 export class ApiError extends Error {
   constructor(

@@ -8,7 +8,11 @@ Category = Literal["مطابخ جديدة", "كنوز مخفية", "افتتاح
 
 
 class Model(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, strict=True)
+
+
+class ErrorResponse(Model):
+    detail: str
 
 
 class Preferences(Model):
@@ -67,6 +71,8 @@ class Settings(Model):
             raise ValueError("The anchor cannot be moved to the pocket")
         if set(self.pocket_ids) & set(self.completed_ids):
             raise ValueError("A completed experience cannot be in the pocket")
+        if any(not value for value in self.pocket_ids + self.completed_ids):
+            raise ValueError("Experience IDs must not be empty")
         return self
 
 

@@ -5,13 +5,41 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 process.chdir(root);
-// Fail before starting a new tunnel if an existing backend owns the port.
-await new Promise((resolve, reject) => {
+// Reuse a healthy Hatim backend when only its temporary tunnel needs restarting.
+const reuseBackend = await new Promise((resolve, reject) => {
   const server = createServer();
   server.once("error", reject);
-  server.listen(8000, "127.0.0.1", () => server.close(resolve));
-}).catch(() => {
-  console.error("Port 8000 is in use. Stop the previous test server first.");
+  server.listen(8000, "127.0.0.1", () => server.close(() => resolve(false)));
+}).catch(async (error) => {
+  if (error.code === "EADDRINUSE") {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/health", {
+        signal: AbortSignal.timeout(3000),
+      });
+      const health = await response.json();
+      if (
+        response.ok &&
+        health.status === "ok" &&
+        health.version === "1.0.0" &&
+        health.backend === "python" &&
+        health.database === "postgresql" &&
+        health.catalog_mode === "fictional-demo"
+      ) {
+        const web = await fetch("http://127.0.0.1:8000/", {
+          signal: AbortSignal.timeout(3000),
+        });
+        if (web.ok && web.headers.get("content-type")?.includes("text/html")) {
+          console.log("Reusing the running Hatim API on port 8000.");
+          return true;
+        }
+      }
+    } catch {
+      // A busy port alone does not identify a usable Hatim backend.
+    }
+  }
+  console.error(
+    "Port 8000 is unavailable or is not serving Hatim and its web companion. Stop that server, then retry.",
+  );
   process.exit(1);
 });
 
@@ -93,28 +121,39 @@ if (!closing) {
     ".env.local",
     `${otherSettings}${otherSettings ? "\n" : ""}EXPO_PUBLIC_API_URL=${origin}\n`,
   );
+  const compile = launch("uv", ["sync", "--project", "backend", "--locked"]);
+  const compiled = await new Promise((resolve) =>
+    compile.once("exit", resolve),
+  );
+  if (compiled !== 0) stop(1);
+}
+if (!closing) {
   const build = launch("npm", ["run", "web:build"]);
   const code = await new Promise((resolve) => build.once("exit", resolve));
   if (code !== 0) stop(1);
   else {
-    const server = launch("uv", [
-      "run",
-      "--project",
-      "backend",
-      "uvicorn",
-      "hatim.main:app",
-      "--app-dir",
-      "backend",
-      "--host",
-      "127.0.0.1",
-      "--port",
-      "8000",
-    ]);
-    server.on("exit", () => {
-      if (!closing) stop(1);
-    });
+    if (!reuseBackend) {
+      const server = launch("uv", [
+        "run",
+        "--project",
+        "backend",
+        "--env-file",
+        "backend/.env.local",
+        "uvicorn",
+        "hatim.main:app",
+        "--app-dir",
+        "backend",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000",
+      ]);
+      server.on("exit", () => {
+        if (!closing) stop(1);
+      });
+    }
     console.log(
-      `\nPublic companion: ${origin}\nNative API origin saved to .env.local. Rebuild the iPhone app after a tunnel URL changes.\nKeep this terminal open. Ctrl+C stops both services.\n`,
+      `\nPublic companion: ${origin}\nPublic origin saved to .env.local. Rebuild the native app to update invitations and the physical iPhone connection. The iOS simulator uses localhost.\nKeep this terminal open. Ctrl+C stops the tunnel${reuseBackend ? "; the existing API keeps running" : " and API"}.\n`,
     );
   }
 }

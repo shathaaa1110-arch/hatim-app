@@ -1,46 +1,60 @@
+"""PostgreSQL persistence. Each operation owns one connection and transaction."""
+
 import hashlib
 import os
-import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
+
+import psycopg
+from psycopg.rows import dict_row
 
 
 def digest(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def database_path() -> Path:
-    return Path(os.environ.get("HATIM_DB", Path(__file__).parents[1] / "data" / "hatim.sqlite3"))
+def database_url() -> str:
+    value = os.environ.get("DATABASE_URL")
+    if not value:
+        raise RuntimeError("DATABASE_URL is required. Run npm run db:up or configure PostgreSQL.")
+    return value
 
 
 @contextmanager
-def connect():
-    db = sqlite3.connect(database_path(), timeout=10)
-    db.row_factory = sqlite3.Row
-    db.execute("PRAGMA foreign_keys=ON")
-    try:
-        with db:
-            yield db
-    finally:
-        db.close()
+def connect(*, read_only: bool = False):
+    with psycopg.connect(database_url(), row_factory=dict_row, connect_timeout=5) as db:
+        # Read responses use one snapshot. Writers lock their group before any changes.
+        if read_only:
+            db.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+        db.execute("SET LOCAL statement_timeout = '10s'")
+        db.execute("SET LOCAL lock_timeout = '10s'")
+        yield db
 
 
 def initialize():
-    database_path().parent.mkdir(parents=True, exist_ok=True)
+    migrations = Path(__file__).parents[1] / "migrations"
     with connect() as db:
-        db.execute("PRAGMA journal_mode=WAL")
-        db.executescript("""
-            CREATE TABLE IF NOT EXISTS groups (
-                id TEXT PRIMARY KEY, title TEXT NOT NULL,
-                invite_code TEXT UNIQUE NOT NULL, owner_hash TEXT UNIQUE NOT NULL,
-                settings TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS members (
-                id TEXT PRIMARY KEY, group_id TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
-                token_hash TEXT UNIQUE NOT NULL, preferences TEXT NOT NULL,
-                organizer INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE INDEX IF NOT EXISTS members_group ON members(group_id);
-            PRAGMA user_version=1;
+        # Serialize startup across workers, including first-time schema creation.
+        db.execute("SELECT pg_advisory_xact_lock(734821910)")
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+                version TEXT PRIMARY KEY,
+                checksum TEXT NOT NULL,
+                applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
         """)
+        for file in sorted(migrations.glob("*.sql")):
+            source = file.read_text(encoding="utf-8")
+            checksum = digest(source)
+            applied = db.execute(
+                "SELECT checksum FROM schema_migrations WHERE version=%s", (file.name,)
+            ).fetchone()
+            if applied:
+                if applied["checksum"] != checksum:
+                    raise RuntimeError(f"Applied migration changed: {file.name}")
+                continue
+            db.execute(source)
+            db.execute(
+                "INSERT INTO schema_migrations(version,checksum) VALUES(%s,%s)",
+                (file.name, checksum),
+            )

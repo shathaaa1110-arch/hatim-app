@@ -204,6 +204,11 @@ export interface components {
       /** Score */
       score: number;
     };
+    /** ErrorResponse */
+    ErrorResponse: {
+      /** Detail */
+      detail: string;
+    };
     /** Experience */
     Experience: {
       /** Id */
@@ -293,11 +298,6 @@ export interface components {
       /** Members */
       members: components["schemas"]["Member"][];
       plan: components["schemas"]["Plan"];
-    };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
     };
     /** InviteView */
     InviteView: {
@@ -417,19 +417,6 @@ export interface components {
       /** Completed Ids */
       completed_ids?: string[];
     };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-      /** Input */
-      input?: unknown;
-      /** Context */
-      ctx?: Record<string, never>;
-    };
   };
   responses: never;
   parameters: never;
@@ -457,6 +444,15 @@ export interface operations {
           "application/json": unknown;
         };
       };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
     };
   };
   experiences_api_experiences_get: {
@@ -475,6 +471,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Experience"][];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -501,13 +506,13 @@ export interface operations {
           "application/json": components["schemas"]["GroupCreated"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -534,13 +539,13 @@ export interface operations {
           "application/json": components["schemas"]["GroupView"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -571,13 +576,13 @@ export interface operations {
           "application/json": components["schemas"]["GroupView"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -608,13 +613,13 @@ export interface operations {
           "application/json": components["schemas"]["GroupView"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -642,13 +647,13 @@ export interface operations {
           "application/json": components["schemas"]["GroupView"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -673,13 +678,13 @@ export interface operations {
           "application/json": components["schemas"]["InviteView"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -708,13 +713,13 @@ export interface operations {
           "application/json": components["schemas"]["MemberCreated"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -741,13 +746,13 @@ export interface operations {
           "application/json": components["schemas"]["Member"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };
@@ -778,13 +783,13 @@ export interface operations {
           "application/json": components["schemas"]["Member"];
         };
       };
-      /** @description Validation Error */
+      /** @description Invalid request */
       422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["ErrorResponse"];
         };
       };
     };

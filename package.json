@@ -21,7 +21,8 @@
     "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-svg": "15.15.4",
-    "react-native-web": "^0.21.2"
+    "react-native-web": "^0.21.2",
+    "expo-device": "~57.0.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
@@ -37,14 +38,18 @@
     "ios:release": "expo run:ios --configuration Release",
     "web:build": "expo export --platform web",
     "typecheck": "tsc --noEmit",
-    "api": "uv run --project backend uvicorn hatim.main:app --app-dir backend --host 127.0.0.1 --port 8000",
-    "test:api": "uv run --project backend pytest backend/tests -q",
+    "api": "uv run --project backend --env-file backend/.env.local uvicorn hatim.main:app --app-dir backend --host 127.0.0.1 --port 8000",
+    "test:api": "uv run --project backend --env-file backend/.env.local pytest backend/tests -q",
     "test:e2e": "playwright test",
     "types:api": "node scripts/generate-types.mjs",
     "check": "npm run typecheck && npm run test:api",
     "public:test": "node scripts/public-test.mjs",
     "format": "prettier --write App.tsx src tests scripts/*.mjs playwright.config.ts",
-    "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts"
+    "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts",
+    "db:up": "node scripts/database.mjs up",
+    "db:stop": "node scripts/database.mjs stop",
+    "db:status": "node scripts/database.mjs status",
+    "db:import": "uv run --directory backend --env-file .env.local python -m hatim.import_sqlite"
   },
   "private": true,
   "overrides": {

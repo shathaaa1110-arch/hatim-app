@@ -1,9 +1,21 @@
+import json
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
 from hatim.catalog import CATALOG
-from hatim.models import Member, Preferences, Settings
+from hatim.models import Member, Plan, Preferences, Settings
 from hatim.planner import build_plan, evaluate
+
+CASES = json.loads((Path(__file__).parent / "fixtures" / "planner-parity.json").read_text())
+
+
+@pytest.mark.parametrize("case", CASES, ids=[str(index) for index in range(len(CASES))])
+def test_existing_decisions_are_preserved(case):
+    people = [Member.model_validate(member) for member in case["members"]]
+    settings = Settings.model_validate(case["settings"])
+    assert build_plan(CATALOG, people, settings) == Plan.model_validate(case["plan"])
 
 
 def member(**kwargs):

@@ -1,16 +1,3 @@
-import pytest
-from fastapi.testclient import TestClient
-
-from hatim.main import app
-
-
-@pytest.fixture
-def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("HATIM_DB", str(tmp_path / "test.sqlite3"))
-    with TestClient(app) as client:
-        yield client
-
-
 def create(client):
     response = client.post("/api/groups", json={"preferences": {"name": "المنظّم"}})
     assert response.status_code == 201
