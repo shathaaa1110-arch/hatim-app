@@ -30,6 +30,8 @@ export const social = {
       password,
     }),
   me: (token: string) => call<Account>("/auth/me", token),
+  updateMe: (token: string, name: string) =>
+    call<Account>("/auth/me", token, "PUT", { name }),
   logout: (token: string) => call("/auth/logout", token, "POST"),
   catalog: () => call<Experience[]>("/experiences"),
   groups: (token: string) => call<CircleSummary[]>("/groups", token),

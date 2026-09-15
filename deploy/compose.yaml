@@ -1,0 +1,18 @@
+# For a host with an existing PostgreSQL service and HTTPS reverse proxy.
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set the hosted PostgreSQL connection string}
+      HATIM_CORS_ORIGINS: ${HATIM_CORS_ORIGINS:-}
+    ports:
+      - "127.0.0.1:${HATIM_HTTP_PORT:-8000}:8000"
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true

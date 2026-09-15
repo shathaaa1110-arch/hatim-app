@@ -10,6 +10,7 @@ export type Member = components["schemas"]["Member"];
 export type Decision = components["schemas"]["Decision"];
 export type Invite = components["schemas"]["InviteView"];
 export type Session = { groupId: string; token: string };
+export type PlanSummary = components["schemas"]["PlanSummary"];
 
 const configuredOrigin =
   process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -88,18 +89,37 @@ export async function request<T>(
 
 export const api = {
   catalog: () => request<Experience[]>("/experiences"),
-  create: (preferences: Preferences, settings?: Settings) =>
+  create: (preferences: Preferences, settings?: Settings, token?: string) =>
     request<components["schemas"]["GroupCreated"]>("/groups", {
       method: "POST",
+      token,
       body: { preferences, settings },
+    }),
+  plans: (token: string) => request<PlanSummary[]>("/groups", { token }),
+  saveToAccount: (s: Session, token: string) =>
+    request<Group>(`/groups/${s.groupId}/account`, {
+      method: "PUT",
+      token,
+      body: { owner_token: s.token },
+    }),
+  rename: (s: Session, title: string) =>
+    request<Group>(`/groups/${s.groupId}/title`, {
+      method: "PUT",
+      token: s.token,
+      body: { title },
+    }),
+  deletePlan: (s: Session) =>
+    request<{ ok: boolean }>(`/groups/${s.groupId}`, {
+      method: "DELETE",
+      token: s.token,
     }),
   group: (s: Session) =>
     request<Group>(`/groups/${s.groupId}`, { token: s.token }),
-  settings: (s: Session, body: Settings) =>
+  settings: (s: Session, body: Settings, expected: Settings) =>
     request<Group>(`/groups/${s.groupId}/settings`, {
       method: "PUT",
       token: s.token,
-      body,
+      body: { ...body, expected },
     }),
   profile: (s: Session, body: Preferences) =>
     request<Group>(`/groups/${s.groupId}/profile`, {

@@ -17,8 +17,11 @@
 | `POST /auth/register` | handle، password، name | 201 AccountSession |
 | `POST /auth/login` | handle، password | AccountSession |
 | `GET /auth/me` | جلسة | Account |
+| `PUT /auth/me` | جلسة وname من1 إلى30 حرفًا | تعديل اسم العرض للحساب نفسه، ثم Account |
 | `POST /auth/logout` | جلسة، حتى لو منتهية | `{ok: true}` وإلغاء مفتاحها |
 | `GET /experiences` | عام | Experience[] من PostgreSQL |
+
+المصادقة مشتركة بين «حسابي» والقروبات والتخطيط المباشر المحفوظ، رغم بقاء اسم مساراتها /api/v2/auth للتوافق. لا يغير تعديل اسم الحساب تفضيلات رفقة أو عضويات سابقة بصمت؛ لكل منها Preferences مستقلة. مصدر الكتالوج موحد في experience_store.py بين الاكتشاف والتخطيط المباشر والطلعات. حفظ خطة ضيف للحساب دون قروب موثق في [API التخطيط](api-planning.ar.md)، وهو مختلف عن legacy/claim.
 
 ## القروبات
 

@@ -10,8 +10,7 @@ import { CircleScreen } from "./CircleScreen";
 import { OutingScreen } from "./OutingScreen";
 import { ErrorNotice, Loading, Page, Panel } from "./ui";
 import { useRemote } from "./useRemote";
-
-const sessionKey = "hatim.account.v1";
+import { useAccount } from "../account/AccountProvider";
 
 function Join({
   code,
@@ -126,53 +125,35 @@ export function SocialApp({
   inviteCode?: string | null;
   onExit?: () => void;
 }) {
-  const [session, setSession] = useState<AccountSession | null>(null);
+  const {
+    session,
+    loading,
+    error,
+    restore,
+    signIn: onAuth,
+    signOut,
+  } = useAccount();
   const [legacy, setLegacy] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [circle, setCircle] = useState<string | null>(null);
   const [outing, setOuting] = useState<string | null>(null);
   const [joined, setJoined] = useState(false);
-  const restore = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [token, previous] = await Promise.all([
-        storage.get(sessionKey),
-        readSession(),
-      ]);
-      setLegacy(previous);
-      if (token) {
-        try {
-          setSession({ token, account: await social.me(token) });
-        } catch (e) {
-          if (e instanceof ApiError && e.status === 401) {
-            await storage.remove(sessionKey);
-            setSession(null);
-          } else throw e;
-        }
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "تعذّرت استعادة حسابك.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
   useEffect(() => {
-    void restore();
-  }, [restore]);
-  const onAuth = async (next: AccountSession) => {
-    await storage.set(sessionKey, next.token);
-    setSession(next);
-  };
+    let alive = true;
+    void readSession()
+      .then((value) => {
+        if (alive) setLegacy(value);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
   const open = useCallback((id: string) => {
     setCircle(id);
     setJoined(true);
   }, []);
   const logout = async () => {
-    if (session) await social.logout(session.token);
-    await storage.remove(sessionKey);
-    setSession(null);
+    await signOut();
     setCircle(null);
     setOuting(null);
     setJoined(false);

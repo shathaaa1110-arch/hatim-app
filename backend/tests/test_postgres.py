@@ -63,7 +63,7 @@ def test_migrations_are_repeatable_and_detect_edited_history(database):
     initialize()
     initialize()
     with connect() as db:
-        assert db.execute("SELECT COUNT(*) AS n FROM schema_migrations").fetchone()["n"] == 2
+        assert db.execute("SELECT COUNT(*) AS n FROM schema_migrations").fetchone()["n"] == 3
         db.execute("UPDATE schema_migrations SET checksum='changed'")
     with pytest.raises(RuntimeError, match="Applied migration changed"):
         initialize()

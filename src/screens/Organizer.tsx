@@ -25,6 +25,7 @@ import {
   Share2,
   Sparkles,
   Users,
+  UserRound,
   Utensils,
   X,
 } from "lucide-react-native";
@@ -53,6 +54,8 @@ import { ExperienceCard } from "../components/ExperienceCard";
 import { Discover } from "./Discover";
 import { GroupScreen } from "./GroupScreen";
 import { PlanScreen } from "./PlanScreen";
+import { Field } from "../social/ui";
+import { useAccount } from "../account/AccountProvider";
 
 type Tab = "discover" | "plan" | "pocket" | "group";
 type StartIntent = { kind: "anchor" | "pocket"; id: string };
@@ -85,14 +88,27 @@ export function Logo() {
   );
 }
 
-export function Organizer({ openGroups }: { openGroups: () => void }) {
+export function Organizer({
+  openGroups,
+  openAccount,
+  start = "discover",
+}: {
+  openGroups: () => void;
+  openAccount: () => void;
+  start?: "discover" | "plan" | "new";
+}) {
+  const account = useAccount();
   const organizer = useOrganizer();
   const { group, loading, busy, error } = organizer;
   const [catalog, setCatalog] = useState<Experience[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("discover");
+  const [tab, setTab] = useState<Tab>(
+    start === "discover" ? "discover" : "plan",
+  );
   const [detail, setDetail] = useState<Experience | null>(null);
-  const [profile, setProfile] = useState(false);
+  const [profile, setProfile] = useState(start === "new");
+  const [manage, setManage] = useState<"title" | "delete" | null>(null);
+  const [planTitle, setPlanTitle] = useState("");
   const [startIntent, setStartIntent] = useState<StartIntent | null>(null);
   const [initialSlots, setInitialSlots] = useState(9);
   const startPlanning = (intent: StartIntent | null = null) => {
@@ -261,6 +277,15 @@ export function Organizer({ openGroups }: { openGroups: () => void }) {
           </Pressable>
           {wide && nav}
           <Row>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="حسابي"
+              onPress={openAccount}
+              style={{ alignItems: "center", gap: 3, padding: 7 }}
+            >
+              <UserRound color={c.green} size={21} />
+              <T style={{ fontSize: 10 }}>حسابي</T>
+            </Pressable>
             <View style={s.location}>
               <MapPin size={13} color={c.green} />
               <T weight="medium" style={{ fontSize: 12 }}>
@@ -359,6 +384,22 @@ export function Organizer({ openGroups }: { openGroups: () => void }) {
           )}
           {tab === "plan" && group && (
             <>
+              <Button
+                secondary
+                small
+                label="إدارة الخطة"
+                onPress={() => {
+                  setPlanTitle(group.title);
+                  setManage("title");
+                }}
+              />
+              <Notice
+                text={
+                  group.owner_account_id
+                    ? "هذه الخطة محفوظة في حسابك."
+                    : "هذه الخطة على هذا الجهاز. افتح حسابي لحفظها والوصول إليها من أجهزتك."
+                }
+              />
               <Button
                 secondary
                 small
@@ -539,8 +580,10 @@ export function Organizer({ openGroups }: { openGroups: () => void }) {
             )}
             <PreferencesForm
               initial={
-                group?.members.find((m) => m.organizer)?.preferences ??
-                emptyPreferences
+                group?.members.find((m) => m.organizer)?.preferences ?? {
+                  ...emptyPreferences,
+                  name: account.session?.account.name ?? "",
+                }
               }
               busy={busy}
               label={group ? "حفظ ذوقي" : "ابنِ خطتي"}
@@ -699,6 +742,73 @@ export function Organizer({ openGroups }: { openGroups: () => void }) {
         />
         <Button secondary label="مشاركة الدعوة" icon={Share2} onPress={share} />
         <Notice text="كل شخص يعدّل بياناته من نفس المتصفح. المنظّم يشوف القيود، والأعضاء يشوفون الخطة وأسماء اللَمّة." />
+      </Sheet>
+      <Sheet
+        title={manage === "delete" ? "حذف الخطة؟" : "إدارة الخطة"}
+        visible={!!manage}
+        onClose={() => {
+          if (!busy) setManage(null);
+        }}
+      >
+        {manage === "delete" ? (
+          <>
+            <Notice
+              warning
+              text="ستُحذف هذه الخطة والجيب وبيانات رفقتها نهائيًا، ويتوقف رابط دعوتها. خططك الأخرى وقروباتك تبقى محفوظة."
+            />
+            {error && <Notice warning text={error} />}
+            <Button
+              label="نعم، احذف الخطة نهائيًا"
+              busy={busy}
+              onPress={async () => {
+                try {
+                  await organizer.deletePlan();
+                  setManage(null);
+                  navigate("discover");
+                } catch {}
+              }}
+            />
+            <Button
+              secondary
+              label="إلغاء الحذف"
+              disabled={busy}
+              onPress={() => setManage("title")}
+            />
+          </>
+        ) : (
+          <>
+            <Field
+              label="اسم الخطة"
+              value={planTitle}
+              onChangeText={setPlanTitle}
+              maxLength={60}
+            />
+            {error && <Notice warning text={error} />}
+            <Button
+              label="حفظ اسم الخطة"
+              busy={busy}
+              disabled={!planTitle.trim()}
+              onPress={async () => {
+                try {
+                  await organizer.rename(planTitle.trim());
+                  setManage(null);
+                } catch {}
+              }}
+            />
+            <Button
+              secondary
+              label="خططي وحسابي"
+              disabled={busy}
+              onPress={openAccount}
+            />
+            <Button
+              secondary
+              label="حذف هذه الخطة"
+              disabled={busy}
+              onPress={() => setManage("delete")}
+            />
+          </>
+        )}
       </Sheet>
       <Sheet
         title="إزالة من اللَمّة"

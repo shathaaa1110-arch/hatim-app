@@ -7,7 +7,7 @@ from psycopg.errors import UniqueViolation
 from pwdlib import PasswordHash
 
 from ..store import connect, digest
-from .models import Account, AccountSession, Acknowledged, Credentials, Registration
+from .models import Account, AccountProfile, AccountSession, Acknowledged, Credentials, Registration
 
 router = APIRouter(prefix="/api/v2/auth", tags=["Accounts"])
 security = HTTPBearer(auto_error=False)
@@ -22,7 +22,7 @@ def account_model(row):
 
 def session_token(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)]):
     if not credentials or credentials.scheme.lower() != "bearer":
-        raise HTTPException(401, "سجّل دخولك للوصول إلى لَمّاتك.")
+        raise HTTPException(401, "سجّل دخولك للوصول إلى حسابك.")
     return credentials.credentials
 
 
@@ -111,3 +111,12 @@ def logout(token: Token):
     with connect() as db:
         db.execute("DELETE FROM account_sessions WHERE token_hash=%s", (digest(token),))
     return Acknowledged()
+
+
+@router.put("/me", response_model=Account)
+def update_profile(body: AccountProfile, user: User):
+    with connect() as db:
+        row = db.execute(
+            "UPDATE accounts SET name=%s WHERE id=%s RETURNING *", (body.name, user.id)
+        ).fetchone()
+        return account_model(row)

@@ -8,7 +8,9 @@ For a beginner's explanation of this implementation, read [ابني حاتم ب�
 
 The iPhone opens discovery without asking for an account. Starting a plan, choosing an anchor or saving a pocket item opens preferences and meal slots. **قروباتي** opens the saved-group feature with a route back to discovery. See [the core-flow explanation](docs/learning-python-postgres/15-experiences-first.ar.md) and [direct planning API](docs/api-planning.ar.md).
 
-Optional group features: accounts, saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
+**حسابي**, at the top of discovery, provides registration/login/logout, display-name editing and saved direct plans. Signed-in users can create multiple plans, recover them on another device, rename and delete them. Saving an existing guest plan to the account is explicit and preserves its companions, constraints and pocket. Accounts are shared with the optional group feature; browsing still needs no login. See the [account walkthrough](docs/learning-python-postgres/16-accounts-and-school.ar.md), [current school requirements](docs/school-readiness.ar.md), and [deployment files](docs/deployment.ar.md).
+
+Optional group features: saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
 
 ## Start locally
 
@@ -104,6 +106,7 @@ The same invitation code continues under the current tunnel origin. For new grou
 - **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and native GlassEffect. Account, group, outing and decision screens reuse the existing components.
 - **API:** FastAPI routers in `backend/hatim/social/`, validated with Pydantic. Deterministic ranking stays in `planner.py`. `psycopg` runs parameterized SQL without an ORM.
 - **Database:** 12 new tables alongside the 3 existing ones. Accounts, circle memberships, outings, participants, catalog, rounds, votes and fun cards have explicit keys and constraints. Numbered migrations remain checksum-verified.
+- **Direct account plans:** migration003 adds optional account ownership to groups, preserving existing guest plans. Both discovery endpoints and both planners read the same PostgreSQL catalog. Settings updates in the current UI send expected values to reject stale writes.
 - **Access:** Argon2 passwords and random opaque sessions stored as SHA-256 hashes, expiring in 30 days. Native sessions use SecureStore. Browser sessions are local to their origin. Owners and outing coordinators have separate permissions enforced on every request.
 - **Consistency:** writers lock circle → outing → round. One vote per member per round; resolving twice returns the same result. Settings writes compare the client's expected settings to prevent overwriting another device's choice.
 - **Updates:** active clients poll every six seconds; stale reads cannot replace local write results. No queue, WebSocket server or AI model is involved.
@@ -128,18 +131,18 @@ npm run types:api
 
 `test:api` runs against real PostgreSQL, using a fresh, randomly named schema per test and cleaning up only that schema. It uses `HATIM_TEST_DATABASE_URL` if configured, otherwise `DATABASE_URL`. Planner tests do not need a database. Coverage includes 180 preserved-decision fixtures, constraints, privacy, validation, concurrent joins, consistent snapshots, rollback, migrations and safe SQLite import.
 
-Browser tests create records in the target API. Use a separate test database/schema rather than a personal-data service. With a built web companion and an API pointing to your test database:
+Browser tests create records in the target API. Start `npm run test:e2e:server` after `npm run web:build`: it creates a randomly named PostgreSQL schema, serves8002 and removes only its own schema on normal termination. In another terminal:
 
 ```sh
 npx playwright install chromium
 HATIM_TEST_URL=http://127.0.0.1:8002 npm run test:e2e
 ```
 
-The tests cover new account registration/login, permanent groups, attendance, opt-in fun, voting, tie-breaking draw, stored results, removal/restoration, and the legacy separate organizer/member browsers, joining/editing, contraction, blocked anchor, completion/undo, search, pocket persistence, retry and mobile overflow. Configure the test API to listen on 8002 for this example. Backend OpenAPI export does not start the server or touch the database. Its TypeScript generator is isolated with TS5 because the app uses TS6.
+The tests cover standalone account entry, direct plan CRUD/recovery from another browser, guest-plan linking, and permanent groups, attendance, opt-in fun, voting, tie-breaking draw, stored results, removal/restoration, plus direct organizer/member joining/editing, contraction, blocked anchor, completion/undo, search, pocket persistence, retry and mobile overflow. Backend OpenAPI export does not start the server or touch the database. Its TypeScript generator is isolated with TS5 because the app uses TS6.
 
 ## Scope
 
-The nine experiences, venue names, prices and options are fictional demo content. Allergy verification is intentionally absent, so entering an allergy can correctly block the whole demo catalog. No reservations, live availability, password recovery, catalog editing interface, or permanent hosting are implemented. Accounts, password login/logout and cross-device group recovery by signing in are implemented. A hosted PostgreSQL URL can replace the local one; the local Docker setup is not a remote database deployment by itself.
+The nine experiences, venue names, prices and options are fictional demo content. Allergy verification is intentionally absent, so entering an allergy can correctly block the whole demo catalog. No reservations, live availability, password recovery, catalog editing interface, or permanent hosting are implemented. Accounts, password login/logout and cross-device recovery of saved plans and groups are implemented. Docker deployment files are prepared; selecting hosting is deferred by the user. A hosted PostgreSQL URL can replace the local one; the local Docker setup is not a remote database deployment by itself.
 
 For the school project, this AI-assisted implementation is a learning reference; your own implementation evidence, Figma deliverables and permanent deployment still need their own work. Switching the database alone does not fulfill every academic requirement. The old untracked `docs/learning/` material describes the pre-migration SQLite implementation.
 

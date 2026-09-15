@@ -25,6 +25,10 @@ class Account(Model):
     name: str
 
 
+class AccountProfile(Model):
+    name: str = Field(min_length=1, max_length=30)
+
+
 class AccountSession(Model):
     token: str
     account: Account

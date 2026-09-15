@@ -89,7 +89,8 @@ def create_circle(body: CircleCreate, user: User):
 def claim_legacy(body: LegacyClaim, user: User):
     with connect() as db:
         old = db.execute(
-            "SELECT * FROM groups WHERE id=%s AND owner_hash=%s FOR UPDATE",
+            "SELECT * FROM groups WHERE id=%s AND owner_hash=%s "
+            "AND owner_account_id IS NULL FOR UPDATE",
             (body.group_id, digest(body.owner_token.get_secret_value())),
         ).fetchone()
         if not old:

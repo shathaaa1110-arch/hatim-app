@@ -84,6 +84,7 @@ def import_database(source: Path) -> tuple[int, int, Path]:
             expected = expected_groups[row["id"]]
             expected["settings"] = Settings.model_validate_json(expected["settings"]).model_dump()
             expected["created_at"] = timestamp(expected["created_at"])
+            expected["owner_account_id"] = None
             if row != expected:
                 raise RuntimeError("Group verification failed; import rolled back.")
         for row, expected_row in zip(actual_members, members, strict=True):

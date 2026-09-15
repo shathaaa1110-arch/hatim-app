@@ -47,7 +47,8 @@ export interface paths {
     };
     /** Me */
     get: operations["me_api_v2_auth_me_get"];
-    put?: never;
+    /** Update Profile */
+    put: operations["update_profile_api_v2_auth_me_put"];
     post?: never;
     delete?: never;
     options?: never;
@@ -557,10 +558,45 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** Account Plans */
+    get: operations["account_plans_api_groups_get"];
     put?: never;
     /** Create Group */
     post: operations["create_group_api_groups_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/groups/{group_id}/account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Save To Account */
+    put: operations["save_to_account_api_groups__group_id__account_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/groups/{group_id}/title": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Rename Plan */
+    put: operations["rename_plan_api_groups__group_id__title_put"];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -578,7 +614,8 @@ export interface paths {
     get: operations["get_group_api_groups__group_id__get"];
     put?: never;
     post?: never;
-    delete?: never;
+    /** Delete Plan */
+    delete: operations["delete_plan_api_groups__group_id__delete"];
     options?: never;
     head?: never;
     patch?: never;
@@ -697,6 +734,11 @@ export interface components {
       id: string;
       /** Handle */
       handle: string;
+      /** Name */
+      name: string;
+    };
+    /** AccountProfile */
+    AccountProfile: {
       /** Name */
       name: string;
     };
@@ -916,7 +958,7 @@ export interface components {
     /** GroupCreated */
     GroupCreated: {
       /** Organizer Token */
-      organizer_token: string;
+      organizer_token: string | null;
       group: components["schemas"]["GroupView"];
     };
     /** GroupView */
@@ -925,6 +967,8 @@ export interface components {
       id: string;
       /** Title */
       title: string;
+      /** Owner Account Id */
+      owner_account_id?: string | null;
       /** Invite Code */
       invite_code: string;
       settings: components["schemas"]["Settings"];
@@ -1095,6 +1139,35 @@ export interface components {
       /** Unfilled */
       unfilled: number;
     };
+    /** PlanSettingsChange */
+    PlanSettingsChange: {
+      /**
+       * Slots
+       * @default 9
+       */
+      slots: number;
+      /**
+       * Anchor Id
+       * @default fire
+       */
+      anchor_id: string | null;
+      /** Pocket Ids */
+      pocket_ids?: string[];
+      /** Completed Ids */
+      completed_ids?: string[];
+      expected?: components["schemas"]["Settings"] | null;
+    };
+    /** PlanSummary */
+    PlanSummary: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Slots */
+      slots: number;
+      /** Consumed */
+      consumed: number;
+    };
     /** PocketItem */
     PocketItem: {
       /** Experience Id */
@@ -1218,6 +1291,14 @@ export interface components {
       /** Resolved At */
       resolved_at: string | null;
     };
+    /** SaveToAccount */
+    SaveToAccount: {
+      /**
+       * Owner Token
+       * Format: password
+       */
+      owner_token: string;
+    };
     /** Settings */
     Settings: {
       /**
@@ -1333,6 +1414,39 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Account"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  update_profile_api_v2_auth_me_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AccountProfile"];
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {
@@ -2356,10 +2470,41 @@ export interface operations {
       };
     };
   };
-  create_group_api_groups_post: {
+  account_plans_api_groups_get: {
     parameters: {
       query?: never;
       header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlanSummary"][];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  create_group_api_groups_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
       path?: never;
       cookie?: never;
     };
@@ -2376,6 +2521,78 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["GroupCreated"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  save_to_account_api_groups__group_id__account_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveToAccount"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GroupView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  rename_plan_api_groups__group_id__title_put: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TitleChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GroupView"];
         };
       };
       /** @description Invalid request */
@@ -2422,6 +2639,39 @@ export interface operations {
       };
     };
   };
+  delete_plan_api_groups__group_id__delete: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        group_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Acknowledged"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
   update_settings_api_groups__group_id__settings_put: {
     parameters: {
       query?: never;
@@ -2435,7 +2685,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["Settings"];
+        "application/json": components["schemas"]["PlanSettingsChange"];
       };
     };
     responses: {

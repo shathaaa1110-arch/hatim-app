@@ -12,9 +12,16 @@ import { Organizer } from "./src/screens/Organizer";
 import { InviteScreen } from "./src/screens/InviteScreen";
 import { colors } from "./src/theme";
 import { WebDocument } from "./src/components/WebDocument";
+import { AccountProvider } from "./src/account/AccountProvider";
+import { AccountScreen } from "./src/account/AccountScreen";
 
 export default function App() {
-  const [groupsOpen, setGroupsOpen] = useState(false);
+  const [screen, setScreen] = useState<"organizer" | "groups" | "account">(
+    "organizer",
+  );
+  const [planStart, setPlanStart] = useState<"discover" | "plan" | "new">(
+    "discover",
+  );
   const [loaded, fontError] = useFonts({
     IBMPlexSansArabic_400Regular,
     IBMPlexSansArabic_500Medium,
@@ -33,21 +40,42 @@ export default function App() {
     : null;
   return (
     <SafeAreaProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <WebDocument />
-        <StatusBar style="dark" />
-        {!loaded && !fontError ? (
-          <ActivityIndicator style={{ flex: 1 }} color={colors.green} />
-        ) : web && !organizerPreview && !inviteCode ? (
-          <InviteScreen code={null} />
-        ) : inviteCode ? (
-          <SocialApp inviteCode={inviteCode} />
-        ) : groupsOpen ? (
-          <SocialApp onExit={() => setGroupsOpen(false)} />
-        ) : (
-          <Organizer openGroups={() => setGroupsOpen(true)} />
-        )}
-      </View>
+      <AccountProvider>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          <WebDocument />
+          <StatusBar style="dark" />
+          {!loaded && !fontError ? (
+            <ActivityIndicator style={{ flex: 1 }} color={colors.green} />
+          ) : web && !organizerPreview && !inviteCode ? (
+            <InviteScreen code={null} />
+          ) : inviteCode ? (
+            <SocialApp inviteCode={inviteCode} />
+          ) : screen === "groups" ? (
+            <SocialApp onExit={() => setScreen("organizer")} />
+          ) : screen === "account" ? (
+            <AccountScreen
+              back={() => setScreen("organizer")}
+              openGroups={() => setScreen("groups")}
+              openPlan={(fresh) => {
+                setPlanStart(fresh ? "new" : "plan");
+                setScreen("organizer");
+              }}
+            />
+          ) : (
+            <Organizer
+              start={planStart}
+              openAccount={() => {
+                setPlanStart("discover");
+                setScreen("account");
+              }}
+              openGroups={() => {
+                setPlanStart("discover");
+                setScreen("groups");
+              }}
+            />
+          )}
+        </View>
+      </AccountProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
 
 Cuisine = Literal["سعودي", "ياباني", "إيطالي", "شامي", "آسيوي", "قهوة وحلى"]
 Allergen = Literal["مكسرات", "فول سوداني", "حليب", "قمح", "سمسم", "قشريات", "سمك", "بيض", "صويا"]
@@ -76,6 +76,11 @@ class Settings(Model):
         return self
 
 
+class PlanSettingsChange(Settings):
+    # Optional only for compatibility with earlier native builds.
+    expected: Settings | None = None
+
+
 class Decision(Model):
     experience_id: str
     priority: Literal["ركيزة", "أساسية", "مرنة"]
@@ -108,6 +113,7 @@ class CreateGroup(Model):
 class GroupView(Model):
     id: str
     title: str
+    owner_account_id: str | None = None
     invite_code: str
     settings: Settings
     members: list[Member]
@@ -115,8 +121,19 @@ class GroupView(Model):
 
 
 class GroupCreated(Model):
-    organizer_token: str
+    organizer_token: str | None
     group: GroupView
+
+
+class PlanSummary(Model):
+    id: str
+    title: str
+    slots: int
+    consumed: int
+
+
+class SaveToAccount(Model):
+    owner_token: SecretStr
 
 
 class MemberCreated(Model):

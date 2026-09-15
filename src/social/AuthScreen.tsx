@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View } from "react-native";
-import { LockKeyhole, UsersRound } from "lucide-react-native";
+import { LockKeyhole, Bookmark } from "lucide-react-native";
 import { Button, Chip, Row, T } from "../components/ui";
 import { social, type AccountSession } from "./client";
 import { ErrorNotice, Field, Page, Panel, s } from "./ui";
@@ -50,18 +50,20 @@ export function AuthScreen({
   };
   return (
     <Page
-      title={invitation ? `لك مكان في «${invitation}»` : "لَمّاتكم لها مكان."}
-      subtitle="قروبكم وذوقكم محفوظان. كل طلعة تبدأ منكم، مو من الصفر."
+      title={invitation ? `لك مكان في «${invitation}»` : "حسابك في حاتم"}
+      subtitle="خططك معك، حتى لو تغيّر جهازك. اكتشاف التجارب متاح بدون حساب."
       back={back}
     >
       <Panel glass>
         <Row>
-          <UsersRound color={c.green} size={34} />
+          <Bookmark color={c.green} size={34} />
           <View style={{ flex: 1 }}>
             <T weight="semibold" style={s.heading}>
-              قروب ثابت. خطط على قدّ وقتكم.
+              خطط محفوظة، على قدّ وقتك.
             </T>
-            <T style={s.muted}>ادخل من أي جهاز، وخلّ ذوقك مع الربع.</T>
+            <T style={s.muted}>
+              احفظ خططك وجيبك، وأضف قروبًا دائمًا إذا احتجته.
+            </T>
           </View>
         </Row>
       </Panel>
@@ -122,11 +124,11 @@ export function AuthScreen({
           textContentType={register ? "newPassword" : "password"}
         />
         <T style={s.muted}>
-          ١٠ أحرف على الأقل. احتفظ باسم المستخدم وكلمة المرور لاستعادة لَمّاتك.
+          ١٠ أحرف على الأقل. احتفظ باسم المستخدم وكلمة المرور للعودة إلى حسابك.
         </T>
         <ErrorNotice error={error} />
         <Button
-          label={register ? "أنشئ حسابي" : "ادخل إلى لَمّاتي"}
+          label={register ? "أنشئ حسابي" : "ادخل إلى حسابي"}
           icon={LockKeyhole}
           busy={busy}
           onPress={() => {

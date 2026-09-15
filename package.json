@@ -41,6 +41,7 @@
     "api": "uv run --project backend --env-file backend/.env.local uvicorn hatim.main:app --app-dir backend --host 127.0.0.1 --port 8000",
     "test:api": "uv run --project backend --env-file backend/.env.local pytest backend/tests -q",
     "test:e2e": "playwright test",
+    "test:e2e:server": "uv run --project backend --env-file backend/.env.local python scripts/e2e-server.py",
     "types:api": "node scripts/generate-types.mjs",
     "check": "npm run typecheck && npm run test:api",
     "public:test": "node scripts/public-test.mjs",

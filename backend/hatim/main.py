@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from psycopg import Error as DatabaseError
 from psycopg.types.json import Jsonb
 
-from .catalog import CATALOG, CATALOG_IDS
+from .experience_store import catalog
 from .middleware import ResponsePolicyMiddleware
 from .models import (
     CreateGroup,
@@ -23,11 +23,15 @@ from .models import (
     InviteView,
     Member,
     MemberCreated,
+    PlanSettingsChange,
+    PlanSummary,
     Preferences,
+    SaveToAccount,
     Settings,
 )
 from .planner import build_plan
 from .social import auth, circles, outings, rounds
+from .social.models import Acknowledged, TitleChange
 from .store import connect, digest, initialize
 
 
@@ -80,11 +84,20 @@ def bearer(authorization: str | None) -> str:
 
 def require_owner(db, group_id: str, authorization: str | None, *, lock=False):
     row = db.execute(
-        "SELECT * FROM groups WHERE id=%s AND owner_hash=%s" + (" FOR UPDATE" if lock else ""),
-        (group_id, digest(bearer(authorization))),
+        "SELECT * FROM groups WHERE id=%s" + (" FOR UPDATE" if lock else ""), (group_id,)
     ).fetchone()
-    if row is None:
-        raise HTTPException(404, "المجموعة غير متاحة أو الرابط غير صالح.")
+    token_hash = digest(bearer(authorization))
+    allowed = False
+    if row and row["owner_account_id"]:
+        allowed = db.execute(
+            "SELECT 1 FROM account_sessions WHERE account_id=%s AND token_hash=%s "
+            "AND expires_at>CURRENT_TIMESTAMP",
+            (row["owner_account_id"], token_hash),
+        ).fetchone()
+    elif row:
+        allowed = secrets.compare_digest(row["owner_hash"], token_hash)
+    if not allowed:
+        raise HTTPException(404, "الخطة غير متاحة لك أو انتهت صلاحية الوصول.")
     if lock:
         reject_upgraded_write(db, group_id)
     return row
@@ -125,10 +138,11 @@ def group_model(db, row) -> GroupView:
     return GroupView(
         id=row["id"],
         title=row["title"],
+        owner_account_id=row["owner_account_id"],
         invite_code=row["invite_code"],
         settings=settings,
         members=members,
-        plan=build_plan(CATALOG, members, settings),
+        plan=build_plan(catalog(db), members, settings),
     )
 
 
@@ -148,21 +162,32 @@ def health():
 
 @app.get("/api/experiences", response_model=list[Experience])
 def experiences():
-    return CATALOG
+    with connect(read_only=True) as db:
+        return catalog(db)
 
 
 @app.post("/api/groups", response_model=GroupCreated, status_code=201)
-def create_group(body: CreateGroup):
-    validate_settings(body.settings)
+def create_group(body: CreateGroup, authorization: str | None = Header(default=None)):
+    # Supplying an invalid account session must never create an anonymous plan.
+    user = auth.current_account(bearer(authorization)) if authorization else None
     group_id, owner_token, code = (
         secrets.token_urlsafe(12),
         secrets.token_urlsafe(32),
         secrets.token_urlsafe(18),
     )
     with connect() as db:
+        validate_settings(db, body.settings)
         db.execute(
-            "INSERT INTO groups(id,title,invite_code,owner_hash,settings) VALUES(%s,%s,%s,%s,%s)",
-            (group_id, body.title, code, digest(owner_token), Jsonb(body.settings.model_dump())),
+            "INSERT INTO groups(id,title,invite_code,owner_hash,settings,owner_account_id) "
+            "VALUES(%s,%s,%s,%s,%s,%s)",
+            (
+                group_id,
+                body.title,
+                code,
+                digest(owner_token),
+                Jsonb(body.settings.model_dump()),
+                user.id if user else None,
+            ),
         )
         db.execute(
             "INSERT INTO members(id,group_id,token_hash,preferences,organizer) "
@@ -174,8 +199,68 @@ def create_group(body: CreateGroup):
                 Jsonb(body.preferences.model_dump()),
             ),
         )
-        row = require_owner(db, group_id, f"Bearer {owner_token}")
-        return GroupCreated(organizer_token=owner_token, group=group_model(db, row))
+        row = require_owner(db, group_id, authorization if user else f"Bearer {owner_token}")
+        return GroupCreated(
+            organizer_token=None if user else owner_token, group=group_model(db, row)
+        )
+
+
+@app.get("/api/groups", response_model=list[PlanSummary], tags=["Plans"])
+def account_plans(user: auth.User):
+    with connect(read_only=True) as db:
+        return [
+            PlanSummary(
+                id=r["id"],
+                title=r["title"],
+                slots=r["settings"]["slots"],
+                consumed=len(r["settings"].get("completed_ids", [])),
+            )
+            for r in db.execute(
+                "SELECT id,title,settings FROM groups WHERE owner_account_id=%s "
+                "ORDER BY created_at DESC,id",
+                (user.id,),
+            )
+        ]
+
+
+@app.put("/api/groups/{group_id}/account", response_model=GroupView, tags=["Plans"])
+def save_to_account(group_id: str, body: SaveToAccount, user: auth.User):
+    with connect() as db:
+        row = db.execute("SELECT * FROM groups WHERE id=%s FOR UPDATE", (group_id,)).fetchone()
+        if row and row["owner_account_id"] == user.id:
+            return group_model(db, row)  # Safe retry after a lost response.
+        if (
+            not row
+            or row["owner_account_id"]
+            or not secrets.compare_digest(
+                row["owner_hash"], digest(body.owner_token.get_secret_value())
+            )
+        ):
+            raise HTTPException(404, "تعذّر إثبات ملكيتك للخطة.")
+        reject_upgraded_write(db, group_id)
+        row = db.execute(
+            "UPDATE groups SET owner_account_id=%s,owner_hash=%s WHERE id=%s RETURNING *",
+            (user.id, digest(secrets.token_urlsafe(32)), group_id),
+        ).fetchone()
+        return group_model(db, row)
+
+
+@app.put("/api/groups/{group_id}/title", response_model=GroupView, tags=["Plans"])
+def rename_plan(group_id: str, body: TitleChange, authorization: str | None = Header(default=None)):
+    with connect() as db:
+        require_owner(db, group_id, authorization, lock=True)
+        row = db.execute(
+            "UPDATE groups SET title=%s WHERE id=%s RETURNING *", (body.title, group_id)
+        ).fetchone()
+        return group_model(db, row)
+
+
+@app.delete("/api/groups/{group_id}", response_model=Acknowledged, tags=["Plans"])
+def delete_plan(group_id: str, authorization: str | None = Header(default=None)):
+    with connect() as db:
+        require_owner(db, group_id, authorization, lock=True)
+        db.execute("DELETE FROM groups WHERE id=%s", (group_id,))
+    return Acknowledged()
 
 
 @app.get("/api/groups/{group_id}", response_model=GroupView)
@@ -184,25 +269,28 @@ def get_group(group_id: str, authorization: str | None = Header(default=None)):
         return group_model(db, require_owner(db, group_id, authorization))
 
 
-def validate_settings(body: Settings):
+def validate_settings(db, body: Settings):
     ids = set(
         body.pocket_ids
         + body.completed_ids
         + ([body.anchor_id] if body.anchor_id is not None else [])
     )
-    if not ids <= CATALOG_IDS:
+    if not ids <= {e.id for e in catalog(db)}:
         raise HTTPException(422, "تجربة غير موجودة.")
 
 
 @app.put("/api/groups/{group_id}/settings", response_model=GroupView)
 def update_settings(
-    group_id: str, body: Settings, authorization: str | None = Header(default=None)
+    group_id: str, body: PlanSettingsChange, authorization: str | None = Header(default=None)
 ):
-    validate_settings(body)
     with connect() as db:
-        require_owner(db, group_id, authorization, lock=True)
+        row = require_owner(db, group_id, authorization, lock=True)
+        if body.expected is not None and body.expected != Settings.model_validate(row["settings"]):
+            raise HTTPException(409, "تغيّرت الخطة من جهاز آخر. حدّثها وراجع التغيير قبل الحفظ.")
+        settings = Settings.model_validate(body.model_dump(exclude={"expected"}))
+        validate_settings(db, settings)
         db.execute(
-            "UPDATE groups SET settings=%s WHERE id=%s", (Jsonb(body.model_dump()), group_id)
+            "UPDATE groups SET settings=%s WHERE id=%s", (Jsonb(settings.model_dump()), group_id)
         )
         return group_model(db, require_owner(db, group_id, authorization))
 
@@ -237,12 +325,13 @@ def remove_member(group_id: str, member_id: str, authorization: str | None = Hea
 def invite(code: str):
     with connect(read_only=True) as db:
         group = group_model(db, require_invite(db, code))
+        entries = catalog(db)
         # Invitations never expose other members' private constraints or workarounds.
         selected = [
             d.model_copy(
                 update={
                     "adaptations": [],
-                    "reason": next(e.why for e in CATALOG if e.id == d.experience_id),
+                    "reason": next(e.why for e in entries if e.id == d.experience_id),
                 }
             )
             for d in group.plan.selected

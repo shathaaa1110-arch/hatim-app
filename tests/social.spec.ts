@@ -183,7 +183,7 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   await page
     .getByLabel("كلمة المرور", { exact: true })
     .fill("test-password-1234");
-  await button(page, "ادخل إلى لَمّاتي").click();
+  await button(page, "ادخل إلى حسابي").click();
   await expect(button(page, "افتح قروب ربع الاختبار")).toBeVisible();
   expect(errors).toEqual([]);
   await context.close();

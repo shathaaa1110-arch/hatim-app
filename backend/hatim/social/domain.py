@@ -5,7 +5,8 @@ from datetime import UTC, datetime
 
 from fastapi import HTTPException
 
-from ..models import Experience, Member, Plan, Preferences, Settings
+from ..experience_store import catalog
+from ..models import Member, Plan, Preferences, Settings
 from ..planner import build_plan, evaluate
 from .models import (
     CircleMember,
@@ -17,13 +18,6 @@ from .models import (
     RoundOption,
     RoundView,
 )
-
-
-def catalog(db):
-    return [
-        Experience.model_validate(r["payload"])
-        for r in db.execute("SELECT payload FROM experiences ORDER BY id")
-    ]
 
 
 def circle_access(db, circle_id, user_id, *, lock=False):
