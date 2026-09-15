@@ -6,6 +6,8 @@ This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementat
 
 For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes 13 lessons, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). It distinguishes the current implementation from proposed account and deployment work.
 
+Under discussion, not implemented: [persistent groups, separate outings, voting, member roles, a shared random draw, and playful interactions](docs/proposals/persistent-groups.ar.md), with proposed architecture and a [beginner design explanation](docs/learning-python-postgres/group-feature-design.ar.md). Feature changes must keep architecture and learning material in sync as documented in AGENTS.md.
+
 ## Start locally
 
 Requirements: Node 22.13+, npm, uv, Docker/OrbStack, Xcode 26.4+ and CocoaPods for iOS. Install cloudflared for public invitations.
