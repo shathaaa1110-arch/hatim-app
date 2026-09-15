@@ -35,6 +35,7 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   await button(page, "أنشئ القروب").click();
   const group = await (await createdResponse).json();
   await expect(button(page, "طلعة جديدة")).toBeVisible();
+  await button(page, "الأعضاء والطرد").click();
   await page.getByTestId("fun-opt-in").click();
   await expect(
     page.getByTestId("fun-opt-in").getByRole("switch"),
@@ -51,6 +52,7 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   await register(guest, "سارة", `guest_${stamp}`);
   await button(guest, "انضم للّمّة").click();
   await expect(button(guest, "طلعة جديدة")).toBeVisible();
+  await button(guest, "الأعضاء والطرد").click();
   await guest.getByTestId("fun-opt-in").click();
   await expect(
     guest.getByTestId("fun-opt-in").getByRole("switch"),
@@ -71,14 +73,15 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   );
   await button(page, "ابدأ الطلعة").click();
   const trip = await (await outingResponse).json();
+  await button(guest, "الطلعات").click();
   await button(guest, "افتح طلعة عشاء اللمّة").click();
   await button(guest, "أنا حاضر").click();
   await expect(button(guest, "أنا حاضر")).toHaveCount(0);
-  await button(page, "الحضور").click();
-  await expect(button(page, "مقعد الاحتياط لـسارة 😄")).toBeVisible({
+  await button(page, "إدارة الطلعة والطرد").click();
+  await expect(button(page, "طرد سارة فكاهيًا 😄")).toBeVisible({
     timeout: 15000,
   });
-  await button(page, "مقعد الاحتياط لـسارة 😄").click();
+  await button(page, "طرد سارة فكاهيًا 😄").click();
   await expect(
     guest.getByText("سارة على مقعد الاحتياط 😄", { exact: true }),
   ).toBeVisible({ timeout: 15000 });
@@ -87,6 +90,11 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
     guest.getByText("سارة على مقعد الاحتياط 😄", { exact: true }),
   ).toHaveCount(0);
 
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "إغلاق", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await button(page, "الاختيار").click();
   await button(page, "نختار ركيزتنا مع بعض").click();
   const roundResponse = page.waitForResponse(
@@ -154,16 +162,15 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   ).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await button(page, "رجوع").click();
-  await button(page, "إدارة سارة").click();
-  await button(page, "إزالة من القروب").click();
-  await button(page, "تأكيد الإزالة").click();
+  await button(page, "الأعضاء والطرد").click();
+  await button(page, "طرد سارة من القروب").click();
+  await button(page, "تأكيد الطرد").click();
   await expect(
     guest.getByText("القروب غير متاح لحسابك أو أُزيلت عضويتك.", {
       exact: true,
     }),
   ).toBeVisible({ timeout: 15000 });
-  await button(page, "إدارة سارة").click();
-  await button(page, "إعادة العضو للقروب").click();
+  await button(page, "إعادة سارة للقروب").click();
   await button(page, "إعادة العضو").click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await button(page, "رجوع").click();

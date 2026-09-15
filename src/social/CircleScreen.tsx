@@ -27,7 +27,7 @@ import { ar, colors as c } from "../theme";
 import { social, type CircleMember } from "./client";
 import { useRemote } from "./useRemote";
 import {
-  Confirm,
+  ConfirmationContent,
   type Confirmation,
   ErrorNotice,
   Field,
@@ -52,6 +52,8 @@ export function CircleScreen({
   const r = useRemote(read);
   const group = r.data;
   const [profile, setProfile] = useState(false);
+  const [section, setSection] = useState("الطلعات");
+  const [coordinatorId, setCoordinatorId] = useState<string | undefined>();
   const [invite, setInvite] = useState(false);
   const [copied, setCopied] = useState(false);
   const [create, setCreate] = useState(false);
@@ -62,11 +64,35 @@ export function CircleScreen({
   const [confirm, setConfirm] = useState<Confirmation | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const update = <R,>(operation: () => Promise<R>) => r.mutate(operation);
+  const membershipAction = (person: CircleMember) => {
+    setMember(null);
+    setConfirm({
+      title:
+        person.status === "removed"
+          ? `إعادة ${person.name}؟`
+          : `طرد ${person.name} من القروب؟`,
+      text:
+        person.status === "removed"
+          ? "يستعيد الوصول، ويحتاج تأكيد حضوره للطلعات المفتوحة من جديد."
+          : "طرد حقيقي: يفقد الوصول للقروب وطلعاته وتصويتها. تُراجع الجولات المتأثرة، وتعود قيادة طلعاته المفتوحة لمالك القروب. تقدر تعيده من قائمة الأعضاء.",
+      label: person.status === "removed" ? "إعادة العضو" : "تأكيد الطرد",
+      run: () =>
+        update(() =>
+          person.status === "removed"
+            ? social.restore(token, id, person.id)
+            : social.remove(token, id, person.id),
+        ),
+    });
+  };
   const inviteUrl = group ? `${PUBLIC_ORIGIN}/join/${group.invite_code}` : "";
   return (
     <Page
       title={group?.title ?? "لَمّتنا"}
-      subtitle="القروب ثابت. خططكم تتغيّر."
+      subtitle={
+        group
+          ? `مالك القروب: ${group.members.find((p) => p.is_owner)?.name ?? ""} · القروب ثابت وطلعاته تتغيّر.`
+          : "القروب ثابت. خططكم تتغيّر."
+      }
       back={back}
       action={
         group && (
@@ -118,6 +144,8 @@ export function CircleScreen({
                 onPress={() => {
                   setTitle("");
                   setSlots(3);
+                  setCoordinatorId(group.me.id);
+                  setLocalError(null);
                   setCreate(true);
                 }}
               />
@@ -132,148 +160,202 @@ export function CircleScreen({
               />
             </Panel>
           )}
-          <T weight="semibold" style={s.heading}>
-            طلعاتنا
-          </T>
-          {!group.outings.length && (
-            <Empty
-              icon={CalendarPlus}
-              title="أول حكاية لسه قدّام"
-              text="ابدأ طلعة واختر مين حاضر. كل طلعة لها خاناتها وركيزتها."
-            />
-          )}
-          {group.outings.map((trip) => (
-            <Pressable
-              key={trip.id}
-              accessibilityRole="button"
-              accessibilityLabel={`افتح طلعة ${trip.title}`}
-              onPress={() => openOuting(trip.id)}
-            >
-              <Panel>
-                <Row>
-                  <View style={{ flex: 1 }}>
-                    <T weight="semibold" style={s.heading}>
-                      {trip.title}
-                    </T>
-                    <T style={s.muted}>
-                      {trip.status === "closed"
-                        ? "طلعة محفوظة في الأرشيف"
-                        : `${ar(trip.going)} حاضر · ${ar(trip.slots)} خانات`}
-                    </T>
-                  </View>
-                  <ArrowUpLeft color={c.green} size={21} />
-                </Row>
-              </Panel>
-            </Pressable>
-          ))}
-          <Row style={{ justifyContent: "space-between" }}>
-            <T weight="semibold" style={s.heading}>
-              أهل اللَمّة
-            </T>
+          <Row>
             <Chip
-              label={`${ar(group.members.filter((m) => m.status === "active").length)} / ١٢`}
+              label="الطلعات"
+              selected={section === "الطلعات"}
+              onPress={() => setSection("الطلعات")}
+            />
+            <Chip
+              label="الأعضاء والطرد"
+              selected={section === "الأعضاء"}
+              onPress={() => setSection("الأعضاء")}
             />
           </Row>
-          {group.members.map((person) => (
-            <Panel key={person.id}>
-              <Row>
-                <UserRound size={22} color={c.green} />
-                <View style={{ flex: 1 }}>
-                  <T weight="semibold" style={{ fontSize: 19 }}>
-                    {person.name}
-                    {person.is_me ? " · أنت" : ""}
-                  </T>
-                  <T style={s.muted}>
-                    {person.status === "removed"
-                      ? "أُزيل من القروب"
-                      : person.is_owner
-                        ? "مالك القروب"
-                        : !person.claimed
-                          ? "عضو سابق · ينتظر ربط حسابه"
-                          : "من أهل اللمّة"}
-                  </T>
-                </View>
-                {person.is_me ? (
-                  <Button
-                    small
-                    secondary
-                    label="ذوقي"
-                    disabled={group.archived}
-                    onPress={() => setProfile(true)}
-                  />
-                ) : (
-                  group.is_owner &&
-                  !group.archived && (
-                    <Button
-                      small
-                      secondary
-                      label={`إدارة ${person.name}`}
-                      onPress={() => setMember(person)}
-                    />
-                  )
-                )}
-              </Row>
-              {person.preferences && (
-                <View style={s.wrap}>
-                  <Chip
-                    label={`حتى ${ar(person.preferences.budget ?? 200)} ر.س`}
-                  />
-                  {person.preferences.vegetarian && <Chip label="نباتي" />}
-                  {person.preferences.cuisines?.map((cuisine) => (
-                    <Chip key={cuisine} label={cuisine} />
-                  ))}
-                  {person.preferences.allergies?.map((allergy) => (
-                    <Chip key={allergy} label={`حساسية ${allergy}`} />
-                  ))}
-                </View>
+          {section === "الطلعات" && (
+            <>
+              <T weight="semibold" style={s.heading}>
+                طلعاتنا
+              </T>
+              {!group.outings.length && (
+                <Empty
+                  icon={CalendarPlus}
+                  title="أول حكاية لسه قدّام"
+                  text="ابدأ طلعة واختر مين حاضر. كل طلعة لها خاناتها وركيزتها."
+                />
               )}
-            </Panel>
-          ))}
-          <Panel>
-            <Row>
-              <Smile color={c.green} size={24} />
-              <View style={{ flex: 1 }}>
-                <T weight="semibold">المزاح له مكان؟</T>
-                <T style={s.muted}>
-                  أوافق على «مقعد الاحتياط» ٣٠ ثانية. صوتي وقيودي تبقى محسوبة،
-                  وأقدر أقفله فورًا.
-                </T>
-              </View>
-              <Toggle
-                testID="fun-opt-in"
-                label="أوافق على المزاح في القروب"
-                value={group.me.fun_opt_in}
-                onValueChange={(value) => {
-                  void update(() =>
-                    social.options(token, id, { fun_opt_in: value }),
-                  ).catch(() => {});
-                }}
-              />
-            </Row>
-          </Panel>
-          {group.is_owner && !group.archived && (
-            <View style={{ gap: 10 }}>
-              <Button
-                secondary
-                label="تعديل اسم القروب"
-                onPress={() => {
-                  setTitle(group.title);
-                  setEditName(true);
-                }}
-              />
-              <Button
-                secondary
-                label="أرشفة القروب"
-                onPress={() =>
-                  setConfirm({
-                    title: "نحفظ اللَمّة؟",
-                    text: "تحتاج إغلاق طلعاته أولًا. يبقى القروب وذكرياته في الأرشيف.",
-                    label: "أرشفة القروب",
-                    run: () => update(() => social.archiveGroup(token, id)),
-                  })
+              {group.outings.map((trip) => (
+                <Pressable
+                  key={trip.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`افتح طلعة ${trip.title}`}
+                  onPress={() => openOuting(trip.id)}
+                >
+                  <Panel>
+                    <Row>
+                      <View style={{ flex: 1 }}>
+                        <T weight="semibold" style={s.heading}>
+                          {trip.title}
+                        </T>
+                        <T style={s.muted}>
+                          قائد الطلعة: {trip.coordinator_name}
+                        </T>
+                        <T style={s.muted}>
+                          {trip.status === "closed"
+                            ? "طلعة محفوظة في الأرشيف"
+                            : `${ar(trip.going)} حاضر · ${ar(trip.slots)} خانات`}
+                        </T>
+                      </View>
+                      <ArrowUpLeft color={c.green} size={21} />
+                    </Row>
+                  </Panel>
+                </Pressable>
+              ))}
+            </>
+          )}
+          {section === "الأعضاء" && (
+            <>
+              <Notice
+                text={
+                  group.is_owner
+                    ? "أنت مالك القروب. الطرد الجدي وإعادة الأعضاء ونقل الملكية من هنا. الطرد الفكاهي داخل كل طلعة."
+                    : "الطرد من القروب وإعادة الأعضاء لمالكه فقط. تقدر تشارك في الطرد الفكاهي داخل الطلعة بعد تفعيله."
                 }
               />
-            </View>
+              <Row style={{ justifyContent: "space-between" }}>
+                <T weight="semibold" style={s.heading}>
+                  أهل اللَمّة
+                </T>
+                <Chip
+                  label={`${ar(group.members.filter((m) => m.status === "active").length)} / ١٢`}
+                />
+              </Row>
+              {group.members.map((person) => (
+                <Panel key={person.id}>
+                  <Row>
+                    <UserRound size={22} color={c.green} />
+                    <View style={{ flex: 1 }}>
+                      <T weight="semibold" style={{ fontSize: 19 }}>
+                        {person.name}
+                        {person.is_me ? " · أنت" : ""}
+                      </T>
+                      <T style={s.muted}>
+                        {person.status === "removed"
+                          ? "أُزيل من القروب"
+                          : person.is_owner
+                            ? "مالك القروب"
+                            : !person.claimed
+                              ? "عضو سابق · ينتظر ربط حسابه"
+                              : "من أهل اللمّة"}
+                      </T>
+                    </View>
+                    {person.is_me ? (
+                      <Button
+                        small
+                        secondary
+                        label="ذوقي"
+                        disabled={group.archived}
+                        onPress={() => setProfile(true)}
+                      />
+                    ) : (
+                      group.is_owner &&
+                      !group.archived && (
+                        <Button
+                          small
+                          secondary
+                          label={`إدارة ${person.name}`}
+                          onPress={() => setMember(person)}
+                        />
+                      )
+                    )}
+                  </Row>
+                  {!person.is_me && (
+                    <>
+                      <Button
+                        secondary
+                        label={
+                          person.status === "removed"
+                            ? `إعادة ${person.name} للقروب`
+                            : `طرد ${person.name} من القروب`
+                        }
+                        disabled={
+                          r.busy ||
+                          !group.is_owner ||
+                          group.archived ||
+                          person.is_owner
+                        }
+                        onPress={() => membershipAction(person)}
+                      />
+                      {person.is_owner && (
+                        <T style={s.muted}>
+                          المالك محمي من الطرد. نقل الملكية إجراء مستقل.
+                        </T>
+                      )}
+                    </>
+                  )}
+                  {person.preferences && (
+                    <View style={s.wrap}>
+                      <Chip
+                        label={`حتى ${ar(person.preferences.budget ?? 200)} ر.س`}
+                      />
+                      {person.preferences.vegetarian && <Chip label="نباتي" />}
+                      {person.preferences.cuisines?.map((cuisine) => (
+                        <Chip key={cuisine} label={cuisine} />
+                      ))}
+                      {person.preferences.allergies?.map((allergy) => (
+                        <Chip key={allergy} label={`حساسية ${allergy}`} />
+                      ))}
+                    </View>
+                  )}
+                </Panel>
+              ))}
+              <Panel>
+                <Row>
+                  <Smile color={c.green} size={24} />
+                  <View style={{ flex: 1 }}>
+                    <T weight="semibold">المزاح له مكان؟</T>
+                    <T style={s.muted}>
+                      أوافق على «مقعد الاحتياط» ٣٠ ثانية. صوتي وقيودي تبقى
+                      محسوبة، وأقدر أقفله فورًا.
+                    </T>
+                  </View>
+                  <Toggle
+                    testID="fun-opt-in"
+                    label="أوافق على المزاح في القروب"
+                    value={group.me.fun_opt_in}
+                    onValueChange={(value) => {
+                      void update(() =>
+                        social.options(token, id, { fun_opt_in: value }),
+                      ).catch(() => {});
+                    }}
+                  />
+                </Row>
+              </Panel>
+              {group.is_owner && !group.archived && (
+                <View style={{ gap: 10 }}>
+                  <Button
+                    secondary
+                    label="تعديل اسم القروب"
+                    onPress={() => {
+                      setTitle(group.title);
+                      setEditName(true);
+                    }}
+                  />
+                  <Button
+                    secondary
+                    label="أرشفة القروب"
+                    onPress={() =>
+                      setConfirm({
+                        title: "نحفظ اللَمّة؟",
+                        text: "تحتاج إغلاق طلعاته أولًا. يبقى القروب وذكرياته في الأرشيف.",
+                        label: "أرشفة القروب",
+                        run: () => update(() => social.archiveGroup(token, id)),
+                      })
+                    }
+                  />
+                </View>
+              )}
+            </>
           )}
           <Sheet
             title="ذوقك له مكان"
@@ -355,6 +437,32 @@ export function CircleScreen({
                 />
               ))}
             </View>
+            <T weight="semibold">مين قائد الطلعة؟</T>
+            <T style={s.muted}>
+              مسؤول الخطة والتصويت. إذا اخترت غيرك، تتولى القيادة تلك العضوية؛
+              مالك القروب يبقى قادرًا على الإدارة.
+            </T>
+            <View style={s.wrap}>
+              {group.members
+                .filter((p) => p.status === "active")
+                .map((p) => (
+                  <Chip
+                    key={p.id}
+                    label={`${p.name}${p.is_me ? " · أنت" : ""}`}
+                    selected={coordinatorId === p.id}
+                    onPress={
+                      p.claimed && !r.busy
+                        ? () => setCoordinatorId(p.id)
+                        : undefined
+                    }
+                  />
+                ))}
+            </View>
+            {group.members.some((p) => p.status === "active" && !p.claimed) && (
+              <T style={s.muted}>
+                الأعضاء السابقون يحتاجون ربط حسابهم قبل تعيينهم قادة.
+              </T>
+            )}
             <Notice text="أنت حاضر كبداية. البقية يؤكدون حضورهم بأنفسهم، وذوق الغائب ما يقيّد هذه الطلعة." />
             <ErrorNotice error={localError ?? r.error} />
             <Button
@@ -365,8 +473,15 @@ export function CircleScreen({
                   setLocalError("اكتب اسم الطلعة.");
                   return;
                 }
+                setLocalError(null);
                 void update(() =>
-                  social.createOuting(token, id, title.trim(), slots),
+                  social.createOuting(
+                    token,
+                    id,
+                    title.trim(),
+                    slots,
+                    coordinatorId,
+                  ),
                 )
                   .then((trip) => {
                     setCreate(false);
@@ -399,69 +514,57 @@ export function CircleScreen({
             />
           </Sheet>
           <Sheet
-            title={member?.name ?? "العضو"}
-            visible={!!member}
-            onClose={() => setMember(null)}
+            title={confirm?.title ?? member?.name ?? "العضو"}
+            visible={!!member || !!confirm}
+            onClose={() => {
+              if (!r.busy) {
+                setMember(null);
+                setConfirm(null);
+              }
+            }}
           >
-            {member && (
-              <>
-                <Button
-                  secondary
-                  label={
-                    member.status === "removed"
-                      ? "إعادة العضو للقروب"
-                      : "إزالة من القروب"
-                  }
-                  onPress={() => {
-                    const selected = member;
-                    setMember(null);
-                    setConfirm({
-                      title:
-                        selected.status === "removed"
-                          ? "نرجّع للّمّة؟"
-                          : `إزالة ${selected.name}؟`,
-                      text:
-                        selected.status === "removed"
-                          ? "يستعيد الوصول. يحتاج تأكيد حضوره للطلعات المفتوحة."
-                          : "إزالة حقيقية: يفقد الوصول والتصويت، وتتراجع جولات الطلعات المتأثرة. تقدر تعيده من هذه القائمة.",
-                      label:
-                        selected.status === "removed"
-                          ? "إعادة العضو"
-                          : "تأكيد الإزالة",
-                      run: () =>
-                        update(() =>
-                          selected.status === "removed"
-                            ? social.restore(token, id, selected.id)
-                            : social.remove(token, id, selected.id),
-                        ),
-                    });
-                  }}
-                />
-                {member.claimed && member.status === "active" && (
+            {confirm ? (
+              <ConfirmationContent
+                value={confirm}
+                busy={r.busy}
+                done={() => setConfirm(null)}
+                back={() => setConfirm(null)}
+              />
+            ) : (
+              member && (
+                <>
                   <Button
                     secondary
-                    label="نقل ملكية القروب إليه"
-                    onPress={() => {
-                      const selected = member;
-                      setMember(null);
-                      setConfirm({
-                        title: "نقل الملكية",
-                        text: `سيصبح ${selected.name} مالك القروب، وتصبح أنت عضوًا. قيادة الطلعات تبقى كما هي.`,
-                        label: "نقل الملكية",
-                        run: () =>
-                          update(() => social.transfer(token, id, selected.id)),
-                      });
-                    }}
+                    label={
+                      member.status === "removed"
+                        ? "إعادة العضو للقروب"
+                        : "طرد من القروب"
+                    }
+                    onPress={() => membershipAction(member)}
                   />
-                )}
-              </>
+                  {member.claimed && member.status === "active" && (
+                    <Button
+                      secondary
+                      label="نقل ملكية القروب إليه"
+                      onPress={() => {
+                        const selected = member;
+                        setMember(null);
+                        setConfirm({
+                          title: "نقل الملكية",
+                          text: `سيصبح ${selected.name} مالك القروب، وتصبح أنت عضوًا. قيادة الطلعات تبقى كما هي.`,
+                          label: "نقل الملكية",
+                          run: () =>
+                            update(() =>
+                              social.transfer(token, id, selected.id),
+                            ),
+                        });
+                      }}
+                    />
+                  )}
+                </>
+              )
             )}
           </Sheet>
-          <Confirm
-            value={confirm}
-            busy={r.busy}
-            close={() => setConfirm(null)}
-          />
         </>
       )}
     </Page>

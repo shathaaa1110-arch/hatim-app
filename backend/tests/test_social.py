@@ -430,3 +430,100 @@ def test_restore_resets_open_attendance_and_transfer_changes_only_owner_rights(c
     assert client.put(root + "/title", headers=guest, json={"title": "اسم جديد"}).status_code == 200
     # Creating an outing made the former owner its coordinator; that role is independent.
     assert client.get(f"/api/v2/outings/{trip['id']}", headers=owner).json()["can_manage"] is True
+
+
+def test_choose_coordinator_when_creating_without_forcing_attendance(client):
+    owner, circle = setup_circle(client)
+    guest, member_id = join(client, circle)
+    result = client.post(
+        f"/api/v2/groups/{circle['id']}/outings",
+        headers=owner,
+        json={"title": "طلعة بقيادة سارة", "coordinator_id": member_id},
+    )
+    assert result.status_code == 201
+    trip = result.json()
+    assert trip["coordinator_id"] == member_id
+    assert trip["coordinator_name"] == "guest"
+    assert trip["owner_name"] == "أمل"
+    assert (
+        next(p for p in trip["participants"] if p["member_id"] == member_id)["attendance"]
+        == "pending"
+    )
+    guest_view = client.get(f"/api/v2/outings/{trip['id']}", headers=guest).json()
+    assert guest_view["can_manage"] is True
+    assert guest_view["is_owner"] is False
+    assert guest_view["participants"][0]["is_owner"] is True
+    assert (
+        client.get(f"/api/v2/groups/{circle['id']}", headers=owner).json()["outings"][0][
+            "coordinator_name"
+        ]
+        == "guest"
+    )
+
+
+def test_coordinator_can_handoff_to_pending_member_and_loses_permission(client):
+    owner, circle = setup_circle(client)
+    guest, member_id = join(client, circle)
+    other, other_id = join(client, circle, "another")
+    trip = outing(client, guest, circle)
+    trip = start(client, guest, trip)
+    path = f"/api/v2/outings/{trip['id']}/coordinator"
+    assert client.put(path, headers=other, json={"member_id": other_id}).status_code == 403
+    handoff = client.put(path, headers=guest, json={"member_id": other_id})
+    assert handoff.status_code == 200
+    result = handoff.json()
+    assert result["can_manage"] is False
+    assert result["coordinator_id"] == other_id
+    assert result["settings"] == trip["settings"]
+    assert result["round"] == trip["round"]
+    assert result["planning_revision"] == trip["planning_revision"]
+    assert (
+        next(p for p in result["participants"] if p["member_id"] == other_id)["attendance"]
+        == "pending"
+    )
+    assert client.put(path, headers=guest, json={"member_id": member_id}).status_code == 403
+    # Circle owner remains able to recover the organizer role.
+    assert (
+        client.put(path, headers=owner, json={"member_id": circle["me"]["id"]}).status_code == 200
+    )
+
+
+def test_coordinator_selection_rejects_external_removed_unclaimed_and_closed(client):
+    owner, circle = setup_circle(client)
+    _, member_id = join(client, circle)
+    _, elsewhere = setup_other_circle(client)
+    root = f"/api/v2/groups/{circle['id']}"
+    trip = outing(client, owner, circle)
+    path = f"/api/v2/outings/{trip['id']}/coordinator"
+    with connect() as db:
+        db.execute(
+            "INSERT INTO circle_members(id,circle_id,preferences) VALUES(%s,%s,%s::jsonb)",
+            ("unclaimed", circle["id"], '{"name":"عضو ينتظر حسابه"}'),
+        )
+    for target in ("missing-member", "unclaimed", elsewhere["me"]["id"]):
+        assert client.put(path, headers=owner, json={"member_id": target}).status_code == 409
+        assert (
+            client.post(
+                root + "/outings",
+                headers=owner,
+                json={"title": "لا تنشأ", "coordinator_id": target},
+            ).status_code
+            == 409
+        )
+    client.post(root + f"/members/{member_id}/remove", headers=owner)
+    assert client.put(path, headers=owner, json={"member_id": member_id}).status_code == 409
+    client.post(root + f"/members/{member_id}/restore", headers=owner)
+    client.post(f"/api/v2/outings/{trip['id']}/close", headers=owner)
+    assert client.put(path, headers=owner, json={"member_id": member_id}).status_code == 409
+    assert len(client.get(root, headers=owner).json()["outings"]) == 1
+
+
+def setup_other_circle(client):
+    auth, _ = account(client, "outsider_owner")
+    response = client.post(
+        "/api/v2/groups",
+        headers=auth,
+        json={"title": "قروب آخر", "preferences": {"name": "من قروب آخر"}},
+    )
+    assert response.status_code == 201
+    return auth, response.json()

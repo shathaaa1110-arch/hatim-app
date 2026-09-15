@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -116,6 +116,54 @@ export type Confirmation = {
   label: string;
   run: () => Promise<unknown>;
 };
+/** Keep confirmation inside the current sheet when switching between member actions. */
+export function ConfirmationContent({
+  value,
+  busy,
+  done,
+  back,
+}: {
+  value: Confirmation;
+  busy: boolean;
+  done: () => void;
+  back: () => void;
+}) {
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const inFlight = useRef(false);
+  useEffect(() => setError(null), [value]);
+  const submit = async () => {
+    if (busy || inFlight.current) return;
+    inFlight.current = true;
+    setSaving(true);
+    setError(null);
+    try {
+      await value.run();
+      done();
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "تعذّر تنفيذ الإجراء. حاول مجددًا.",
+      );
+    } finally {
+      inFlight.current = false;
+      setSaving(false);
+    }
+  };
+  return (
+    <>
+      <T style={{ lineHeight: 26 }}>{value.text}</T>
+      <ErrorNotice error={error} />
+      <Button
+        label={value.label}
+        busy={busy || saving}
+        onPress={() => {
+          void submit();
+        }}
+      />
+      <Button secondary label="رجوع" disabled={busy || saving} onPress={back} />
+    </>
+  );
+}
 export function Confirm({
   value,
   busy,
@@ -133,20 +181,14 @@ export function Confirm({
         if (!busy) close();
       }}
     >
-      <T style={{ lineHeight: 26 }}>{value?.text}</T>
-      <Button
-        label={value?.label ?? "تأكيد"}
-        busy={busy}
-        onPress={() => {
-          void value
-            ?.run()
-            .then(close)
-            .catch(() => {
-              close();
-            });
-        }}
-      />
-      <Button secondary label="رجوع" disabled={busy} onPress={close} />
+      {value && (
+        <ConfirmationContent
+          value={value}
+          busy={busy}
+          done={close}
+          back={close}
+        />
+      )}
     </Sheet>
   );
 }

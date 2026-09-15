@@ -87,6 +87,10 @@ docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES
 
 That filename is an example; use a fresh filename when retaining multiple backups.
 
+## Leadership and member actions
+
+Choose the outing coordinator while creating an outing. The group owner or current coordinator can transfer that role to an active account-linked member without changing attendance. The outing shows both names and an **إدارة الطلعة والطرد** entry. Unavailable actions explain why; funny removal can be enabled there. Real group removal remains owner-only, available there and in **الأعضاء والطرد** on the group screen. Confirmations stay in one native sheet and failed writes remain visible for retry. Read the [Arabic walkthrough](docs/learning-python-postgres/14-leadership-and-removal.ar.md).
+
 ## Link a previous group
 
 After registering or signing in on the original organizer device, choose **اربط قروبي السابق بحسابي**. The server verifies its existing owner token, preserves its members/preferences/settings and creates the first outing. Old writes are then disabled for that group. A returning browser member can claim their old membership while joining with an account if that browser still holds its previous member token. Without that token, no account can impersonate the old member. Existing data is not deleted by migration 002.

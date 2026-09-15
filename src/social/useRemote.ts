@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
+import { ApiError } from "../api/client";
 
 /** Reads may refresh, but a read begun before a write must never replace its result. */
 export function useRemote<T>(read: () => Promise<T>) {
@@ -22,8 +23,11 @@ export function useRemote<T>(read: () => Promise<T>) {
         setError(null);
       }
     } catch (e) {
-      if (live.current && version === epoch.current)
+      if (live.current && version === epoch.current) {
+        if (e instanceof ApiError && (e.status === 401 || e.status === 404))
+          setData(null);
         setError(e instanceof Error ? e.message : "تعذّر التحديث.");
+      }
     } finally {
       fetching.current = false;
       if (live.current) setLoading(false);

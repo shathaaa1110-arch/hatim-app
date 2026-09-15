@@ -994,6 +994,8 @@ export interface components {
        * @default 3
        */
       slots: number;
+      /** Coordinator Id */
+      coordinator_id?: string | null;
     };
     /** OutingSummary */
     OutingSummary: {
@@ -1010,6 +1012,8 @@ export interface components {
       going: number;
       /** Slots */
       slots: number;
+      /** Coordinator Name */
+      coordinator_name: string;
     };
     /** OutingView */
     OutingView: {
@@ -1019,6 +1023,12 @@ export interface components {
       circle_id: string;
       /** Title */
       title: string;
+      /** Owner Name */
+      owner_name: string;
+      /** Coordinator Name */
+      coordinator_name: string;
+      /** Coordinator Id */
+      coordinator_id: string;
       /**
        * Status
        * @enum {string}
@@ -1057,6 +1067,8 @@ export interface components {
       is_me: boolean;
       /** Is Coordinator */
       is_coordinator: boolean;
+      /** Is Owner */
+      is_owner: boolean;
       /** Fun Opt In */
       fun_opt_in: boolean;
       /** Claimed */

@@ -82,6 +82,7 @@ class OutingSummary(Model):
     status: Literal["open", "closed"]
     going: int
     slots: int
+    coordinator_name: str
 
 
 class CircleView(Model):
@@ -108,6 +109,7 @@ class TitleChange(Model):
 
 class OutingCreate(TitleChange):
     slots: int = Field(default=3, ge=1, le=9)
+    coordinator_id: str | None = Field(default=None, min_length=1)
 
 
 class AttendanceChange(Model):
@@ -130,6 +132,7 @@ class Participant(Model):
     attendance: Literal["pending", "going", "declined"]
     is_me: bool
     is_coordinator: bool
+    is_owner: bool
     fun_opt_in: bool
     claimed: bool
     fun_used: bool
@@ -181,6 +184,9 @@ class OutingView(Model):
     id: str
     circle_id: str
     title: str
+    owner_name: str
+    coordinator_name: str
+    coordinator_id: str
     status: Literal["open", "closed"]
     settings: Settings
     plan: Plan

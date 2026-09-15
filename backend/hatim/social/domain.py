@@ -60,6 +60,17 @@ def manage_outing(circle, me, outing):
         raise HTTPException(403, "هذا الإجراء لقائد الطلعة أو مالك القروب.")
 
 
+def coordinator_target(db, circle_id, member_id):
+    target = db.execute(
+        "SELECT id FROM circle_members WHERE circle_id=%s AND id=%s "
+        "AND status='active' AND account_id IS NOT NULL",
+        (circle_id, member_id),
+    ).fetchone()
+    if not target:
+        raise HTTPException(409, "اختر عضوًا نشطًا في هذا القروب وله حساب. الحضور يُؤكَّد بشكل مستقل.")
+    return target["id"]
+
+
 def ensure_open(circle, outing=None):
     if circle["archived"] or (outing and outing["status"] != "open"):
         raise HTTPException(409, "هذه اللمّة مؤرشفة؛ افتح طلعة جديدة.")
@@ -182,6 +193,9 @@ def circle_view(db, circle, me):
                 status=o["status"],
                 going=o["going"],
                 slots=o["settings"]["slots"],
+                coordinator_name=next(
+                    r["preferences"]["name"] for r in rows if r["id"] == o["coordinator_id"]
+                ),
             )
             for o in outings
         ],
@@ -301,6 +315,16 @@ def outing_view(db, circle, me, outing):
         id=outing["id"],
         circle_id=circle["id"],
         title=outing["title"],
+        owner_name=db.execute(
+            "SELECT preferences->>'name' AS name FROM circle_members WHERE circle_id=%s AND account_id=%s",
+            (circle["id"], circle["owner_id"]),
+        ).fetchone()["name"],
+        coordinator_name=next(
+            preferences_for(r, archived=outing["status"] == "closed").name
+            for r in rows
+            if r["member_id"] == outing["coordinator_id"]
+        ),
+        coordinator_id=outing["coordinator_id"],
         status=outing["status"],
         settings=Settings.model_validate(outing["settings"]),
         plan=plan,
@@ -315,6 +339,7 @@ def outing_view(db, circle, me, outing):
                 attendance=r["attendance"],
                 is_me=r["member_id"] == me["id"],
                 is_coordinator=r["member_id"] == outing["coordinator_id"],
+                is_owner=r["account_id"] == circle["owner_id"],
                 fun_opt_in=r["fun_opt_in"],
                 claimed=r["account_id"] is not None,
                 fun_used=r["fun_used"],

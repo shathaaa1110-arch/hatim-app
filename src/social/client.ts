@@ -66,8 +66,18 @@ export const social = {
     call<Circle>(`/groups/${id}/transfer`, token, "POST", { member_id }),
   archiveGroup: (token: string, id: string) =>
     call<Circle>(`/groups/${id}/archive`, token, "POST"),
-  createOuting: (token: string, id: string, title: string, slots: number) =>
-    call<Outing>(`/groups/${id}/outings`, token, "POST", { title, slots }),
+  createOuting: (
+    token: string,
+    id: string,
+    title: string,
+    slots: number,
+    coordinator_id?: string,
+  ) =>
+    call<Outing>(`/groups/${id}/outings`, token, "POST", {
+      title,
+      slots,
+      coordinator_id,
+    }),
   outing: (token: string, id: string) => call<Outing>(`/outings/${id}`, token),
   attendance: (
     token: string,

@@ -9,12 +9,12 @@ from .auth import User
 from .domain import (
     catalog,
     circle_access,
+    coordinator_target,
     ensure_open,
     invalidate,
     manage_outing,
     outing_access,
     outing_view,
-    owner_only,
     participant_rows,
     planning,
     preferences_for,
@@ -29,6 +29,7 @@ def create(circle_id: str, body: OutingCreate, user: User):
     with connect() as db:
         circle, me = circle_access(db, circle_id, user.id, lock=True)
         ensure_open(circle)
+        coordinator_id = coordinator_target(db, circle_id, body.coordinator_id or me["id"])
         outing_id = secrets.token_urlsafe(12)
         db.execute(
             "INSERT INTO outings(id,circle_id,title,coordinator_id,settings) VALUES(%s,%s,%s,%s,%s)",
@@ -36,7 +37,7 @@ def create(circle_id: str, body: OutingCreate, user: User):
                 outing_id,
                 circle_id,
                 body.title,
-                me["id"],
+                coordinator_id,
                 Jsonb(Settings(slots=body.slots, anchor_id=None).model_dump()),
             ),
         )
@@ -112,16 +113,10 @@ def settings(outing_id: str, change: SettingsChange, user: User):
 @router.put("/outings/{outing_id}/coordinator", response_model=OutingView)
 def coordinator(outing_id: str, body: MemberSelection, user: User):
     with connect() as db:
-        circle, _me, outing = outing_access(db, outing_id, user.id, lock=True)
-        owner_only(circle, user.id)
+        circle, me, outing = outing_access(db, outing_id, user.id, lock=True)
+        manage_outing(circle, me, outing)
         ensure_open(circle, outing)
-        target = db.execute(
-            "SELECT 1 FROM outing_participants p JOIN circle_members m ON m.id=p.member_id "
-            "WHERE p.outing_id=%s AND p.member_id=%s AND p.attendance='going' AND m.status='active' AND m.account_id IS NOT NULL",
-            (outing_id, body.member_id),
-        ).fetchone()
-        if not target:
-            raise HTTPException(409, "اختر عضوًا حاضرًا مرتبطًا بحساب.")
+        coordinator_target(db, circle["id"], body.member_id)
         db.execute("UPDATE outings SET coordinator_id=%s WHERE id=%s", (body.member_id, outing_id))
         return outing_view(db, *outing_access(db, outing_id, user.id))
 

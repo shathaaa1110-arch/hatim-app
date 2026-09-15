@@ -2928,6 +2928,18 @@
             "minimum": 1.0,
             "title": "Slots",
             "default": 3
+          },
+          "coordinator_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coordinator Id"
           }
         },
         "additionalProperties": false,
@@ -2962,6 +2974,10 @@
           "slots": {
             "type": "integer",
             "title": "Slots"
+          },
+          "coordinator_name": {
+            "type": "string",
+            "title": "Coordinator Name"
           }
         },
         "additionalProperties": false,
@@ -2971,7 +2987,8 @@
           "title",
           "status",
           "going",
-          "slots"
+          "slots",
+          "coordinator_name"
         ],
         "title": "OutingSummary"
       },
@@ -2988,6 +3005,18 @@
           "title": {
             "type": "string",
             "title": "Title"
+          },
+          "owner_name": {
+            "type": "string",
+            "title": "Owner Name"
+          },
+          "coordinator_name": {
+            "type": "string",
+            "title": "Coordinator Name"
+          },
+          "coordinator_id": {
+            "type": "string",
+            "title": "Coordinator Id"
           },
           "status": {
             "type": "string",
@@ -3057,6 +3086,9 @@
           "id",
           "circle_id",
           "title",
+          "owner_name",
+          "coordinator_name",
+          "coordinator_id",
           "status",
           "settings",
           "plan",
@@ -3097,6 +3129,10 @@
           "is_coordinator": {
             "type": "boolean",
             "title": "Is Coordinator"
+          },
+          "is_owner": {
+            "type": "boolean",
+            "title": "Is Owner"
           },
           "fun_opt_in": {
             "type": "boolean",
@@ -3140,6 +3176,7 @@
           "attendance",
           "is_me",
           "is_coordinator",
+          "is_owner",
           "fun_opt_in",
           "claimed",
           "fun_used"

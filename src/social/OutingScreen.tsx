@@ -14,6 +14,7 @@ import { PlanScreen } from "../screens/PlanScreen";
 import { ar, colors as c, photos } from "../theme";
 import { social, type Outing } from "./client";
 import { RoundPanel } from "./RoundPanel";
+import { OutingManagement } from "./OutingManagement";
 import { useRemote } from "./useRemote";
 import {
   Confirm,
@@ -96,6 +97,7 @@ export function OutingScreen({
   }, [token, id]);
   const r = useRemote(read);
   const [tab, setTab] = useState("خطتنا");
+  const [managing, setManaging] = useState(false);
   const [detail, setDetail] = useState<Experience | null>(null);
   const [confirm, setConfirm] = useState<Confirmation | null>(null);
   const [budget, setBudget] = useState("");
@@ -173,6 +175,34 @@ export function OutingScreen({
       {r.loading && <Loading />}
       {o && (
         <>
+          <Panel glass>
+            <Row>
+              <Crown color={c.green} size={26} />
+              <View style={{ flex: 1 }}>
+                <T weight="semibold">قائد الطلعة: {o.coordinator_name}</T>
+                <T style={s.muted}>مالك القروب: {o.owner_name}</T>
+              </View>
+            </Row>
+            <Button
+              secondary
+              label="إدارة الطلعة والطرد"
+              onPress={() => setManaging(true)}
+            />
+          </Panel>
+          {managing && (
+            <OutingManagement
+              outing={o}
+              token={token}
+              busy={r.busy}
+              error={r.error}
+              update={update}
+              close={() => setManaging(false)}
+              openGroup={() => {
+                setManaging(false);
+                back();
+              }}
+            />
+          )}
           {o.status === "closed" && (
             <Notice text="حفظنا هذه الطلعة كما كانت. تغيير الأذواق لاحقًا ما يغيّر ذكرياتها." />
           )}
@@ -316,51 +346,15 @@ export function OutingScreen({
                       ))}
                     </View>
                   )}
-                  {o.is_owner &&
-                    manage &&
-                    person.attendance === "going" &&
-                    person.claimed &&
-                    !person.is_coordinator && (
-                      <Button
-                        small
-                        secondary
-                        label={`قيادة الطلعة لـ${person.name}`}
-                        onPress={() =>
-                          setConfirm({
-                            title: "نغيّر قائد الطلعة؟",
-                            text: `${person.name} يقدر يعدّل الخطة ويدير جولة الاختيار. ملكية القروب تبقى كما هي.`,
-                            label: "تعيين القائد",
-                            run: () =>
-                              update(() =>
-                                social.coordinator(token, id, person.member_id),
-                              ),
-                          })
-                        }
-                      />
-                    )}
-                  {o.status === "open" &&
-                    me?.attendance === "going" &&
-                    me.fun_opt_in &&
-                    person.attendance === "going" &&
-                    person.fun_opt_in &&
-                    !person.is_me &&
-                    !person.fun_used && (
-                      <Button
-                        small
-                        secondary
-                        label={`مقعد الاحتياط لـ${person.name} 😄`}
-                        icon={Smile}
-                        busy={r.busy}
-                        onPress={() => {
-                          void update(() =>
-                            social.fun(token, id, person.member_id),
-                          ).catch(() => {});
-                        }}
-                      />
-                    )}
+                  <Button
+                    small
+                    secondary
+                    label={`خيارات ${person.name}: القيادة والطرد`}
+                    onPress={() => setManaging(true)}
+                  />
                 </Panel>
               ))}
-              <Notice text="الأذواق التفصيلية تظهر لصاحبها ومالك القروب وقائد الطلعة. فعّل المزاح من صفحة القروب إذا ودّك تشارك." />
+              <Notice text="الأذواق التفصيلية تظهر لصاحبها ومالك القروب وقائد الطلعة. خيارات القيادة والطرد وتفعيل المزاح موجودة في «إدارة الطلعة والطرد» أعلى الصفحة." />
               {manage && (
                 <Button
                   secondary
