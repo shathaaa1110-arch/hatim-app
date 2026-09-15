@@ -1,0 +1,76 @@
+# شرح `package.json`
+
+[فهرس الكود](README.ar.md) · [دروس البداية](../README.ar.md) · [قاموس الرموز](../01-foundations.ar.md) · [التنسيق](../08-components.ar.md)
+
+المصدر: [الملف في النسخة المرجعية](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/package.json) · [الملف المحلي](../../../package.json). عدد الأسطر: 60. المقاطع التالية تعرض المصدر نفسه دون تعديل، والشرح خارج الكود.
+
+## هوية وحزم وأوامر الواجهة
+
+[الأسطر 1–60](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/package.json#L1): JSON إعداد وليست دوال تنفيذ. name و version هوية الحزمة، و main يشير إلى index.ts. dependencies مكتبات التشغيل، و devDependencies أدوات الفحص والاختبار؛ وظائفها في الدرس 09. scripts أسماء مختصرة لأوامر الطرفية، مثل npm run api التي تشغّل Python عبر uv. private تمنع نشر حزمة npm بالخطأ. overrides تضبط uuid تحت حزمة xcode. ~ تسمح بتحديث patch ضمن minor و^ أوسع حسب SemVer، بينما package-lock تثبت الحل الفعلي. expo-linking اعتماد مباشر غير مستعمل في كود الرحلة الحالي.
+
+```json
+{
+  "name": "hatim-app",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo-google-fonts/ibm-plex-sans-arabic": "^0.4.2",
+    "@expo/ui": "~57.0.16",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.20",
+    "expo-blur": "~57.0.2",
+    "expo-clipboard": "~57.0.1",
+    "expo-font": "~57.0.3",
+    "expo-glass-effect": "~57.0.1",
+    "expo-linear-gradient": "~57.0.1",
+    "expo-linking": "~57.0.9",
+    "expo-secure-store": "~57.0.3",
+    "expo-status-bar": "~57.0.1",
+    "lucide-react-native": "^1.41.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "^0.21.2",
+    "expo-device": "~57.0.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/react": "~19.2.2",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "ios:release": "expo run:ios --configuration Release",
+    "web:build": "expo export --platform web",
+    "typecheck": "tsc --noEmit",
+    "api": "uv run --project backend --env-file backend/.env.local uvicorn hatim.main:app --app-dir backend --host 127.0.0.1 --port 8000",
+    "test:api": "uv run --project backend --env-file backend/.env.local pytest backend/tests -q",
+    "test:e2e": "playwright test",
+    "types:api": "node scripts/generate-types.mjs",
+    "check": "npm run typecheck && npm run test:api",
+    "public:test": "node scripts/public-test.mjs",
+    "format": "prettier --write App.tsx src tests scripts/*.mjs playwright.config.ts",
+    "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts",
+    "db:up": "node scripts/database.mjs up",
+    "db:stop": "node scripts/database.mjs stop",
+    "db:status": "node scripts/database.mjs status",
+    "db:import": "uv run --directory backend --env-file .env.local python -m hatim.import_sqlite"
+  },
+  "private": true,
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
+  }
+}
+```
+
+## تأكدي من فهمك
+
+اختاري مقطعًا واشرحي مدخلاته ونتيجته وما الذي يغيّره. ثم اكتبي مثالًا أصغر بنفس الفكرة في مجلد تدريب، واذكري ما يجب اختباره قبل دمجه.

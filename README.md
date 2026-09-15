@@ -4,6 +4,8 @@ An Arabic-first React Native app for a group choosing food experiences within a 
 
 This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The app's API shape, planner rules, and native UI remain compatible.
 
+For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes 13 lessons, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). It distinguishes the current implementation from proposed account and deployment work.
+
 ## Start locally
 
 Requirements: Node 22.13+, npm, uv, Docker/OrbStack, Xcode 26.4+ and CocoaPods for iOS. Install cloudflared for public invitations.
