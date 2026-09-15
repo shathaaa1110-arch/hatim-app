@@ -20,6 +20,7 @@ export function PlanScreen({
   busy,
   onOpen,
   onPocket,
+  readOnly = false,
 }: {
   group: Group;
   catalog: Experience[];
@@ -27,6 +28,7 @@ export function PlanScreen({
   busy: boolean;
   onOpen: (e: Experience) => void;
   onPocket: () => void;
+  readOnly?: boolean;
 }) {
   return (
     <View style={{ gap: 23 }}>
@@ -41,12 +43,14 @@ export function PlanScreen({
           الأهم يبقى. وكل اختيار له سبب واضح.
         </T>
       </View>
-      <MealControl
-        slots={group.settings.slots ?? 9}
-        consumed={group.plan.consumed}
-        onChange={(slots) => update({ ...group.settings, slots })}
-        busy={busy}
-      />
+      {!readOnly && (
+        <MealControl
+          slots={group.settings.slots ?? 9}
+          consumed={group.plan.consumed}
+          onChange={(slots) => update({ ...group.settings, slots })}
+          busy={busy}
+        />
+      )}
       {group.plan.anchor_issue && (
         <View style={{ gap: 9 }}>
           <Notice warning text={group.plan.anchor_issue} />
@@ -132,24 +136,26 @@ export function PlanScreen({
               </Row>
             ))}
             <Row>
-              <View style={{ flex: 1 }}>
-                <Button
-                  small
-                  label="عشناها"
-                  icon={Check}
-                  secondary
-                  busy={busy}
-                  onPress={() =>
-                    update({
-                      ...group.settings,
-                      completed_ids: [
-                        ...(group.settings.completed_ids ?? []),
-                        e.id,
-                      ],
-                    })
-                  }
-                />
-              </View>
+              {!readOnly && (
+                <View style={{ flex: 1 }}>
+                  <Button
+                    small
+                    label="عشناها"
+                    icon={Check}
+                    secondary
+                    busy={busy}
+                    onPress={() =>
+                      update({
+                        ...group.settings,
+                        completed_ids: [
+                          ...(group.settings.completed_ids ?? []),
+                          e.id,
+                        ],
+                      })
+                    }
+                  />
+                </View>
+              )}
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`عرض ${e.title}`}
@@ -212,21 +218,23 @@ export function PlanScreen({
               <T style={{ flex: 1 }}>
                 {catalog.find((e) => e.id === id)?.title}
               </T>
-              <Pressable
-                disabled={busy}
-                accessibilityRole="button"
-                onPress={() =>
-                  update({
-                    ...group.settings,
-                    completed_ids: group.settings.completed_ids?.filter(
-                      (x) => x !== id,
-                    ),
-                  })
-                }
-                style={{ padding: 10 }}
-              >
-                <T style={{ color: c.muted, fontSize: 12 }}>تراجع</T>
-              </Pressable>
+              {!readOnly && (
+                <Pressable
+                  disabled={busy}
+                  accessibilityRole="button"
+                  onPress={() =>
+                    update({
+                      ...group.settings,
+                      completed_ids: group.settings.completed_ids?.filter(
+                        (x) => x !== id,
+                      ),
+                    })
+                  }
+                  style={{ padding: 10 }}
+                >
+                  <T style={{ color: c.muted, fontSize: 12 }}>تراجع</T>
+                </Pressable>
+              )}
             </Row>
           ))}
         </View>

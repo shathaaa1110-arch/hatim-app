@@ -4,6 +4,518 @@
  */
 
 export interface paths {
+  "/api/v2/auth/register": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Register */
+    post: operations["register_api_v2_auth_register_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Login */
+    post: operations["login_api_v2_auth_login_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/auth/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Me */
+    get: operations["me_api_v2_auth_me_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/auth/logout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Logout */
+    post: operations["logout_api_v2_auth_logout_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/experiences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Experiences */
+    get: operations["experiences_api_v2_experiences_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Groups */
+    get: operations["groups_api_v2_groups_get"];
+    put?: never;
+    /** Create Circle */
+    post: operations["create_circle_api_v2_groups_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/legacy/claim": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Claim Legacy */
+    post: operations["claim_legacy_api_v2_legacy_claim_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Group */
+    get: operations["group_api_v2_groups__circle_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/title": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Rename */
+    put: operations["rename_api_v2_groups__circle_id__title_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/me/preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Preferences */
+    put: operations["preferences_api_v2_groups__circle_id__me_preferences_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/me/options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Options */
+    patch: operations["options_api_v2_groups__circle_id__me_options_patch"];
+    trace?: never;
+  };
+  "/api/v2/invites/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Invite */
+    get: operations["invite_api_v2_invites__code__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/invites/{code}/join": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Join */
+    post: operations["join_api_v2_invites__code__join_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/members/{member_id}/remove": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Remove */
+    post: operations["remove_api_v2_groups__circle_id__members__member_id__remove_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/members/{member_id}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Restore */
+    post: operations["restore_api_v2_groups__circle_id__members__member_id__restore_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Transfer */
+    post: operations["transfer_api_v2_groups__circle_id__transfer_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/archive": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Archive */
+    post: operations["archive_api_v2_groups__circle_id__archive_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/groups/{circle_id}/outings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create */
+    post: operations["create_api_v2_groups__circle_id__outings_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get */
+    get: operations["get_api_v2_outings__outing_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/me/attendance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Attendance */
+    put: operations["attendance_api_v2_outings__outing_id__me_attendance_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Settings */
+    put: operations["settings_api_v2_outings__outing_id__settings_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/coordinator": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Coordinator */
+    put: operations["coordinator_api_v2_outings__outing_id__coordinator_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/close": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Close */
+    post: operations["close_api_v2_outings__outing_id__close_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/fun/{member_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Send Fun */
+    post: operations["send_fun_api_v2_outings__outing_id__fun__member_id__post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/fun/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Dismiss Fun */
+    delete: operations["dismiss_fun_api_v2_outings__outing_id__fun_me_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/rounds": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create */
+    post: operations["create_api_v2_outings__outing_id__rounds_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/rounds/{round_id}/my-vote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Vote */
+    put: operations["vote_api_v2_rounds__round_id__my_vote_put"];
+    post?: never;
+    /** Withdraw */
+    delete: operations["withdraw_api_v2_rounds__round_id__my_vote_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/rounds/{round_id}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Cancel */
+    post: operations["cancel_api_v2_rounds__round_id__cancel_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/rounds/{round_id}/resolve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Resolve */
+    post: operations["resolve_api_v2_rounds__round_id__resolve_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/rounds/{round_id}/draw": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Draw */
+    post: operations["draw_api_v2_rounds__round_id__draw_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/health": {
     parameters: {
       query?: never;
@@ -179,6 +691,107 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** Account */
+    Account: {
+      /** Id */
+      id: string;
+      /** Handle */
+      handle: string;
+      /** Name */
+      name: string;
+    };
+    /** AccountSession */
+    AccountSession: {
+      /** Token */
+      token: string;
+      account: components["schemas"]["Account"];
+    };
+    /** Acknowledged */
+    Acknowledged: {
+      /**
+       * Ok
+       * @default true
+       */
+      ok: boolean;
+    };
+    /** AttendanceChange */
+    AttendanceChange: {
+      /**
+       * Attendance
+       * @enum {string}
+       */
+      attendance: "pending" | "going" | "declined";
+      /** Budget Override */
+      budget_override?: number | null;
+    };
+    /** CircleCreate */
+    CircleCreate: {
+      /** Title */
+      title: string;
+      preferences: components["schemas"]["Preferences"];
+    };
+    /** CircleJoin */
+    CircleJoin: {
+      preferences: components["schemas"]["Preferences"];
+      /** Legacy Token */
+      legacy_token?: string | null;
+    };
+    /** CircleMember */
+    CircleMember: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Is Owner */
+      is_owner: boolean;
+      /** Is Me */
+      is_me: boolean;
+      /** Claimed */
+      claimed: boolean;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "active" | "removed";
+      /** Fun Opt In */
+      fun_opt_in: boolean;
+      preferences?: components["schemas"]["Preferences"] | null;
+    };
+    /** CircleSummary */
+    CircleSummary: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Member Count */
+      member_count: number;
+      /** Pinned */
+      pinned: boolean;
+      /** Is Owner */
+      is_owner: boolean;
+      /** Archived */
+      archived: boolean;
+    };
+    /** CircleView */
+    CircleView: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Invite Code */
+      invite_code: string;
+      /** Is Owner */
+      is_owner: boolean;
+      /** Archived */
+      archived: boolean;
+      me: components["schemas"]["CircleMember"];
+      /** Pinned */
+      pinned: boolean;
+      /** Members */
+      members: components["schemas"]["CircleMember"][];
+      /** Outings */
+      outings: components["schemas"]["OutingSummary"][];
+    };
     /** CreateGroup */
     CreateGroup: {
       /**
@@ -187,6 +800,16 @@ export interface components {
        */
       title: string;
       preferences: components["schemas"]["Preferences"];
+    };
+    /** Credentials */
+    Credentials: {
+      /** Handle */
+      handle: string;
+      /**
+       * Password
+       * Format: password
+       */
+      password: string;
     };
     /** Decision */
     Decision: {
@@ -280,6 +903,15 @@ export interface components {
         | "صويا"
       )[];
     };
+    /** FunCard */
+    FunCard: {
+      /** Target Id */
+      target_id: string;
+      /** Target Name */
+      target_name: string;
+      /** Remaining Seconds */
+      remaining_seconds: number;
+    };
     /** GroupCreated */
     GroupCreated: {
       /** Organizer Token */
@@ -314,6 +946,16 @@ export interface components {
       /** Consumed */
       consumed: number;
     };
+    /** LegacyClaim */
+    LegacyClaim: {
+      /** Group Id */
+      group_id: string;
+      /**
+       * Owner Token
+       * Format: password
+       */
+      owner_token: string;
+    };
     /** Member */
     Member: {
       /** Id */
@@ -330,6 +972,100 @@ export interface components {
       /** Member Token */
       member_token: string;
       member: components["schemas"]["Member"];
+    };
+    /** MemberSelection */
+    MemberSelection: {
+      /** Member Id */
+      member_id: string;
+    };
+    /** MembershipOptions */
+    MembershipOptions: {
+      /** Pinned */
+      pinned?: boolean | null;
+      /** Fun Opt In */
+      fun_opt_in?: boolean | null;
+    };
+    /** OutingCreate */
+    OutingCreate: {
+      /** Title */
+      title: string;
+      /**
+       * Slots
+       * @default 3
+       */
+      slots: number;
+    };
+    /** OutingSummary */
+    OutingSummary: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "closed";
+      /** Going */
+      going: number;
+      /** Slots */
+      slots: number;
+    };
+    /** OutingView */
+    OutingView: {
+      /** Id */
+      id: string;
+      /** Circle Id */
+      circle_id: string;
+      /** Title */
+      title: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "closed";
+      settings: components["schemas"]["Settings"];
+      plan: components["schemas"]["Plan"];
+      /** Participants */
+      participants: components["schemas"]["Participant"][];
+      /** My Member Id */
+      my_member_id: string;
+      /** Can Manage */
+      can_manage: boolean;
+      /** Is Owner */
+      is_owner: boolean;
+      /** Eligible Ids */
+      eligible_ids: string[];
+      round: components["schemas"]["RoundView"] | null;
+      /** Cards */
+      cards: components["schemas"]["FunCard"][];
+      /** Planning Revision */
+      planning_revision: number;
+    };
+    /** Participant */
+    Participant: {
+      /** Member Id */
+      member_id: string;
+      /** Name */
+      name: string;
+      /**
+       * Attendance
+       * @enum {string}
+       */
+      attendance: "pending" | "going" | "declined";
+      /** Is Me */
+      is_me: boolean;
+      /** Is Coordinator */
+      is_coordinator: boolean;
+      /** Fun Opt In */
+      fun_opt_in: boolean;
+      /** Claimed */
+      claimed: boolean;
+      /** Fun Used */
+      fun_used: boolean;
+      preferences?: components["schemas"]["Preferences"] | null;
+      /** Budget Override */
+      budget_override?: number | null;
     };
     /** Plan */
     Plan: {
@@ -400,6 +1136,75 @@ export interface components {
        */
       budget: number;
     };
+    /** PublicCircle */
+    PublicCircle: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Member Count */
+      member_count: number;
+    };
+    /** Registration */
+    Registration: {
+      /** Handle */
+      handle: string;
+      /**
+       * Password
+       * Format: password
+       */
+      password: string;
+      /** Name */
+      name: string;
+    };
+    /** RoundCreate */
+    RoundCreate: {
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "vote" | "draw";
+      /** Experience Ids */
+      experience_ids: string[];
+    };
+    /** RoundOption */
+    RoundOption: {
+      /** Experience Id */
+      experience_id: string;
+      /** Votes */
+      votes: number;
+    };
+    /** RoundView */
+    RoundView: {
+      /** Id */
+      id: string;
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "vote" | "draw";
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "tied" | "resolved" | "invalidated";
+      /** Options */
+      options: components["schemas"]["RoundOption"][];
+      /** My Vote */
+      my_vote: string | null;
+      /** Voter Count */
+      voter_count: number;
+      /** Voted Count */
+      voted_count: number;
+      /** Can Vote */
+      can_vote: boolean;
+      /** Result Id */
+      result_id: string | null;
+      /** Resolved By */
+      resolved_by: ("vote" | "draw" | "only_option") | null;
+      /** Resolved At */
+      resolved_at: string | null;
+    };
     /** Settings */
     Settings: {
       /**
@@ -417,6 +1222,21 @@ export interface components {
       /** Completed Ids */
       completed_ids?: string[];
     };
+    /** SettingsChange */
+    SettingsChange: {
+      settings: components["schemas"]["Settings"];
+      expected: components["schemas"]["Settings"];
+    };
+    /** TitleChange */
+    TitleChange: {
+      /** Title */
+      title: string;
+    };
+    /** VoteChange */
+    VoteChange: {
+      /** Experience Id */
+      experience_id: string;
+    };
   };
   responses: never;
   parameters: never;
@@ -426,6 +1246,1045 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  register_api_v2_auth_register_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Registration"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountSession"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  login_api_v2_auth_login_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Credentials"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountSession"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  me_api_v2_auth_me_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Account"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  logout_api_v2_auth_logout_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Acknowledged"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  experiences_api_v2_experiences_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Experience"][];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  groups_api_v2_groups_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleSummary"][];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  create_circle_api_v2_groups_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CircleCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  claim_legacy_api_v2_legacy_claim_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LegacyClaim"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  group_api_v2_groups__circle_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  rename_api_v2_groups__circle_id__title_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TitleChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  preferences_api_v2_groups__circle_id__me_preferences_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Preferences"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  options_api_v2_groups__circle_id__me_options_patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MembershipOptions"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  invite_api_v2_invites__code__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicCircle"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  join_api_v2_invites__code__join_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CircleJoin"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  remove_api_v2_groups__circle_id__members__member_id__remove_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+        member_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  restore_api_v2_groups__circle_id__members__member_id__restore_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+        member_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  transfer_api_v2_groups__circle_id__transfer_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MemberSelection"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  archive_api_v2_groups__circle_id__archive_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  create_api_v2_groups__circle_id__outings_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OutingCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  get_api_v2_outings__outing_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  attendance_api_v2_outings__outing_id__me_attendance_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AttendanceChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  settings_api_v2_outings__outing_id__settings_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SettingsChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  coordinator_api_v2_outings__outing_id__coordinator_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MemberSelection"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  close_api_v2_outings__outing_id__close_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  send_fun_api_v2_outings__outing_id__fun__member_id__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+        member_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  dismiss_fun_api_v2_outings__outing_id__fun_me_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  create_api_v2_outings__outing_id__rounds_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RoundCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  vote_api_v2_rounds__round_id__my_vote_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        round_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VoteChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  withdraw_api_v2_rounds__round_id__my_vote_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        round_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  cancel_api_v2_rounds__round_id__cancel_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        round_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  resolve_api_v2_rounds__round_id__resolve_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        round_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  draw_api_v2_rounds__round_id__draw_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        round_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
   health_api_health_get: {
     parameters: {
       query?: never;

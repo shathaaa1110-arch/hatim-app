@@ -1,5 +1,8 @@
 # 00 · المتطلبات وحدود النسخة
 
+> ملاحظة إصدار: هذا الدرس يحلل لقطة `59d45d3`. الحسابات والكتالوج المخزن والقروبات أضيفت لاحقًا؛ [الفصل 13](13-social-groups.ar.md) يشرح التنفيذ الجديد. لا يثبت ذلك تلقائيًا استيفاء متطلبات المدرسة أو استقلالية العمل.
+
+
 [الفهرس](README.ar.md) · [التالي: الأساسيات](01-foundations.ar.md)
 
 راجعت صفحتي [المتطلبات التقنية](https://hoblertonschool.notion.site/Portfolio-Project-Technical-Requirements-311204290bfc8076ac82d9867899af46) و[خطة الاجتماعات](https://hoblertonschool.notion.site/Portfolio-Project-Meetings-Plan-397204290bfc8077b41fe6333d5b9f16) من رابط الفصل الذي أرسلتِه. لم أعتمد على دليل SQLite القديم داخل المستودع.

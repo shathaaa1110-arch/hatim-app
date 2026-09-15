@@ -2,11 +2,11 @@
 
 An Arabic-first React Native app for a group choosing food experiences within a limited number of meal slots. The organizer uses the iPhone app; invited members use a browser link.
 
-This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The app's API shape, planner rules, and native UI remain compatible.
+This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The new group API lives under `/api/v2`; legacy group endpoints remain available for groups that have not been linked to an account. The original planner is reused.
 
-For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes 13 lessons, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). It distinguishes the current implementation from proposed account and deployment work.
+For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes 13 lessons, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). The 48-file codebook preserves revision `59d45d3`; the [new social-features chapter](docs/learning-python-postgres/13-social-groups.ar.md) explains the current implementation separately.
 
-Under discussion, not implemented: [persistent groups, separate outings, voting, member roles, a shared random draw, and playful interactions](docs/proposals/persistent-groups.ar.md), with proposed architecture and a [beginner design explanation](docs/learning-python-postgres/group-feature-design.ar.md). Feature changes must keep architecture and learning material in sync as documented in AGENTS.md.
+Implemented here: accounts, persistent groups with saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
 
 ## Start locally
 
@@ -41,11 +41,11 @@ With PostgreSQL running:
 npm run public:test
 ```
 
-The script starts a temporary Cloudflare tunnel, saves its HTTPS origin in the root `.env.local`, exports the Expo web companion, and starts FastAPI on port 8000. It can reuse a healthy Python/PostgreSQL Hatim API already serving the web companion on that port. It refuses an unrelated or .NET service. Reusing a process does not reload modified backend code; restart your API after backend edits.
+The script starts a temporary Cloudflare tunnel, saves its HTTPS origin in the root `.env.local`, exports the Expo web companion, and starts FastAPI on port 8000. It can reuse a healthy Python/PostgreSQL Hatim API already serving the web companion on that port. It checks `api_generation: 2` and refuses an older, unrelated, or .NET service. Reusing a process does not reload modified backend code; restart your API after backend edits.
 
 Leave the terminal open. Ctrl+C stops only the API/tunnel processes started by the script; PostgreSQL keeps running. If cloudflared is not on PATH, `.tools/cloudflared` is also supported. Only the HTTP API is tunneled, never the PostgreSQL port.
 
-In the native app use **لَمّتنا → اعزم الربع** to copy the real `/join/<random-code>` link. The root website is the invitation entry, not organizer administration. The Mac, database, API, and tunnel must remain running. Quick Tunnel origins change on restart: rebuild the native app with the new origin and share the refreshed invitation URL. Group IDs and invitation codes remain in PostgreSQL.
+In the native app use **لَمّاتي → القروب → اعزم الربع** to copy the real `/join/<random-code>` link. The root website is the invitation entry, not organizer administration. The Mac, database, API, and tunnel must remain running. Quick Tunnel origins change on restart: rebuild the native app with the new origin and share the refreshed invitation URL. Group IDs and invitation codes remain in PostgreSQL.
 
 ## iPhone and Simulator
 
@@ -87,13 +87,20 @@ docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES
 
 That filename is an example; use a fresh filename when retaining multiple backups.
 
+## Link a previous group
+
+After registering or signing in on the original organizer device, choose **اربط قروبي السابق بحسابي**. The server verifies its existing owner token, preserves its members/preferences/settings and creates the first outing. Old writes are then disabled for that group. A returning browser member can claim their old membership while joining with an account if that browser still holds its previous member token. Without that token, no account can impersonate the old member. Existing data is not deleted by migration 002.
+
+The same invitation code continues under the current tunnel origin. For new groups, invited members sign in once and confirm attendance for each outing. Password reset is not yet available; keep the username and password you choose.
+
 ## Small architecture
 
-- **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and GlassEffect. Four local organizer tabs and a member invitation screen.
-- **API:** FastAPI routes and Pydantic validation. Pure deterministic ranking in `backend/hatim/planner.py`. `psycopg` executes parameterized PostgreSQL queries; no ORM or external backend service.
-- **Database:** groups and members tables; settings/preferences stored as JSONB, timestamps as TIMESTAMPTZ, organizer flag as BOOLEAN. Numbered SQL migrations with recorded checksums. Reads use repeatable-read snapshots. Mutations lock the group's row before inspecting/changing its state; concurrent joins cannot exceed twelve members.
-- **Access:** separate random invitation, organizer, and member capabilities. Private tokens are hashed at rest. Native organizer credentials use SecureStore; browser credentials stay in that browser. Organizer sees constraints and can remove members, but cannot edit another member's profile. Invite responses omit private constraints and adaptations.
-- **Updates:** active clients poll every six seconds. Organizer mutations suppress stale poll results. No queue, WebSocket server, or AI model is involved.
+- **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and native GlassEffect. Account, group, outing and decision screens reuse the existing components.
+- **API:** FastAPI routers in `backend/hatim/social/`, validated with Pydantic. Deterministic ranking stays in `planner.py`. `psycopg` runs parameterized SQL without an ORM.
+- **Database:** 12 new tables alongside the 3 existing ones. Accounts, circle memberships, outings, participants, catalog, rounds, votes and fun cards have explicit keys and constraints. Numbered migrations remain checksum-verified.
+- **Access:** Argon2 passwords and random opaque sessions stored as SHA-256 hashes, expiring in 30 days. Native sessions use SecureStore. Browser sessions are local to their origin. Owners and outing coordinators have separate permissions enforced on every request.
+- **Consistency:** writers lock circle → outing → round. One vote per member per round; resolving twice returns the same result. Settings writes compare the client's expected settings to prevent overwriting another device's choice.
+- **Updates:** active clients poll every six seconds; stale reads cannot replace local write results. No queue, WebSocket server or AI model is involved.
 
 See [the Arabic architecture and PostgreSQL migration guide](docs/architecture-python-postgres.ar.md).
 
@@ -122,12 +129,12 @@ npx playwright install chromium
 HATIM_TEST_URL=http://127.0.0.1:8002 npm run test:e2e
 ```
 
-The tests cover separate organizer/member browsers, joining/editing, contraction, blocked anchor, completion/undo, search, pocket persistence, retry and mobile overflow. Configure the test API to listen on 8002 for this example. Backend OpenAPI export does not start the server or touch the database. Its TypeScript generator is isolated with TS5 because the app uses TS6.
+The tests cover new account registration/login, permanent groups, attendance, opt-in fun, voting, tie-breaking draw, stored results, removal/restoration, and the legacy separate organizer/member browsers, joining/editing, contraction, blocked anchor, completion/undo, search, pocket persistence, retry and mobile overflow. Configure the test API to listen on 8002 for this example. Backend OpenAPI export does not start the server or touch the database. Its TypeScript generator is isolated with TS5 because the app uses TS6.
 
 ## Scope
 
-The nine experiences, venue names, prices and options are fictional demo content. Allergy verification is intentionally absent, so entering an allergy can correctly block the whole demo catalog. No reservations, live availability, account/password login, account recovery, or permanent hosting are implemented. A hosted PostgreSQL URL can replace the local one; the local Docker setup is not a remote database deployment by itself.
+The nine experiences, venue names, prices and options are fictional demo content. Allergy verification is intentionally absent, so entering an allergy can correctly block the whole demo catalog. No reservations, live availability, password recovery, catalog editing interface, or permanent hosting are implemented. Accounts, password login/logout and cross-device group recovery by signing in are implemented. A hosted PostgreSQL URL can replace the local one; the local Docker setup is not a remote database deployment by itself.
 
-For the school project, independently implemented authentication, Figma deliverables, learning evidence and permanent deployment still need their own work. Switching the database alone does not fulfill every academic requirement. The old untracked `docs/learning/` material describes the pre-migration SQLite implementation.
+For the school project, this AI-assisted implementation is a learning reference; your own implementation evidence, Figma deliverables and permanent deployment still need their own work. Switching the database alone does not fulfill every academic requirement. The old untracked `docs/learning/` material describes the pre-migration SQLite implementation.
 
 Photography is bundled and attributed in `assets/ATTRIBUTION.md`. IBM Plex Sans Arabic comes from @expo-google-fonts under its bundled OFL license.

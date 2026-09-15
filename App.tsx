@@ -6,6 +6,7 @@ import { IBMPlexSansArabic_400Regular } from "@expo-google-fonts/ibm-plex-sans-a
 import { IBMPlexSansArabic_500Medium } from "@expo-google-fonts/ibm-plex-sans-arabic/500Medium";
 import { IBMPlexSansArabic_600SemiBold } from "@expo-google-fonts/ibm-plex-sans-arabic/600SemiBold";
 import { IBMPlexSansArabic_700Bold } from "@expo-google-fonts/ibm-plex-sans-arabic/700Bold";
+import { SocialApp } from "./src/social/SocialApp";
 import { Organizer } from "./src/screens/Organizer";
 import { InviteScreen } from "./src/screens/InviteScreen";
 import { colors } from "./src/theme";
@@ -22,6 +23,9 @@ export default function App() {
   const organizerPreview =
     web &&
     new URLSearchParams(window.location.search).get("preview") === "organizer";
+  const legacyPreview =
+    web &&
+    new URLSearchParams(window.location.search).get("preview") === "legacy";
   const inviteCode = web
     ? (window.location.pathname.match(/^\/join\/([A-Za-z0-9_-]+)\/?$/)?.[1] ??
       null)
@@ -33,10 +37,12 @@ export default function App() {
         <StatusBar style="dark" />
         {!loaded && !fontError ? (
           <ActivityIndicator style={{ flex: 1 }} color={colors.green} />
-        ) : web && !organizerPreview ? (
-          <InviteScreen code={inviteCode} />
-        ) : (
+        ) : legacyPreview ? (
           <Organizer />
+        ) : web && !organizerPreview && !inviteCode ? (
+          <InviteScreen code={null} />
+        ) : (
+          <SocialApp inviteCode={inviteCode} />
         )}
       </View>
     </SafeAreaProvider>

@@ -27,6 +27,7 @@ from .models import (
     Settings,
 )
 from .planner import build_plan
+from .social import auth, circles, outings, rounds
 from .store import connect, digest, initialize
 
 
@@ -54,10 +55,12 @@ app.add_middleware(
         ).split(",")
         if origin.strip()
     ],
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["Authorization", "Content-Type"],
 )
 app.add_middleware(ResponsePolicyMiddleware)
+for router in (auth.router, circles.router, outings.router, rounds.router):
+    app.include_router(router)
 
 
 @app.exception_handler(RequestValidationError)
@@ -82,7 +85,14 @@ def require_owner(db, group_id: str, authorization: str | None, *, lock=False):
     ).fetchone()
     if row is None:
         raise HTTPException(404, "المجموعة غير متاحة أو الرابط غير صالح.")
+    if lock:
+        reject_upgraded_write(db, group_id)
     return row
+
+
+def reject_upgraded_write(db, group_id):
+    if db.execute("SELECT 1 FROM circles WHERE legacy_group_id=%s", (group_id,)).fetchone():
+        raise HTTPException(409, "تم نقل القروب إلى اللمّات. افتح النسخة الجديدة وسجّل الدخول.")
 
 
 def require_invite(db, code: str, *, lock=False):
@@ -91,6 +101,8 @@ def require_invite(db, code: str, *, lock=False):
     ).fetchone()
     if row is None:
         raise HTTPException(404, "دعوة غير صالحة. اطلب رابطًا جديدًا من المنظّم.")
+    if lock:
+        reject_upgraded_write(db, row["id"])
     return row
 
 
@@ -127,6 +139,7 @@ def health():
     return {
         "status": "ok",
         "version": "1.0.0",
+        "api_generation": 2,
         "catalog_mode": "fictional-demo",
         "backend": "python",
         "database": "postgresql",

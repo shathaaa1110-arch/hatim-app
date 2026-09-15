@@ -38,7 +38,7 @@ test("organizer and invited member coordinate a persistent, shrinking plan", asy
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/?preview=organizer");
+  await page.goto("/?preview=legacy");
   await page.getByRole("button", { name: "نبدأ لَمّتنا", exact: true }).click();
   await page.getByRole("textbox", { name: "اسمك" }).fill("منظّم التجربة");
   await page.getByRole("button", { name: "سعودي", exact: true }).click();

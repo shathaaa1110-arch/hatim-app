@@ -21,6 +21,7 @@ const reuseBackend = await new Promise((resolve, reject) => {
         response.ok &&
         health.status === "ok" &&
         health.version === "1.0.0" &&
+        health.api_generation === 2 &&
         health.backend === "python" &&
         health.database === "postgresql" &&
         health.catalog_mode === "fictional-demo"

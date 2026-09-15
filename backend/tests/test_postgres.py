@@ -16,6 +16,7 @@ def test_health_checks_postgresql_and_handles_connection_failure(client, monkeyp
     assert client.get("/api/health").json() == {
         "status": "ok",
         "version": "1.0.0",
+        "api_generation": 2,
         "catalog_mode": "fictional-demo",
         "backend": "python",
         "database": "postgresql",
@@ -62,7 +63,7 @@ def test_migrations_are_repeatable_and_detect_edited_history(database):
     initialize()
     initialize()
     with connect() as db:
-        assert db.execute("SELECT COUNT(*) AS n FROM schema_migrations").fetchone()["n"] == 1
+        assert db.execute("SELECT COUNT(*) AS n FROM schema_migrations").fetchone()["n"] == 2
         db.execute("UPDATE schema_migrations SET checksum='changed'")
     with pytest.raises(RuntimeError, match="Applied migration changed"):
         initialize()
