@@ -12,6 +12,8 @@ The iPhone opens discovery without asking for an account. Starting a plan, choos
 
 Optional group features: saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
 
+The implemented [modular architecture](docs/architecture-modules.ar.md) separates accounts, experiences, planning and optional groups. `src/application` composes feature entrypoints; `src/shared` provides UI, HTTP and storage. Backend `features` use shared `domain` rules and `core` infrastructure. Public interfaces and dependency-cycle checks run with `npm run check:architecture` and `npm run check`. Read [chapter17](docs/learning-python-postgres/17-extensible-architecture.ar.md) for adding a feature by hand.
+
 ## Start locally
 
 Requirements: Node 22.13+, npm, uv, Docker/OrbStack, Xcode 26.4+ and CocoaPods for iOS. Install cloudflared for public invitations.
@@ -104,7 +106,7 @@ The same invitation code continues under the current tunnel origin. For new grou
 ## Small architecture
 
 - **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and native GlassEffect. Account, group, outing and decision screens reuse the existing components.
-- **API:** FastAPI routers in `backend/hatim/social/`, validated with Pydantic. Deterministic ranking stays in `planner.py`. `psycopg` runs parameterized SQL without an ORM.
+- **API:** FastAPI routers in `backend/hatim/features/`, validated with Pydantic. `main.py` composes them; deterministic ranking stays in `domain/planner.py`. `psycopg` runs parameterized SQL without an ORM.
 - **Database:** 12 new tables alongside the 3 existing ones. Accounts, circle memberships, outings, participants, catalog, rounds, votes and fun cards have explicit keys and constraints. Numbered migrations remain checksum-verified.
 - **Direct account plans:** migration003 adds optional account ownership to groups, preserving existing guest plans. Both discovery endpoints and both planners read the same PostgreSQL catalog. Settings updates in the current UI send expected values to reject stale writes.
 - **Access:** Argon2 passwords and random opaque sessions stored as SHA-256 hashes, expiring in 30 days. Native sessions use SecureStore. Browser sessions are local to their origin. Owners and outing coordinators have separate permissions enforced on every request.

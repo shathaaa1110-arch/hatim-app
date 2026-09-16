@@ -1,5 +1,7 @@
 # 13 · ابني القروبات والطلعات والتصويت بنفسك
 
+> فصل تاريخي للسلوك قبل إعادة الهيكلة. روابط الكود أدناه مثبتة على النسخة94f2277؛ للمسارات الحالية وطريقة التوسعة اقرئي [الفصل17](17-extensible-architecture.ar.md).
+
 هذا فصل يشرح **الكود المضاف فعلًا** على `codex/persistent-groups` بتاريخ 15 سبتمبر 2026. لا يغيّر مرجع الأسطر القديم؛ ذلك المرجع يخص اللقطة `59d45d3`. [المعمارية الحالية](../architecture-python-postgres.ar.md) و[عقد API](../api-social.ar.md) يصفان الإضافة نفسها.
 
 ## ابدئي من الفرق بين الأشياء
@@ -26,7 +28,7 @@
 
 ## 1. الجداول: لماذا SQL قبل الشاشة؟
 
-افتحي [002_social_groups.sql](../../backend/migrations/002_social_groups.sql). `CREATE TABLE` ينشئ نوعًا من السجلات. `PRIMARY KEY` يحدد هوية السجل. `REFERENCES` يعني أن القيمة يجب أن تشير إلى سجل موجود. `UNIQUE` يمنع تكرار علاقة، و`CHECK` يرفض قيمة تخالف القاعدة حتى لو أخطأ الخادم.
+افتحي [002_social_groups.sql](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/migrations/002_social_groups.sql). `CREATE TABLE` ينشئ نوعًا من السجلات. `PRIMARY KEY` يحدد هوية السجل. `REFERENCES` يعني أن القيمة يجب أن تشير إلى سجل موجود. `UNIQUE` يمنع تكرار علاقة، و`CHECK` يرفض قيمة تخالف القاعدة حتى لو أخطأ الخادم.
 
 | مجموعة الجداول | ما الذي تعلّمينه منها؟ |
 |---|---|
@@ -45,7 +47,7 @@
 
 ## 2. نماذج Python: عقد قبل التنفيذ
 
-افتحي [social/models.py](../../backend/hatim/social/models.py). كل class ترث Model القديمة، فتستفيد من تحقق Pydantic ومنع الحقول غير المعروفة. `str` نص، `bool` صح/خطأ، `list[str]` قائمة نصوص، و`X | None` قيمة أو لا شيء. `Literal` قائمة قيم مسموحة فقط.
+افتحي [social/models.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/models.py). كل class ترث Model القديمة، فتستفيد من تحقق Pydantic ومنع الحقول غير المعروفة. `str` نص، `bool` صح/خطأ، `list[str]` قائمة نصوص، و`X | None` قيمة أو لا شيء. `Literal` قائمة قيم مسموحة فقط.
 
 - Credentials وRegistration يصفان طلب الدخول والتسجيل. `Field` يحدد الأطوال، و`field_validator` يوحد اسم الدخول إلى أحرف صغيرة. `SecretStr` يقلل ظهور كلمة المرور في تمثيل الكائن، لكن حماية التخزين الفعلية تأتي من Argon2.
 - Account لا يحتوي كلمة المرور. AccountSession يضيف token للرد عند الدخول فقط.
@@ -62,7 +64,7 @@
 
 ## 3. الدخول: من كلمة المرور إلى جلسة
 
-افتحي [auth.py](../../backend/hatim/social/auth.py). `APIRouter` يجمع المسارات تحت `/api/v2/auth`. `HTTPBearer` يقرأ Authorization. `Depends` يطلب من FastAPI تنفيذ دالة مساعدة قبل المسار.
+افتحي [auth.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/auth.py). `APIRouter` يجمع المسارات تحت `/api/v2/auth`. `HTTPBearer` يقرأ Authorization. `Depends` يطلب من FastAPI تنفيذ دالة مساعدة قبل المسار.
 
 | الدالة | مدخلها وفكرتها ومخرجها |
 |---|---|
@@ -82,7 +84,7 @@
 
 ## 4. domain.py: القواعد المشتركة والرد الآمن
 
-افتحي [domain.py](../../backend/hatim/social/domain.py). وضعنا الدوال المستعملة في أكثر من مسار هنا حتى لا تختلف قاعدة الصلاحية بين التصويت والخطة.
+افتحي [domain.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/domain.py). وضعنا الدوال المستعملة في أكثر من مسار هنا حتى لا تختلف قاعدة الصلاحية بين التصويت والخطة.
 
 | الدالة | لماذا نحتاجها؟ |
 |---|---|
@@ -109,7 +111,7 @@
 
 ## 5. circles.py: عمر القروب أطول من عمر الطلعة
 
-افتحي [circles.py](../../backend/hatim/social/circles.py) بجانب [جدول المسارات](../api-social.ar.md).
+افتحي [circles.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/circles.py) بجانب [جدول المسارات](../api-social.ar.md).
 
 إنشاء القروب يولد معرفًا ورمز دعوة، ثم يكتب القروب وعضوية المالك داخل معاملة. قائمة القروبات تُقرأ من عضوية الحساب وتُرتب مع المثبت أولًا. التثبيت خاص بكل عضو؛ لا يفرض ترتيبًا على بقية القروب.
 
@@ -123,7 +125,7 @@
 
 ## 6. outings.py: أين تعيش خطة اليوم؟
 
-افتحي [outings.py](../../backend/hatim/social/outings.py). create يضيف طلعة ويجعل منشئها حاضرًا. يستخدم القائد المختار أو المنشئ إن لم يحدد قائدًا، ويضيف بقية أعضاء القروب كمنتظرين. get يقرأ ردًا متسقًا دون تعديل.
+افتحي [outings.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/outings.py). create يضيف طلعة ويجعل منشئها حاضرًا. يستخدم القائد المختار أو المنشئ إن لم يحدد قائدًا، ويضيف بقية أعضاء القروب كمنتظرين. get يقرأ ردًا متسقًا دون تعديل.
 
 attendance يقرأ الحالة السابقة ويكتب الحالة الجديدة. إذا دخل عضو ضمن الحاضرين أو خرج منهم أو غيّر ميزانيته وهو حاضر، يستدعي invalidate. اعتذار الغائب عن طلعة لم يحضرها أصلًا لا يغير قيود الحاضرين.
 
@@ -133,7 +135,7 @@ coordinator يسمح للمالك أو القائد الحالي بتعيين ع
 
 ## 7. rounds.py: الصوت ليس رقمًا في الشاشة
 
-افتحي [rounds.py](../../backend/hatim/social/rounds.py).
+افتحي [rounds.py](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/hatim/social/rounds.py).
 
 create يفحص صلاحية المدير، وخانات متبقية، وخيارات متوافقة، وحسابات الحاضرين. يسجل قائمة المصوتين ورقم المراجعة ويكتب خيارات الجولة. لا يفتح جولة فوق جولة مفتوحة؛ يلزم إلغاؤها صراحة.
 
@@ -145,7 +147,7 @@ finish مشتركة بين resolve وdraw حتى تكون قاعدة الحسم 
 
 ## 8. من Python إلى TypeScript
 
-[client.ts الجديد](../../src/social/client.ts) يعيد استخدام request من [العميل المشترك](../../src/api/client.ts). الدالة call تضيف `/v2`، ثم request تضيف `/api` وتحدد عنوان المنصة ورأس Bearer والمهلة ورسالة الفشل.
+[client.ts الجديد](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/client.ts) يعيد استخدام request من [العميل المشترك](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/api/client.ts). الدالة call تضيف `/v2`، ثم request تضيف `/api` وتحدد عنوان المنصة ورأس Bearer والمهلة ورسالة الفشل.
 
 `type Outing = components["schemas"]["OutingView"]` يعني: استعملي شكل الرد المولد من نموذج Python بدل كتابة نسخة ثانية قد تختلف. التوليد يصف النوع أثناء البرمجة؛ التحقق الفعلي من طلب المستخدم ما زال مسؤولية الخادم.
 
@@ -153,7 +155,7 @@ finish مشتركة بين resolve وdraw حتى تكون قاعدة الحسم 
 
 ## 9. useRemote: كيف تصل بيانات مشتركة بلا WebSocket؟
 
-افتحي [useRemote.ts](../../src/social/useRemote.ts). hook دالة React تجمع سلوكًا متكررًا. كل شاشة تزودها بدالة read ثابتة باستخدام useCallback.
+افتحي [useRemote.ts](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/useRemote.ts). hook دالة React تجمع سلوكًا متكررًا. كل شاشة تزودها بدالة read ثابتة باستخدام useCallback.
 
 state تحتوي data/error/busy/loading. refs مثل writing وfetching وepoch تبقى بين مرات العرض دون أن تسبب عرضًا جديدًا وحدها. refresh يمنع قراءتين متداخلتين، ويحفظ رقم epoch قبل بدء الشبكة. mutate يزيد الرقم، فيصبح رد قراءة بدأت قبل الحفظ قديمًا فلا يستبدل نتيجته.
 
@@ -165,14 +167,14 @@ state تحتوي data/error/busy/loading. refs مثل writing وfetching وepoch
 
 | الملف | مسؤولياته وحالته المحلية |
 |---|---|
-| [SocialApp.tsx](../../src/social/SocialApp.tsx) | يستعيد token، يتحقق من me، ويحدد حساب/قروب/طلعة. Invitation تميز الرابط الجديد من القديم. Join تعيد العضو الحالي لقروبه أو تحفظ عضوية جديدة. claim يربط مفتاح المنظم السابق ثم يزيله محليًا بعد النجاح |
-| [AuthScreen.tsx](../../src/social/AuthScreen.tsx) | اسم وكلمة مرور ووضع تسجيل/دخول وخطأ وbusy. يحفظ الأب الجلسة عند النجاح؛ الشاشة لا تخزن كلمة المرور في DB أو التخزين المحلي |
-| [GroupsScreen.tsx](../../src/social/GroupsScreen.tsx) | لَمّاتي، التثبيت، الأرشيف، قروب جديد، وربط السابق. المسودة في state حتى ترسل |
-| [CircleScreen.tsx](../../src/social/CircleScreen.tsx) | قائمة الأعضاء والطلعات، تعديل ذوقي، رابط الدعوة، التثبيت والمزاح، إنشاء طلعة، وإجراءات المالك مع تأكيد |
-| [OutingScreen.tsx](../../src/social/OutingScreen.tsx) | تبويبات خطة/اختيار/حضور/اكتشاف/جيب، ميزانية مؤقتة، تفاصيل تجربة، إغلاق الطلعة. Bench يعرض الوقت المتبقي ويختفي عند الصفر |
-| [OutingManagement.tsx](../../src/social/OutingManagement.tsx) | إدارة القيادة والطرد وتفعيل المزاح وشرح أسباب التعطيل، وتأكيد داخل نفس النافذة |
-| [RoundPanel.tsx](../../src/social/RoundPanel.tsx) | اختيار نوع الجولة وتجاربها، التصويت والسحب والتعادل والحسم. حركة النرد أثناء الطلب تحترم تقليل الحركة؛ النتيجة من الخادم |
-| [ui.tsx](../../src/social/ui.tsx) | Page لترتيب الصفحة العربية، Panel للبطاقات، Field للمدخلات، ErrorNotice للفشل، Confirm لنافذة إجراء واضح |
+| [SocialApp.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/SocialApp.tsx) | يستعيد token، يتحقق من me، ويحدد حساب/قروب/طلعة. Invitation تميز الرابط الجديد من القديم. Join تعيد العضو الحالي لقروبه أو تحفظ عضوية جديدة. claim يربط مفتاح المنظم السابق ثم يزيله محليًا بعد النجاح |
+| [AuthScreen.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/AuthScreen.tsx) | اسم وكلمة مرور ووضع تسجيل/دخول وخطأ وbusy. يحفظ الأب الجلسة عند النجاح؛ الشاشة لا تخزن كلمة المرور في DB أو التخزين المحلي |
+| [GroupsScreen.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/GroupsScreen.tsx) | لَمّاتي، التثبيت، الأرشيف، قروب جديد، وربط السابق. المسودة في state حتى ترسل |
+| [CircleScreen.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/CircleScreen.tsx) | قائمة الأعضاء والطلعات، تعديل ذوقي، رابط الدعوة، التثبيت والمزاح، إنشاء طلعة، وإجراءات المالك مع تأكيد |
+| [OutingScreen.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/OutingScreen.tsx) | تبويبات خطة/اختيار/حضور/اكتشاف/جيب، ميزانية مؤقتة، تفاصيل تجربة، إغلاق الطلعة. Bench يعرض الوقت المتبقي ويختفي عند الصفر |
+| [OutingManagement.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/OutingManagement.tsx) | إدارة القيادة والطرد وتفعيل المزاح وشرح أسباب التعطيل، وتأكيد داخل نفس النافذة |
+| [RoundPanel.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/RoundPanel.tsx) | اختيار نوع الجولة وتجاربها، التصويت والسحب والتعادل والحسم. حركة النرد أثناء الطلب تحترم تقليل الحركة؛ النتيجة من الخادم |
+| [ui.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/social/ui.tsx) | Page لترتيب الصفحة العربية، Panel للبطاقات، Field للمدخلات، ErrorNotice للفشل، Confirm لنافذة إجراء واضح |
 
 كل شاشة ترسل طلب الإجراء، ثم تعرض الرد المعتمد. لا تمنح الصلاحية لمجرد قيمة مخزنة محليًا. حتى لو عدل أحد JavaScript ليظهر زر إزالة، الخادم يرفضه إذا لم يكن المالك.
 
@@ -191,7 +193,7 @@ state تحتوي data/error/busy/loading. refs مثل writing وfetching وepoch
 
 ## 12. كيف تعرفين أنها تعمل؟
 
-[اختبارات social](../../backend/tests/test_social.py) تبدأ قاعدة من مخطط معزول لكل اختبار. تجرّب دخولًا وخروجًا، جلسة منتهية، صلاحيات وحضورًا، صوتًا متكررًا، تعادلًا، أربعة طلبات قرعة متزامنة، لقطة مغلقة، إزالة وإعادة، ومفتاح القروب القديم. اختبار settings القديم يثبت أن تغييرًا من جهاز آخر لا يضيع.
+[اختبارات social](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/tests/test_social.py) تبدأ قاعدة من مخطط معزول لكل اختبار. تجرّب دخولًا وخروجًا، جلسة منتهية، صلاحيات وحضورًا، صوتًا متكررًا، تعادلًا، أربعة طلبات قرعة متزامنة، لقطة مغلقة، إزالة وإعادة، ومفتاح القروب القديم. اختبار settings القديم يثبت أن تغييرًا من جهاز آخر لا يضيع.
 
 [اختبار المتصفحين](../../tests/social.spec.ts) يسجل حسابين من الواجهة، ينشئ قروبًا وطلعة، يدعو عضوًا، يؤكد الحضور، يجرّب المزاح والتصويت والتعادل والقرعة، يقلل الوقت، ويعيد تحميل المتصفح ويختبر الإزالة والاستعادة والدخول مجددًا. لا يكفي اختبار زر في متصفح واحد لإثبات أن القرار مشترك.
 

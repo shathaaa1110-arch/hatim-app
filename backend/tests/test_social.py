@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from hatim.store import connect, digest
+from hatim.core.db import connect, digest
 
 
 def account(client, handle="owner"):

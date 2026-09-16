@@ -37,7 +37,7 @@
 
 ## src/api/schema.d.ts — أنواع للواجهة
 
-[افتحي الملف الكامل](../../../src/api/schema.d.ts). ملف `.d.ts` يصف أنواعًا ولا يشغّل شبكة. نولده من OpenAPI بواسطة [generate-types.mjs](scripts-generate-types.mjs.ar.md).
+[افتحي الملف الكامل](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/src/api/schema.d.ts). ملف `.d.ts` يصف أنواعًا ولا يشغّل شبكة. نولده من OpenAPI بواسطة [generate-types.mjs](scripts-generate-types.mjs.ar.md).
 
 من المصدر نفسه:
 

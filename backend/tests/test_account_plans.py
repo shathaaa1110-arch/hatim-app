@@ -5,8 +5,8 @@ from psycopg.types.json import Jsonb
 from test_api import create
 from test_social import account
 
-from hatim.catalog import CATALOG
-from hatim.store import connect
+from hatim.core.db import connect
+from hatim.features.experiences.fixtures import CATALOG
 
 
 def saved_plan(client, headers, **settings):

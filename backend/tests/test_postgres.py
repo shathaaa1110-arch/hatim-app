@@ -7,9 +7,9 @@ import pytest
 from psycopg.types.json import Jsonb
 from test_api import create
 
+from hatim.core.db import connect, initialize
+from hatim.domain.models import Settings
 from hatim.import_sqlite import import_database
-from hatim.models import Settings
-from hatim.store import connect, initialize
 
 
 def test_health_checks_postgresql_and_handles_connection_failure(client, monkeypatch):

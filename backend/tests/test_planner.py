@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from hatim.catalog import CATALOG
-from hatim.models import Member, Plan, Preferences, Settings
-from hatim.planner import build_plan, evaluate
+from hatim.domain.models import Member, Plan, Preferences, Settings
+from hatim.domain.planner import build_plan, evaluate
+from hatim.features.experiences.fixtures import CATALOG
 
 CASES = json.loads((Path(__file__).parent / "fixtures" / "planner-parity.json").read_text())
 

@@ -2,7 +2,7 @@
 
 هذا عقد الإضافة الاختيارية للقروبات الدائمة. المسار الأساسي للاكتشاف والخطة ورفقة الطلعة موضح في [عقد الخطة المباشرة](api-planning.ar.md)، ولا يتطلب حسابًا أو إنشاء قروب دائم.
 
-هذا مرجع النسخة المنفذة على `codex/persistent-groups`. المصدر الدقيق القابل للآلة هو [backend/openapi.json](../backend/openapi.json)، وتعرضه FastAPI في `/api/docs`. جميع المسارات أدناه تحت `/api/v2`، وتتعامل مع JSON. أنواع الواجهة في [schema.d.ts](../src/api/schema.d.ts) تُولّد بالأمر `npm run types:api` ولا تُكتب يدويًا.
+هذا مرجع النسخة المنفذة على `codex/persistent-groups`. المصدر الدقيق القابل للآلة هو [backend/openapi.json](../backend/openapi.json)، وتعرضه FastAPI في `/api/docs`. أعيد ترتيب الكود في16سبتمبر2026 إلى features/accounts وfeatures/groups وfeatures/experiences دون تغيير العقد. [شرح حدود الوحدات](architecture-modules.ar.md). جميع المسارات أدناه تحت `/api/v2`، وتتعامل مع JSON. أنواع الواجهة في [schema.d.ts](../src/shared/api/schema.d.ts) تُولّد بالأمر `npm run types:api` ولا تُكتب يدويًا.
 
 ## الهوية والأخطاء
 

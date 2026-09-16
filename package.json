@@ -43,14 +43,15 @@
     "test:e2e": "playwright test",
     "test:e2e:server": "uv run --project backend --env-file backend/.env.local python scripts/e2e-server.py",
     "types:api": "node scripts/generate-types.mjs",
-    "check": "npm run typecheck && npm run test:api",
+    "check": "npm run check:architecture && npm run typecheck && npm run test:api",
     "public:test": "node scripts/public-test.mjs",
     "format": "prettier --write App.tsx src tests scripts/*.mjs playwright.config.ts",
     "format:check": "prettier --check App.tsx src tests scripts/*.mjs playwright.config.ts",
     "db:up": "node scripts/database.mjs up",
     "db:stop": "node scripts/database.mjs stop",
     "db:status": "node scripts/database.mjs status",
-    "db:import": "uv run --directory backend --env-file .env.local python -m hatim.import_sqlite"
+    "db:import": "uv run --directory backend --env-file .env.local python -m hatim.import_sqlite",
+    "check:architecture": "node scripts/check-architecture.mjs && uv run --project backend pytest backend/tests/test_architecture.py -q"
   },
   "private": true,
   "overrides": {

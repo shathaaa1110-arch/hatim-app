@@ -2,7 +2,7 @@
 
 [فهرس الكود](README.ar.md) · [دروس البداية](../README.ar.md) · [قاموس الرموز](../01-foundations.ar.md) · [التنسيق](../08-components.ar.md)
 
-المصدر: [الملف في النسخة المرجعية](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/src/useOrganizer.ts) · [الملف المحلي](../../../src/useOrganizer.ts). عدد الأسطر: 121. المقاطع التالية تعرض المصدر نفسه دون تعديل، والشرح خارج الكود.
+المصدر: [الملف في النسخة المرجعية](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/src/useOrganizer.ts) · [خريطة الملفات الحالية](../../architecture-modules.ar.md). عدد الأسطر: 121. المقاطع التالية تعرض المصدر نفسه دون تعديل، والشرح خارج الكود.
 
 ## Hook لإدارة رحلة المنظّم
 

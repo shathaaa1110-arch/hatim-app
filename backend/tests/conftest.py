@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from psycopg import sql
 from psycopg.conninfo import make_conninfo
 
+from hatim.core.db import initialize
 from hatim.main import app
-from hatim.store import initialize
 
 
 @pytest.fixture

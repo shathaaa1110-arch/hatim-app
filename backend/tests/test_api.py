@@ -139,7 +139,7 @@ def test_start_plan_with_selected_anchor_and_constraints_in_one_request(client):
 
 
 def test_start_plan_without_silent_anchor_and_reject_unknown_experience(client):
-    from hatim.store import connect
+    from hatim.core.db import connect
 
     with connect() as db:
         before = db.execute("SELECT count(*) AS n FROM groups").fetchone()["n"]

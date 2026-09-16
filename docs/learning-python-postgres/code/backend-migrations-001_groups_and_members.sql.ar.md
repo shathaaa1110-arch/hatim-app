@@ -2,7 +2,7 @@
 
 [فهرس الكود](README.ar.md) · [دروس البداية](../README.ar.md) · [قاموس الرموز](../01-foundations.ar.md) · [التنسيق](../08-components.ar.md)
 
-المصدر: [الملف في النسخة المرجعية](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/backend/migrations/001_groups_and_members.sql) · [الملف المحلي](../../../backend/migrations/001_groups_and_members.sql). عدد الأسطر: 21. المقاطع التالية تعرض المصدر نفسه دون تعديل، والشرح خارج الكود.
+المصدر: [الملف في النسخة المرجعية](https://github.com/shathaaa1110-arch/hatim-app/blob/59d45d33cbd6995a07a9b68236dd9de9aaf2b713/backend/migrations/001_groups_and_members.sql) · [خريطة الملفات الحالية](../../architecture-modules.ar.md). عدد الأسطر: 21. المقاطع التالية تعرض المصدر نفسه دون تعديل، والشرح خارج الكود.
 
 ## جدول المجموعات
 

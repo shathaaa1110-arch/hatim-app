@@ -238,6 +238,38 @@
         }
       }
     },
+    "/api/experiences": {
+      "get": {
+        "summary": "Experiences",
+        "operationId": "experiences_api_experiences_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Experience"
+                  },
+                  "type": "array",
+                  "title": "Response Experiences Api Experiences Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/groups": {
       "get": {
         "tags": [
@@ -1626,64 +1658,6 @@
         }
       }
     },
-    "/api/health": {
-      "get": {
-        "summary": "Health",
-        "operationId": "health_api_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/experiences": {
-      "get": {
-        "summary": "Experiences",
-        "operationId": "experiences_api_experiences_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Experience"
-                  },
-                  "type": "array",
-                  "title": "Response Experiences Api Experiences Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/groups": {
       "post": {
         "summary": "Create Group",
@@ -2398,6 +2372,32 @@
                 "schema": {
                   "$ref": "#/components/schemas/Member"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },

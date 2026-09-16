@@ -1,0 +1,14 @@
+{
+  "frontend": {
+    "accounts": [],
+    "experiences": [],
+    "planning": ["accounts", "experiences"],
+    "groups": ["accounts", "experiences", "planning"]
+  },
+  "backend": {
+    "accounts": [],
+    "experiences": [],
+    "planning": ["accounts", "experiences"],
+    "groups": ["accounts", "experiences"]
+  }
+}

@@ -1,5 +1,7 @@
 # 16 · الحساب والخطط ومتطلبات المدرسة
 
+> فصل تاريخي للسلوك قبل إعادة الهيكلة. روابط الكود أدناه مثبتة على النسخة94f2277؛ للمسارات الحالية وطريقة التوسعة اقرئي [الفصل17](17-extensible-architecture.ar.md).
+
 هذا الفصل يصف الإضافة الحالية إلى نسخة Python + PostgreSQL على codex/persistent-groups. الدروس00–12 ومرجع48 ملفًا تبقى لقطة59d45d3 التاريخية. أرقام الاختبارات هنا تخص النموذج المرجعي، ولا تثبت أن الطالب كتبه مستقلًا.
 
 الهدف: الحساب يخدم خطتك وتجاربك. لا يلزم قروب دائم للتسجيل أو حفظ خطة، ولا يلزم حساب لتصفح التجارب. [المعمارية الحالية](../architecture-python-postgres.ar.md) و[مراجعة المدرسة](../school-readiness.ar.md) و[خطة التسليم](../school-delivery-plan.ar.md) تكمّل هذا الفصل.
@@ -45,7 +47,7 @@ sequenceDiagram
 
 ## 3. ترحيل قاعدة البيانات
 
-الملف [003_account_plans.sql](../../backend/migrations/003_account_plans.sql) يحتوي قرارين:
+الملف [003_account_plans.sql](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/backend/migrations/003_account_plans.sql) يحتوي قرارين:
 
 ```sql
 ALTER TABLE groups ADD COLUMN owner_account_id TEXT REFERENCES accounts(id);
@@ -99,7 +101,7 @@ initialize في store.py يقرأ ملفات SQL بالترتيب ويفحص ب�
 
 ## 5. جلسة مشتركة في React
 
-[AccountProvider.tsx](../../src/account/AccountProvider.tsx) يستخدم React Context. تخيليه مكانًا واحدًا تعود له الشاشات لمعرفة جلسة الدخول. App.tsx يضع AccountProvider حول التطبيق؛ الحساب والقروبات والمنظم يقرؤون useAccount بدل نسخ منطق الدخول في كل شاشة.
+[AccountProvider.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/account/AccountProvider.tsx) يستخدم React Context. تخيليه مكانًا واحدًا تعود له الشاشات لمعرفة جلسة الدخول. App.tsx يضع AccountProvider حول التطبيق؛ الحساب والقروبات والمنظم يقرؤون useAccount بدل نسخ منطق الدخول في كل شاشة.
 
 - useAccountState يملك session وloading وerror. state تعيد رسم الشاشات عند تغيرها.
 - restore تقرأ token من التخزين وتتحقق عبر GET auth/me.401 يلغي القيمة المحلية، لكن503 يحتفظ بها ويتيح إعادة المحاولة.
@@ -112,7 +114,7 @@ SecureStore يُستخدم في iPhone، وAsyncStorage في نسخة الويب
 
 ## 6. شاشة الحساب والتنقل
 
-[AccountScreen.tsx](../../src/account/AccountScreen.tsx) تفصل حالتين. دون جلسة تعرض AuthScreen. بوجودها تعرض SignedIn، الذي يقرأ قائمة الخطط ومعها خطة الضيف إن احتفظ الجهاز بمفتاحها.
+[AccountScreen.tsx](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/account/AccountScreen.tsx) تفصل حالتين. دون جلسة تعرض AuthScreen. بوجودها تعرض SignedIn، الذي يقرأ قائمة الخطط ومعها خطة الضيف إن احتفظ الجهاز بمفتاحها.
 
 SignedIn يستعمل useRemote للقراءة والتحديث. لو رُفضت جلسة أثناء قراءة الخطط، تعاد مراجعتها عبر AccountProvider كي يعود المستخدم إلى الدخول. r.mutate يمنع رد قراءة قديم من استبدال نتيجة تعديل أحدث. run يمنع تكرار الضغط أثناء عملية ويعرض رسالتها بدل ابتلاع الفشل.
 
@@ -126,7 +128,7 @@ SocialApp.tsx أصبح يستهلك الجلسة المشتركة بدل است�
 
 ## 7. إدارة الخطة المباشرة
 
-[useOrganizer.ts](../../src/useOrganizer.ts) يعرف ثلاث حالات: خطة حساب مختارة، خطة ضيف محفوظة، أو بداية جديدة. اختيار الحساب يخزن id فقط وتأتي صلاحية الطلب من جلسة AccountProvider. إذا لم توجد خطة مختارة للحساب يمكن عرض خطة الضيف الموجودة على الجهاز حتى يقرر صاحبها حفظها.
+[useOrganizer.ts](https://github.com/shathaaa1110-arch/hatim-app/blob/94f227750c0179145345bb669635a731bcd6d676/src/useOrganizer.ts) يعرف ثلاث حالات: خطة حساب مختارة، خطة ضيف محفوظة، أو بداية جديدة. اختيار الحساب يخزن id فقط وتأتي صلاحية الطلب من جلسة AccountProvider. إذا لم توجد خطة مختارة للحساب يمكن عرض خطة الضيف الموجودة على الجهاز حتى يقرر صاحبها حفظها.
 
 create ترسل token إذا وُجد، ثم تحفظ المرجع المناسب. rename تعيد اسم الخطة من API. deletePlan تنتظر نجاح DELETE ثم تزيل مرجعها المحلي وتعود للاكتشاف. settings ترسل الإعدادات الجديدة ومعها آخر group.settings في expected.
 

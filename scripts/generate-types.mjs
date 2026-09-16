@@ -19,10 +19,10 @@ const commands = [
       "openapi-typescript",
       "backend/openapi.json",
       "-o",
-      "src/api/schema.d.ts",
+      "src/shared/api/schema.d.ts",
     ],
   ],
-  ["npx", ["prettier", "--write", "src/api/schema.d.ts"]],
+  ["npx", ["prettier", "--write", "src/shared/api/schema.d.ts"]],
 ];
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: "inherit" });

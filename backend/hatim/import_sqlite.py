@@ -9,9 +9,9 @@ from uuid import uuid4
 
 from psycopg.types.json import Jsonb
 
-from .catalog import CATALOG_IDS
-from .models import Preferences, Settings
-from .store import connect, initialize
+from .core.db import connect, initialize
+from .domain.models import Preferences, Settings
+from .features.experiences.fixtures import CATALOG_IDS
 
 
 def import_database(source: Path) -> tuple[int, int, Path]:
