@@ -534,6 +534,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v2/groups/{circle_id}/me/skin": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Circle Skin */
+    put: operations["circle_skin_api_v2_groups__circle_id__me_skin_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v2/outings/{outing_id}/me/skin": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Outing Skin */
+    put: operations["outing_skin_api_v2_outings__outing_id__me_skin_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/groups": {
     parameters: {
       query?: never;
@@ -814,6 +848,7 @@ export interface components {
       status: "active" | "removed";
       /** Fun Opt In */
       fun_opt_in: boolean;
+      skin?: components["schemas"]["Skin"] | null;
       preferences?: components["schemas"]["Preferences"] | null;
     };
     /** CircleSummary */
@@ -1152,6 +1187,8 @@ export interface components {
       claimed: boolean;
       /** Fun Used */
       fun_used: boolean;
+      skin?: components["schemas"]["Skin"] | null;
+      skin_override?: components["schemas"]["Skin"] | null;
       preferences?: components["schemas"]["Preferences"] | null;
       /** Budget Override */
       budget_override?: number | null;
@@ -1378,6 +1415,61 @@ export interface components {
     SettingsChange: {
       settings: components["schemas"]["Settings"];
       expected: components["schemas"]["Settings"];
+    };
+    /** Skin */
+    Skin: {
+      /**
+       * Version
+       * @default 1
+       * @constant
+       */
+      version: 1;
+      /**
+       * Persona
+       * @enum {string}
+       */
+      persona: "host" | "on_way" | "you_choose";
+      /**
+       * Tone
+       * @default warm
+       * @enum {string}
+       */
+      tone: "light" | "warm" | "deep";
+      /**
+       * Outfit
+       * @default casual
+       * @enum {string}
+       */
+      outfit: "thobe" | "abaya" | "casual";
+      /**
+       * Color
+       * @default palm
+       * @enum {string}
+       */
+      color: "palm" | "saffron" | "rose" | "sky";
+      /**
+       * Accessory
+       * @default none
+       * @enum {string}
+       */
+      accessory: "none" | "glasses";
+      /**
+       * Expression
+       * @default smile
+       * @enum {string}
+       */
+      expression: "smile" | "wink" | "side_eye";
+      /**
+       * Phrase
+       * @default classic
+       * @enum {string}
+       */
+      phrase: "classic" | "extra";
+    };
+    /** SkinChange */
+    SkinChange: {
+      skin: components["schemas"]["Skin"] | null;
+      expected: components["schemas"]["Skin"] | null;
     };
     /** TitleChange */
     TitleChange: {
@@ -2478,6 +2570,76 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutingView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  circle_skin_api_v2_groups__circle_id__me_skin_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        circle_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkinChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CircleView"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  outing_skin_api_v2_outings__outing_id__me_skin_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        outing_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkinChange"];
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {

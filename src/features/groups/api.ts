@@ -9,6 +9,7 @@ export type CircleMember = components["schemas"]["CircleMember"];
 export type Outing = components["schemas"]["OutingView"];
 export type Round = components["schemas"]["RoundView"];
 export type PublicCircle = components["schemas"]["PublicCircle"];
+export type Skin = components["schemas"]["Skin"];
 
 function call<T>(path: string, token?: string, method = "GET", body?: unknown) {
   return request<T>(`/v2${path}`, { token, method, body });
@@ -25,6 +26,14 @@ export const groupsApi = {
     call<Circle>(`/groups/${id}/title`, token, "PUT", { title }),
   profile: (token: string, id: string, preferences: Preferences) =>
     call<Circle>(`/groups/${id}/me/preferences`, token, "PUT", preferences),
+  skin: (token: string, id: string, skin: Skin | null, expected: Skin | null) =>
+    call<Circle>(`/groups/${id}/me/skin`, token, "PUT", { skin, expected }),
+  outingSkin: (
+    token: string,
+    id: string,
+    skin: Skin | null,
+    expected: Skin | null,
+  ) => call<Outing>(`/outings/${id}/me/skin`, token, "PUT", { skin, expected }),
   options: (
     token: string,
     id: string,

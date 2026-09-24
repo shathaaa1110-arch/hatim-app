@@ -1658,6 +1658,120 @@
         }
       }
     },
+    "/api/v2/groups/{circle_id}/me/skin": {
+      "put": {
+        "tags": [
+          "Skins"
+        ],
+        "summary": "Circle Skin",
+        "operationId": "circle_skin_api_v2_groups__circle_id__me_skin_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "circle_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Circle Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkinChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircleView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/outings/{outing_id}/me/skin": {
+      "put": {
+        "tags": [
+          "Skins"
+        ],
+        "summary": "Outing Skin",
+        "operationId": "outing_skin_api_v2_outings__outing_id__me_skin_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "outing_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Outing Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkinChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutingView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/groups": {
       "post": {
         "summary": "Create Group",
@@ -2640,6 +2754,16 @@
             "type": "boolean",
             "title": "Fun Opt In"
           },
+          "skin": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "preferences": {
             "anyOf": [
               {
@@ -3553,6 +3677,26 @@
             "type": "boolean",
             "title": "Fun Used"
           },
+          "skin": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skin_override": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "preferences": {
             "anyOf": [
               {
@@ -4194,6 +4338,121 @@
           "expected"
         ],
         "title": "SettingsChange"
+      },
+      "Skin": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1,
+            "title": "Version",
+            "default": 1
+          },
+          "persona": {
+            "type": "string",
+            "enum": [
+              "host",
+              "on_way",
+              "you_choose"
+            ],
+            "title": "Persona"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "light",
+              "warm",
+              "deep"
+            ],
+            "title": "Tone",
+            "default": "warm"
+          },
+          "outfit": {
+            "type": "string",
+            "enum": [
+              "thobe",
+              "abaya",
+              "casual"
+            ],
+            "title": "Outfit",
+            "default": "casual"
+          },
+          "color": {
+            "type": "string",
+            "enum": [
+              "palm",
+              "saffron",
+              "rose",
+              "sky"
+            ],
+            "title": "Color",
+            "default": "palm"
+          },
+          "accessory": {
+            "type": "string",
+            "enum": [
+              "none",
+              "glasses"
+            ],
+            "title": "Accessory",
+            "default": "none"
+          },
+          "expression": {
+            "type": "string",
+            "enum": [
+              "smile",
+              "wink",
+              "side_eye"
+            ],
+            "title": "Expression",
+            "default": "smile"
+          },
+          "phrase": {
+            "type": "string",
+            "enum": [
+              "classic",
+              "extra"
+            ],
+            "title": "Phrase",
+            "default": "classic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "persona"
+        ],
+        "title": "Skin"
+      },
+      "SkinChange": {
+        "properties": {
+          "skin": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "skin",
+          "expected"
+        ],
+        "title": "SkinChange"
       },
       "TitleChange": {
         "properties": {

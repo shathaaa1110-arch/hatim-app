@@ -95,6 +95,10 @@ flowchart TD
 
 ## الخادم: مسؤولية كل مجلد
 
+إضافة الشخصيات24سبتمبر2026 تبقى داخل groups: المجلد `src/features/groups/skins` يضم `catalog.ts` لأسماء وعبارات وألوان الشخصيات، `SkinAvatar.tsx` لطبقات SVG، `SkinEditor.tsx` لمسودة التعديل وحفظها، و`SkinPeople.tsx` لعرض الحاضرين في الخطة والاختيار. CircleScreen وOutingScreen يملكان الاتصال عبر groups/api.ts. هذه رسومات ومعانٍ خاصة بالقروبات؛ لم ننقلها إلى shared ولم نضف اعتمادًا بين ميزتين في architecture.json.
+
+في الخادم، `features/groups/skins.py` يملك مساري تعديل الشخصية مع نماذجهما في models.py. domain.py يحسب الشخصية المعروضة، وoutings.py يلتقط شكلها عند الإغلاق. وحدة groups تملك أعمدة skin وskin_override وskin_snapshot المضافة في الترحيل005؛ نفس ترتيب الأقفال circle ثم outing، والتعديل التجميلي لا يستدعي invalidate. [التفاصيل والعقد والاختبارات](learning-python-postgres/19-outing-skins.ar.md).
+
 ```text
 backend/hatim/
   main.py                            تشغيل وربط routers وأخطاء وملفات الويب وhealth
@@ -131,6 +135,7 @@ backend/hatim/
       circles.py                     القروب والعضوية والملكية
       outings.py                     الحضور والقائد والخطة والأرشيف والمزاح
       rounds.py                      التصويت والقرعة والحسم
+      skins.py                       تعديل شكل العضو نفسه في القروب أو الطلعة
       domain.py                      الصلاحيات والاستعلامات وبناء الردود الداخلية
       models.py                      نماذج القروب والطلعة والجولة
   integrations/legacy_plans.py        التحويل الصريح من خطة ضيف إلى قروب دائم

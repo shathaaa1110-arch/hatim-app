@@ -56,7 +56,8 @@ src/
     experiences/                  الاكتشاف وبطاقة التجربة وكتالوج التجارب
     quickDecision/                بحث سريع واختيار صريح بلا حساب
     planning/                     الخطة المباشرة ورفقتها ودعوتها وإعدادها وطلباتها
-    groups/                       القروبات والطلعات والأدوار والجولات والمزاح
+    groups/                       القروبات والطلعات والأدوار والجولات والمزاح والشخصيات
+      skins/                      رسومات الشخصيات ومحررها وعرض الرفقة
   shared/
     api/http.ts                    عنوان المنصة وHTTP والأخطاء والمهلة
     api/schema.d.ts                عقد مولد من OpenAPI
@@ -71,7 +72,7 @@ backend/hatim/
   features/experiences/           مسارا الكتالوج ومستودع القراءة وبيانات الاختبار
   features/quick_decision/        API بحث بلا حفظ؛ يستعمل المحرك نفسه
   features/planning/              نماذج الخطة وrouter وخدمة المعاملات والدعوات
-  features/groups/                circles/outings/rounds ونماذج ومساعدات داخلية
+  features/groups/                circles/outings/rounds/skins ونماذج ومساعدات داخلية
   domain/                         محرك القرار النقي وبياناته المشتركة
   core/                           PostgreSQL والترحيلات وسياسة HTTP والنماذج العامة
   integrations/legacy_plans.py    الجسر الذري لتحويل خطة الضيف إلى قروب دائم
@@ -95,6 +96,16 @@ Dockerfile وdeploy/              ملفات نشر التطبيق؛ الاست�
 
 ```mermaid
 erDiagram
+    circle_members {
+        text id PK
+        jsonb skin "nullable default appearance"
+    }
+    outing_participants {
+        text outing_id PK,FK
+        text member_id PK,FK
+        jsonb skin_override "nullable outing appearance"
+        jsonb skin_snapshot "frozen appearance including null"
+    }
     accounts ||--o{ account_sessions : authenticates
     accounts o|--o{ groups : owns_saved_plans
     accounts ||--o{ circles : owns
@@ -121,9 +132,9 @@ erDiagram
 | `account_sessions` | بصمة مفتاح جلسة، الحساب، انتهاء بعد ٣٠ يومًا |
 | `auth_attempts` | عدادات محاولات الدخول والتسجيل ونهاية نافذة عشر دقائق |
 | `circles` | اسم القروب، مالكه، رمز الدعوة، حالة الأرشفة، رابط اختياري بالقروب القديم |
-| `circle_members` | الحساب أو العضو القديم غير المرتبط بعد، التفضيلات JSONB، الحالة، التثبيت الشخصي، الاشتراك بالمزاح |
+| `circle_members` | الحساب أو العضو القديم غير المرتبط بعد، التفضيلات JSONB، الحالة، التثبيت الشخصي، الاشتراك بالمزاح، وskin اختياري لشخصيته في هذا القروب |
 | `outings` | القروب والقائد والعنوان والخانات والركيزة والجيب والمكتمل ضمن Settings، رقم مراجعة، لقطة الخطة عند الإغلاق |
-| `outing_participants` | عضوية داخل طلعة: حاضر/لم يقرر/معتذر، ميزانية اختيارية، ولقطة الذوق عند الإغلاق |
+| `outing_participants` | عضوية داخل طلعة: حاضر/لم يقرر/معتذر، ميزانية اختيارية، لقطة الذوق، skin_override اختياري وskin_snapshot عند الإغلاق |
 | `experiences` | معرف تجربة وبقية محتواها JSONB؛ بُذرت نفس التجارب التسع الوهمية في الترحيل |
 | `decision_rounds` | الطلعة، نوع الجولة وحالتها، قائمة المصوتين وقت الفتح، المراجعة، النتيجة وطريقة حسمها |
 | `round_options` | تجارب الجولة وترتيب عرضها |
@@ -259,4 +270,31 @@ PostgreSQL محليًا داخل Docker بقرص دائم. FastAPI وdist على
 
 **قاعدة البيانات وERD:** العلاقات والجداول السابقة كما هي. تغير عقد JSONB: Settings.context مضاف اختياريًا بالقيم المحايدة، وexperiences.payload.outing_traits قائمة صفات تحريرية. migration004 يضيف صفات للتجارب الوهمية التسع إذا غاب الحقل؛ لا يعدّل بيانات الأعضاء. لا جدول بحث ولا حفظ لطلبات القرار السريع. الأرشيف يحتفظ بالسياق ولقطة الخطة، والتحويل إلى قروب ينقل settings كاملة. تحديث ERD بعلاقة جديدة هنا سيكون غير صحيح.
 
-حدود النسخة: الوقت مدة التجربة فقط، والحي اختيار يدوي. لا ساعات فتح مباشرة أو زمن قيادة أو ضمان مرافق أطفال. كل بيانات الكتالوج توضيحية. [عقد API](api-quick-decision.ar.md) و[الفصل18](learning-python-postgres/18-quick-decision.ar.md) يشرحان الملفات والتدفق والتحقق. [skins](proposals/outing-skins.ar.md) مقترح غير منفذ، خارج مخطط البيانات الحالي.
+حدود النسخة: الوقت مدة التجربة فقط، والحي اختيار يدوي. لا ساعات فتح مباشرة أو زمن قيادة أو ضمان مرافق أطفال. كل بيانات الكتالوج توضيحية. [عقد API](api-quick-decision.ar.md) و[الفصل18](learning-python-postgres/18-quick-decision.ar.md) يشرحان الملفات والتدفق والتحقق.
+
+## شخصيات اللمّة — تنفيذ24سبتمبر2026
+
+ثلاث شخصيات اختيارية: المعزّب، عند الإشارة، اختاروا أنتم. العضو يختار اللبس والبشرة واللون والتعبير والنظارة وعبارة جاهزة، ويعدّل نفسه فقط. تظهر في القروب وحضور الطلعة والخطة وحول اختيار التجربة. الاسم الحقيقي المعروض يبقى معها؛ الشخصية لا تمنح دورًا أو تصويتًا ولا تعبّر عن موقع فعلي. الواجهة الأساسية تظل الاكتشاف والخطة والجيب.
+
+الترحيل005 يضيف الأعمدة الثلاثة الموضحة في ERD، دون جداول أو علاقات جديدة. ملكيتها لوحدة groups. عند الطلعة المفتوحة تكون الشخصية الفعلية skin_override إن وُجدت، وإلا skin العضوية. عند إغلاق الطلعة تُكتب skin_snapshot لكل مشارك في معاملة لقطة الذوق والخطة نفسها. القراءة المغلقة تستخدم اللقطة وحدها، حتى لو كانت null؛ الطلعات المغلقة قبل هذه الميزة تبقى دون شخصيات بدل اختلاق تاريخ لها.
+
+```mermaid
+sequenceDiagram
+    actor Member as العضو
+    participant Editor as SkinEditor
+    participant API as groups skins router
+    participant DB as PostgreSQL
+    Member->>Editor: اختيار شخصية وتعديل شكلها
+    Editor->>API: PUT me/skin مع skin وexpected
+    API->>DB: قفل القروب ثم الطلعة إن لزم
+    API->>API: تحقق العضوية والأرشفة وexpected
+    alt تغيّر الشكل من جهاز آخر
+        API-->>Editor: 409 وتبقى المسودة
+    else القيمة المتوقعة مطابقة
+        API->>DB: تعديل شكل العضو نفسه فقط
+        API-->>Editor: CircleView أو OutingView
+        Editor-->>Member: إغلاق المحرر وعرض الشكل المحفوظ
+    end
+```
+
+الرسوم محلية باستخدام react-native-svg الموجودة بالمشروع؛ قاعدة البيانات تحفظ اختيارات صغيرة لا ملفات صور. لا اعتماد جديد بين الوحدات، ولا تعديل في planner أو planning_revision أو احتمالات القرعة. التحديث يصل لأعضاء القروب عبر التحديث الدوري الموجود كل٦ثوانٍ. [عقد الشخصيات](api-social.ar.md) و[شرح البناء والتحقق](learning-python-postgres/19-outing-skins.ar.md).

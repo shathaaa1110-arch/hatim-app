@@ -28,6 +28,9 @@ import { ar, colors as c, photos } from "../../shared/theme";
 import { groupsApi, type Outing } from "./api";
 import { RoundPanel } from "./RoundPanel";
 import { OutingManagement } from "./OutingManagement";
+import { SkinAvatar } from "./skins/SkinAvatar";
+import { SkinEditor } from "./skins/SkinEditor";
+import { SkinPeople } from "./skins/SkinPeople";
 import { useRemote } from "../../shared/useRemote";
 import {
   Confirm,
@@ -111,6 +114,7 @@ export function OutingScreen({
   const r = useRemote(read);
   const [tab, setTab] = useState("خطتنا");
   const [managing, setManaging] = useState(false);
+  const [skinEditing, setSkinEditing] = useState(false);
   const [detail, setDetail] = useState<Experience | null>(null);
   const [confirm, setConfirm] = useState<Confirmation | null>(null);
   const [budget, setBudget] = useState("");
@@ -209,6 +213,25 @@ export function OutingScreen({
               }}
             />
           )}
+          {me && o.status === "open" && (
+            <Button
+              secondary
+              label="شخصيتي لهذه الطلعة"
+              onPress={() => setSkinEditing(true)}
+            />
+          )}
+          {skinEditing && me && (
+            <SkinEditor
+              name={me.name}
+              initial={me.skin_override ?? null}
+              effective={me.skin ?? null}
+              scope="outing"
+              close={() => setSkinEditing(false)}
+              save={(value, expected) =>
+                update(() => groupsApi.outingSkin(token, id, value, expected))
+              }
+            />
+          )}
           {o.status === "closed" && (
             <Notice text="حفظنا هذه الطلعة كما كانت. تغيير الأذواق لاحقًا ما يغيّر ذكرياتها." />
           )}
@@ -249,15 +272,18 @@ export function OutingScreen({
             ))}
           </View>
           {tab === "خطتنا" && planGroup && (
-            <PlanScreen
-              group={planGroup}
-              catalog={catalog}
-              update={settings}
-              busy={r.busy}
-              onOpen={setDetail}
-              onPocket={() => setTab("الجيب")}
-              readOnly={!manage}
-            />
+            <>
+              <SkinPeople participants={o.participants} />
+              <PlanScreen
+                group={planGroup}
+                catalog={catalog}
+                update={settings}
+                busy={r.busy}
+                onOpen={setDetail}
+                onPocket={() => setTab("الجيب")}
+                readOnly={!manage}
+              />
+            </>
           )}
           {tab === "الاختيار" && (
             <RoundPanel
@@ -325,6 +351,7 @@ export function OutingScreen({
               {o.participants.map((person) => (
                 <Panel key={person.member_id}>
                   <Row>
+                    <SkinAvatar name={person.name} skin={person.skin} />
                     <View style={{ flex: 1 }}>
                       <T weight="semibold" style={{ fontSize: 20 }}>
                         {person.name}

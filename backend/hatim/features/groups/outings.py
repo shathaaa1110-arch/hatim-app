@@ -19,6 +19,7 @@ from .domain import (
     participant_rows,
     planning,
     preferences_for,
+    skin_for,
 )
 from .models import AttendanceChange, MemberSelection, OutingCreate, OutingView, SettingsChange
 
@@ -133,9 +134,15 @@ def close(outing_id: str, user: User):
         if outing["status"] == "open":
             _, rows, plan, _ = planning(db, outing)
             for row in rows:
+                skin = skin_for(row)
                 db.execute(
-                    "UPDATE outing_participants SET snapshot=%s WHERE outing_id=%s AND member_id=%s",
-                    (Jsonb(preferences_for(row).model_dump()), outing_id, row["member_id"]),
+                    "UPDATE outing_participants SET snapshot=%s,skin_snapshot=%s WHERE outing_id=%s AND member_id=%s",
+                    (
+                        Jsonb(preferences_for(row).model_dump()),
+                        Jsonb(skin.model_dump()) if skin is not None else None,
+                        outing_id,
+                        row["member_id"],
+                    ),
                 )
             db.execute(
                 "UPDATE outings SET status='closed',snapshot=%s WHERE id=%s",

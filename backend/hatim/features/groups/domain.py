@@ -18,6 +18,7 @@ from .models import (
     Participant,
     RoundOption,
     RoundView,
+    Skin,
 )
 
 
@@ -92,7 +93,7 @@ def invalidate_member(db, circle_id, member_id):
 
 def participant_rows(db, outing):
     return db.execute(
-        "SELECT p.*,m.preferences,m.account_id,m.fun_opt_in,m.status,"
+        "SELECT p.*,m.preferences,m.account_id,m.fun_opt_in,m.status,m.skin AS default_skin,"
         "EXISTS(SELECT 1 FROM outing_fun_cards f WHERE f.outing_id=p.outing_id AND f.target_id=p.member_id) AS fun_used "
         "FROM outing_participants p "
         "JOIN circle_members m ON m.id=p.member_id WHERE p.outing_id=%s "
@@ -108,6 +109,16 @@ def preferences_for(row, *, archived=False):
     if row["budget_override"] is not None:
         preferences = preferences.model_copy(update={"budget": row["budget_override"]})
     return preferences
+
+
+def skin_for(row, *, archived=False):
+    # An archived NULL is a saved absence, not permission to inherit a later skin.
+    value = (
+        row["skin_snapshot"]
+        if archived
+        else (row["skin_override"] if row["skin_override"] is not None else row["default_skin"])
+    )
+    return Skin.model_validate(value) if value is not None else None
 
 
 def planning(db, outing):
@@ -152,6 +163,7 @@ def member_view(row, circle, me):
         claimed=row["account_id"] is not None,
         status=row["status"],
         fun_opt_in=row["fun_opt_in"],
+        skin=row["skin"],
         preferences=Preferences.model_validate(row["preferences"])
         if me["account_id"] == circle["owner_id"] or row["id"] == me["id"]
         else None,
@@ -338,6 +350,8 @@ def outing_view(db, circle, me, outing):
                 fun_opt_in=r["fun_opt_in"],
                 claimed=r["account_id"] is not None,
                 fun_used=r["fun_used"],
+                skin=skin_for(r, archived=outing["status"] == "closed"),
+                skin_override=r["skin_override"],
                 budget_override=r["budget_override"]
                 if manage or r["member_id"] == me["id"]
                 else None,

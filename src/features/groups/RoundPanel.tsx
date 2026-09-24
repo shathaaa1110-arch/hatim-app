@@ -18,6 +18,7 @@ import {
 } from "../../shared/ui/primitives";
 import { ar, colors as c } from "../../shared/theme";
 import { groupsApi, type Outing } from "./api";
+import { SkinPeople } from "./skins/SkinPeople";
 import {
   Confirm,
   type Confirmation,
@@ -97,6 +98,7 @@ export function RoundPanel({
           </View>
         </Row>
       </Panel>
+      <SkinPeople participants={o.participants} choosing />
       {round?.status === "invalidated" && (
         <Notice
           warning

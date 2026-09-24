@@ -6,6 +6,22 @@ from hatim.core.models import Model, TitleChange
 from hatim.domain.models import OutingContext, Plan, Preferences, Settings
 
 
+class Skin(Model):
+    version: Literal[1] = 1
+    persona: Literal["host", "on_way", "you_choose"]
+    tone: Literal["light", "warm", "deep"] = "warm"
+    outfit: Literal["thobe", "abaya", "casual"] = "casual"
+    color: Literal["palm", "saffron", "rose", "sky"] = "palm"
+    accessory: Literal["none", "glasses"] = "none"
+    expression: Literal["smile", "wink", "side_eye"] = "smile"
+    phrase: Literal["classic", "extra"] = "classic"
+
+
+class SkinChange(Model):
+    skin: Skin | None
+    expected: Skin | None
+
+
 class CircleCreate(Model):
     title: str = Field(min_length=1, max_length=60)
     preferences: Preferences
@@ -49,6 +65,7 @@ class CircleMember(Model):
     claimed: bool
     status: Literal["active", "removed"]
     fun_opt_in: bool
+    skin: Skin | None = None
     preferences: Preferences | None = None
 
 
@@ -109,6 +126,8 @@ class Participant(Model):
     fun_opt_in: bool
     claimed: bool
     fun_used: bool
+    skin: Skin | None = None
+    skin_override: Skin | None = None
     preferences: Preferences | None = None
     budget_override: int | None = None
 

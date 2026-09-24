@@ -105,7 +105,9 @@ The same invitation code continues under the current tunnel origin. For new grou
 
 ## Quick decisions and outing preferences
 
-**وش يناسبني الحين؟** opens from discovery without login. Choose a neighborhood, experience duration and outing context; the API returns up to three choices using every direct-plan companion’s hard constraints. Confirming creates a one-slot plan or explicitly replaces the current anchor. Family/friends context has editable quiet/sharing/discovery priorities, also available in normal plan and group-outing creation/editing. Demo data has no live availability or travel estimates. Read [chapter18](docs/learning-python-postgres/18-quick-decision.ar.md) and [the API contract](docs/api-quick-decision.ar.md). [Skins](docs/proposals/outing-skins.ar.md) remain a proposal.
+**وش يناسبني الحين؟** opens from discovery without login. Choose a neighborhood, experience duration and outing context; the API returns up to three choices using every direct-plan companion’s hard constraints. Confirming creates a one-slot plan or explicitly replaces the current anchor. Family/friends context has editable quiet/sharing/discovery priorities, also available in normal plan and group-outing creation/editing. Demo data has no live availability or travel estimates. Read [chapter18](docs/learning-python-postgres/18-quick-decision.ar.md) and [the API contract](docs/api-quick-decision.ar.md).
+
+**Optional group skins:** المعزّب، عند الإشارة، اختاروا أنتم are editable SVG characters with outfit, tone, color, expression, glasses and preset phrases. Members change only their own circle default or outing override. The plan, attendance and choice screen show the effective appearance; closed outings preserve a snapshot, including no skin. Cosmetics never change constraints, votes, roles or draw odds. Migration005 adds nullable JSONB columns without changing earlier migrations. See [chapter19](docs/learning-python-postgres/19-outing-skins.ar.md), [API](docs/api-social.ar.md), and [remaining proposals](docs/proposals/outing-skins.ar.md).
 
 ## Small architecture
 

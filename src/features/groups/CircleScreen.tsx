@@ -10,7 +10,6 @@ import {
   Link,
   Pin,
   Smile,
-  UserRound,
 } from "lucide-react-native";
 import {
   Button,
@@ -29,6 +28,8 @@ import { PUBLIC_ORIGIN } from "../../shared/api/http";
 import { ar, colors as c } from "../../shared/theme";
 import { groupsApi, type CircleMember } from "./api";
 import { useRemote } from "../../shared/useRemote";
+import { SkinAvatar } from "./skins/SkinAvatar";
+import { SkinEditor } from "./skins/SkinEditor";
 import {
   ConfirmationContent,
   type Confirmation,
@@ -55,6 +56,7 @@ export function CircleScreen({
   const r = useRemote(read);
   const group = r.data;
   const [profile, setProfile] = useState(false);
+  const [skinEditing, setSkinEditing] = useState(false);
   const [section, setSection] = useState("الطلعات");
   const [coordinatorId, setCoordinatorId] = useState<string | undefined>();
   const [invite, setInvite] = useState(false);
@@ -165,6 +167,22 @@ export function CircleScreen({
               />
             </Panel>
           )}
+          {!group.archived && (
+            <Panel>
+              <Row>
+                <SkinAvatar name={group.me.name} skin={group.me.skin} />
+                <View style={{ flex: 1 }}>
+                  <T weight="semibold">وش شخصيتك في اللمّة؟</T>
+                  <T style={s.muted}>شوية من طبعك، وشوية مبالغة.</T>
+                </View>
+              </Row>
+              <Button
+                secondary
+                label="شخصيتي في القروب"
+                onPress={() => setSkinEditing(true)}
+              />
+            </Panel>
+          )}
           <Row>
             <Chip
               label="الطلعات"
@@ -238,7 +256,7 @@ export function CircleScreen({
               {group.members.map((person) => (
                 <Panel key={person.id}>
                   <Row>
-                    <UserRound size={22} color={c.green} />
+                    <SkinAvatar name={person.name} skin={person.skin} />
                     <View style={{ flex: 1 }}>
                       <T weight="semibold" style={{ fontSize: 19 }}>
                         {person.name}
@@ -362,6 +380,18 @@ export function CircleScreen({
                 </View>
               )}
             </>
+          )}
+          {skinEditing && (
+            <SkinEditor
+              name={group.me.name}
+              initial={group.me.skin ?? null}
+              effective={group.me.skin ?? null}
+              scope="circle"
+              close={() => setSkinEditing(false)}
+              save={(value, expected) =>
+                update(() => groupsApi.skin(token, id, value, expected))
+              }
+            />
           )}
           <Sheet
             title="ذوقك له مكان"
