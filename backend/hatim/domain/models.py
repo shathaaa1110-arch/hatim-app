@@ -7,6 +7,18 @@ from hatim.core.models import Model
 Cuisine = Literal["سعودي", "ياباني", "إيطالي", "شامي", "آسيوي", "قهوة وحلى"]
 Allergen = Literal["مكسرات", "فول سوداني", "حليب", "قمح", "سمسم", "قشريات", "سمك", "بيض", "صويا"]
 Category = Literal["مطابخ جديدة", "كنوز مخفية", "افتتاحات", "طبق ولحظة"]
+OutingPriority = Literal["quiet", "sharing", "discovery"]
+
+
+class OutingContext(Model):
+    kind: Literal["any", "family", "friends"] = "any"
+    priorities: list[OutingPriority] = Field(default_factory=list, max_length=3)
+
+    @model_validator(mode="after")
+    def unique_priorities(self):
+        if len(set(self.priorities)) != len(self.priorities):
+            raise ValueError("Repeated outing priority")
+        return self
 
 
 class Preferences(Model):
@@ -45,6 +57,7 @@ class Experience(Model):
     allergens: list[Allergen] = Field(default_factory=list)
     # Only allergens whose absence AND cross-contact handling were verified belong here.
     verified_free_of: list[Allergen] = Field(default_factory=list)
+    outing_traits: list[OutingPriority] = Field(default_factory=list)
 
 
 class Settings(Model):
@@ -52,6 +65,7 @@ class Settings(Model):
     anchor_id: str | None = "fire"
     pocket_ids: list[str] = Field(default_factory=list, max_length=30)
     completed_ids: list[str] = Field(default_factory=list, max_length=9)
+    context: OutingContext = Field(default_factory=OutingContext)
 
     @model_validator(mode="after")
     def coherent(self):

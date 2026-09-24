@@ -1,3 +1,4 @@
+import { OutingContextForm, emptyOutingContext } from "./OutingContextForm";
 import { experiencesApi } from "../experiences";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -219,6 +220,7 @@ export function InviteScreen({ code }: { code: string | null }) {
               </T>
               <T style={{ color: c.muted, fontSize: 11 }}>تتحدّث تلقائيًا</T>
             </Row>
+            <OutingContextForm value={invite.context ?? emptyOutingContext} />
             {invite.anchor_issue && (
               <Notice warning text={invite.anchor_issue} />
             )}

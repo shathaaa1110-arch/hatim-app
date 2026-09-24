@@ -8,3 +8,5 @@ export type Member = components["schemas"]["Member"];
 export type Decision = components["schemas"]["Decision"];
 export type Invite = components["schemas"]["InviteView"];
 export type PlanSummary = components["schemas"]["PlanSummary"];
+
+export type OutingContext = components["schemas"]["OutingContext"];

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { OutingContextForm, emptyOutingContext } from "./OutingContextForm";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import {
   Bookmark,
@@ -12,6 +14,7 @@ import {
   type Experience,
   type Group,
   type Settings,
+  type OutingContext,
 } from "../../shared/contracts";
 import { ar, colors as c, photos } from "../../shared/theme";
 import {
@@ -20,6 +23,7 @@ import {
   Empty,
   Notice,
   Row,
+  Sheet,
   T,
 } from "../../shared/ui/primitives";
 import { MealControl } from "../../shared/ui/MealControl";
@@ -41,6 +45,15 @@ export function PlanScreen({
   onPocket: () => void;
   readOnly?: boolean;
 }) {
+  const [contextDraft, setContextDraft] = useState<OutingContext | null>(null);
+  const [contextError, setContextError] = useState<string | null>(null);
+  const safeUpdate = async (value: Settings) => {
+    try {
+      await update(value);
+    } catch {
+      /* Parent displays error. */
+    }
+  };
   return (
     <View style={{ gap: 23 }}>
       <View>
@@ -58,10 +71,57 @@ export function PlanScreen({
         <MealControl
           slots={group.settings.slots ?? 9}
           consumed={group.plan.consumed}
-          onChange={(slots) => update({ ...group.settings, slots })}
+          onChange={(slots) => safeUpdate({ ...group.settings, slots })}
           busy={busy}
         />
       )}
+      <OutingContextForm value={group.settings.context ?? emptyOutingContext} />
+      {!readOnly && (
+        <Button
+          secondary
+          small
+          label="تعديل جوّ الطلعة"
+          disabled={busy}
+          onPress={() => {
+            setContextError(null);
+            setContextDraft(group.settings.context ?? emptyOutingContext);
+          }}
+        />
+      )}
+      <Sheet
+        title="تفضيلات هذه الطلعة"
+        visible={!!contextDraft}
+        onClose={() => {
+          if (!busy) setContextDraft(null);
+        }}
+      >
+        {contextDraft && (
+          <>
+            <OutingContextForm
+              value={contextDraft}
+              onChange={setContextDraft}
+              disabled={busy}
+            />
+            <Notice text="حفظ التفضيلات يعيد ترتيب التجارب مع بقاء الركيزة والقيود. في طلعات القروبات تُلغى جولة الاختيار المتأثرة لتبدؤوا جولة جديدة." />
+            {contextError && <Notice warning text={contextError} />}
+            <Button
+              label="حفظ تفضيلات الطلعة"
+              busy={busy}
+              onPress={async () => {
+                setContextError(null);
+                try {
+                  await update({ ...group.settings, context: contextDraft });
+                  setContextDraft(null);
+                } catch (e) {
+                  setContextError(
+                    e instanceof Error ? e.message : "تعذّر الحفظ.",
+                  );
+                }
+              }}
+            />
+          </>
+        )}
+      </Sheet>
       {group.plan.anchor_issue && (
         <View style={{ gap: 9 }}>
           <Notice warning text={group.plan.anchor_issue} />
@@ -156,7 +216,7 @@ export function PlanScreen({
                     secondary
                     busy={busy}
                     onPress={() =>
-                      update({
+                      safeUpdate({
                         ...group.settings,
                         completed_ids: [
                           ...(group.settings.completed_ids ?? []),
@@ -234,7 +294,7 @@ export function PlanScreen({
                   disabled={busy}
                   accessibilityRole="button"
                   onPress={() =>
-                    update({
+                    safeUpdate({
                       ...group.settings,
                       completed_ids: group.settings.completed_ids?.filter(
                         (x) => x !== id,

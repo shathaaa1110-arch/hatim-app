@@ -1,6 +1,6 @@
 # معمارية حاتم القابلة للتوسعة
 
-**مطبقة على الكود في 16 سبتمبر 2026.** التطبيق يستخدم React Native وExpo SDK57، والخادم Python/FastAPI، وقاعدة البيانات PostgreSQL. التنظيم هو **Modular Monolith**: خادم واحد، داخله وحدات واضحة حسب الميزة. إضافة ميزة تعني عادة إضافة وحدة وربطها، مع تعديل محدود في الوحدات التي تشاركها السلوك.
+**الأساس مطبق في16سبتمبر2026، وآخر إضافة موثقة24سبتمبر2026.** التطبيق يستخدم React Native وExpo SDK57، والخادم Python/FastAPI، وقاعدة البيانات PostgreSQL. التنظيم هو **Modular Monolith**: خادم واحد، داخله وحدات واضحة حسب الميزة. إضافة ميزة تعني عادة إضافة وحدة وربطها، مع تعديل محدود في الوحدات التي تشاركها السلوك.
 
 هذا تنظيم يساعدنا على التوسع؛ لا يجعل كل ميزة مستقبلية مجانية. الدفع مثلًا يحتاج مزودًا وصلاحيات واختبارات جديدة، والمزامنة دون اتصال تحتاج حل تعارض البيانات. نضيف تلك الأجزاء عند وجود حاجة محددة لها.
 
@@ -19,6 +19,10 @@ flowchart TB
     Entry --> Experiences[experiences: كتالوج التجارب]
     Entry --> Planning[planning: الخطط والجيب والرفقة]
     Entry --> Groups[groups: القروبات والطلعات والجولات]
+    Entry --> Quick[quick_decision: بحث سريع بلا حفظ]
+    Quick --> Experiences
+    Quick --> Domain
+    Quick --> Core
     Planning --> Accounts
     Groups --> Accounts
     Planning --> Experiences
@@ -48,6 +52,7 @@ src/
     experiences/                     Discover + ExperienceCard + api + index
     planning/                        الخطة والرفقة والدعوة وإعداد الخطة والتخزين وapi
     groups/                          القروب والطلعة والتصويت والإدارة وapi
+    quickDecision/                   شاشة القرار السريع وapi وindex
   shared/
     api/http.ts                      العنوان وHTTP والمهلة وتصنيف الخطأ
     api/schema.d.ts                  عقد TypeScript مولد؛ لا يعدل يدويًا
@@ -69,6 +74,10 @@ flowchart TD
     App --> E[experiences]
     App --> P[planning]
     App --> G[groups]
+    App --> Q[quickDecision]
+    Q --> E
+    Q --> P
+    Q --> S
     G --> A
     G --> E
     G --> P
@@ -107,6 +116,11 @@ backend/hatim/
       router.py                      مسارا الكتالوج الحاليان
       repository.py                  SELECT من experiences ضمن معاملة المستدعي
       fixtures.py                    بيانات مرجعية للاختبارات والمستورد السابق
+    quick_decision/
+      __init__.py                    router العامة
+      models.py                      QuickRequest وQuickResult
+      router.py                      معاملة كتالوج للقراءة فقط
+      service.py                     تصفية الوقت والحي ثم محرك القرار القائم
     planning/
       __init__.py                    router كواجهة عامة
       router.py                      عقد HTTP وقراءة المدخلات وتفويض العملية
@@ -134,7 +148,8 @@ backend/migrations/                  SQL مرقم ببصمات؛ القديم ل
 | المالك | الجداول التي يغيرها |
 |---|---|
 | accounts | accounts، account_sessions، auth_attempts |
-| experiences | experiences؛ التطبيق الحالي يقرأها، والبذر في الترحيل002 |
+| experiences | experiences؛ البذر002 وصفات الكتالوج الوهمي004 |
+| quick_decision | لا جداول مملوكة؛ معاملة قراءة كتالوج فقط |
 | planning | groups، members؛ الاسمان تاريخيان للخطة المباشرة ورفقتها |
 | groups | circles، circle_members، outings، outing_participants، decision_rounds، round_options، votes، outing_fun_cards |
 | core/db | schema_migrations وتطبيق الترحيلات |
@@ -212,3 +227,9 @@ backend/migrations/                  SQL مرقم ببصمات؛ القديم ل
 الدروس القديمة تحتفظ بتاريخها وروابط نسخة المصدر التي شرحتها. كتاب48 ملفًا يبقى لقطة59d45d3؛ لم نستبدل كوده بكود جديد ونبقي شرحًا قديمًا فوقه.
 
 يعتمد تجميع الخادم على [APIRouter في توثيق FastAPI الرسمي](https://fastapi.tiangolo.com/tutorial/bigger-applications/)، والواجهة على [توثيق Expo SDK57 المحدد](https://docs.expo.dev/versions/v57.0.0/). حدود الميزات المذكورة هنا قرار لهذا المشروع وليست مجلدات يفرضها إطار العمل.
+
+## إضافة القرار السريع وتفضيلات الطلعة —24سبتمبر2026
+
+quickDecision يستورد عرض التجربة ونموذج سياق الطلعة من الواجهات العامة. PlannerHome يركبه مع التخطيط ويستقبل onChoose؛ لا اعتماد معاكس من planning. الخادم quick_decision يعتمد على experiences للقراءة وعلى domain للمحرك. التفضيلات الجديدة في Settings.context وExperience.outing_traits؛ لا علاقة جديدة في ERD. التفاصيل في [عقد الإضافة](api-quick-decision.ar.md) و[الفصل18](learning-python-postgres/18-quick-decision.ar.md). أضيفت الحدود المطلوبة فقط إلى architecture.json. مكوّن Sheet المشترك يقبل scrollRef اختياريًا لتعيد الصفحة التمرير للأعلى عند الانتقال من البحث إلى النتائج والتأكيد.
+
+تحقق الإضافة:270 اختبار Python، وخمس رحلات متصفح جديدة مع نجاح الرحلات الـ11 السابقة وإعادة رحلة القروب العائلية، وفحص الحدود والأنواع، وبناء Release وفحص شاشة النتائج على المحاكي. [تفصيل التحقق وحدوده](learning-python-postgres/18-quick-decision.ar.md).

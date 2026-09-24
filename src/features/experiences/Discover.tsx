@@ -30,6 +30,7 @@ export function Discover({
   onSave,
   onPlan,
   onGroup,
+  onQuick,
 }: {
   catalog: Experience[];
   group: Group | null;
@@ -37,6 +38,7 @@ export function Discover({
   onSave: (e: Experience) => void;
   onPlan: () => void;
   onGroup: () => void;
+  onQuick: () => void;
 }) {
   const { width } = useWindowDimensions();
   const wide = width >= 900;
@@ -91,6 +93,7 @@ export function Discover({
               onPress={onPlan}
             />
           </View>
+          <Button secondary label="وش يناسبني الحين؟" onPress={onQuick} />
           {wide && (
             <Row style={{ marginTop: 21, gap: 7 }}>
               <Check size={15} color={c.green} />

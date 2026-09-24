@@ -3,12 +3,14 @@
     "accounts": [],
     "experiences": [],
     "planning": ["accounts", "experiences"],
-    "groups": ["accounts", "experiences", "planning"]
+    "groups": ["accounts", "experiences", "planning"],
+    "quickDecision": ["experiences", "planning"]
   },
   "backend": {
     "accounts": [],
     "experiences": [],
     "planning": ["accounts", "experiences"],
-    "groups": ["accounts", "experiences"]
+    "groups": ["accounts", "experiences"],
+    "quick_decision": ["experiences"]
   }
 }

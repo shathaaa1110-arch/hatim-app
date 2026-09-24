@@ -5,6 +5,7 @@ from hatim.domain.models import Experience
 CATALOG = [
     Experience(
         id="fire",
+        outing_traits=["sharing"],
         title="على مهل… وعلى الحطب",
         venue="مائدة الحطب",
         neighborhood="حي حطين",
@@ -21,6 +22,7 @@ CATALOG = [
     ),
     Experience(
         id="sushi",
+        outing_traits=["discovery"],
         title="رحلة صغيرة إلى اليابان",
         venue="طاولة نوري",
         neighborhood="حي الملقا",
@@ -37,6 +39,7 @@ CATALOG = [
     ),
     Experience(
         id="levant",
+        outing_traits=["quiet", "sharing"],
         title="باب صغير، سفرة كبيرة",
         venue="دار الزيتون",
         neighborhood="حي الروضة",
@@ -53,6 +56,7 @@ CATALOG = [
     ),
     Experience(
         id="pasta",
+        outing_traits=["discovery"],
         title="الباستا تُصنع قدّامك",
         venue="مختبر العجين",
         neighborhood="حي العليا",
@@ -69,6 +73,7 @@ CATALOG = [
     ),
     Experience(
         id="breakfast",
+        outing_traits=["quiet", "sharing"],
         title="صباح بطعم أوّل",
         venue="فناء الصباح",
         neighborhood="حي الدرعية",
@@ -85,6 +90,7 @@ CATALOG = [
     ),
     Experience(
         id="bao",
+        outing_traits=["discovery", "sharing"],
         title="لقمة من آخر العالم",
         venue="بيت الباو",
         neighborhood="حي السليمانية",
@@ -103,6 +109,7 @@ CATALOG = [
     ),
     Experience(
         id="pizza",
+        outing_traits=["sharing"],
         title="حواف تستاهل الانتظار",
         venue="فرن الحارة",
         neighborhood="حي النرجس",
@@ -119,6 +126,7 @@ CATALOG = [
     ),
     Experience(
         id="coffee",
+        outing_traits=["quiet"],
         title="قهوة… وباقي الحكاية",
         venue="ظل البن",
         neighborhood="حي الياسمين",
@@ -135,6 +143,7 @@ CATALOG = [
     ),
     Experience(
         id="dessert",
+        outing_traits=["sharing"],
         title="ختامها فستق",
         venue="قطعة سكر",
         neighborhood="حي العقيق",

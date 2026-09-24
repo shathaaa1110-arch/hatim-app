@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, type RefObject } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -191,11 +191,13 @@ export function Sheet({
   visible,
   onClose,
   children,
+  scrollRef,
 }: {
   title: string;
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
+  scrollRef?: RefObject<ScrollView | null>;
 }) {
   return (
     <Modal
@@ -222,6 +224,7 @@ export function Sheet({
             <IconButton icon={X} label="إغلاق" onPress={onClose} />
           </Row>
           <ScrollView
+            ref={scrollRef}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ padding: 24, paddingTop: 8 }}
           >

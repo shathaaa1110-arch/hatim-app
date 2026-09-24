@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import Field, SecretStr, model_validator
 
 from hatim.core.models import Model, TitleChange
-from hatim.domain.models import Plan, Preferences, Settings
+from hatim.domain.models import OutingContext, Plan, Preferences, Settings
 
 
 class CircleCreate(Model):
@@ -82,6 +82,7 @@ class PublicCircle(Model):
 class OutingCreate(TitleChange):
     slots: int = Field(default=3, ge=1, le=9)
     coordinator_id: str | None = Field(default=None, min_length=1)
+    context: OutingContext = Field(default_factory=OutingContext)
 
 
 class AttendanceChange(Model):

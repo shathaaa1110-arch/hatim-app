@@ -72,8 +72,16 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
       r.url().endsWith(`/groups/${group.id}/outings`) &&
       r.request().method() === "POST",
   );
+  await button(page, "عائلية").click();
   await button(page, "ابدأ الطلعة").click();
   const trip = await (await outingResponse).json();
+  expect(trip.settings.context).toEqual({
+    kind: "family",
+    priorities: ["quiet", "sharing"],
+  });
+  await expect(
+    page.getByText("جوّ هذه الطلعة: عائلية", { exact: true }),
+  ).toBeVisible();
   await button(guest, "الطلعات").click();
   await button(guest, "افتح طلعة عشاء اللمّة").click();
   await button(guest, "أنا حاضر").click();

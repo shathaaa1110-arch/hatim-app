@@ -2388,6 +2388,47 @@
         }
       }
     },
+    "/api/quick-decisions": {
+      "post": {
+        "tags": [
+          "Quick decision"
+        ],
+        "summary": "Quick Decision",
+        "operationId": "quick_decision_api_quick_decisions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuickRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Health",
@@ -2956,6 +2997,18 @@
             },
             "type": "array",
             "title": "Verified Free Of"
+          },
+          "outing_traits": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "quiet",
+                "sharing",
+                "discovery"
+              ]
+            },
+            "type": "array",
+            "title": "Outing Traits"
           }
         },
         "additionalProperties": false,
@@ -3078,6 +3131,9 @@
       },
       "InviteView": {
         "properties": {
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
+          },
           "title": {
             "type": "string",
             "title": "Title"
@@ -3232,6 +3288,36 @@
         "type": "object",
         "title": "MembershipOptions"
       },
+      "OutingContext": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "any",
+              "family",
+              "friends"
+            ],
+            "title": "Kind",
+            "default": "any"
+          },
+          "priorities": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "quiet",
+                "sharing",
+                "discovery"
+              ]
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Priorities"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OutingContext"
+      },
       "OutingCreate": {
         "properties": {
           "title": {
@@ -3258,6 +3344,9 @@
               }
             ],
             "title": "Coordinator Id"
+          },
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
           }
         },
         "additionalProperties": false,
@@ -3589,6 +3678,9 @@
             "maxItems": 9,
             "title": "Completed Ids"
           },
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
+          },
           "expected": {
             "anyOf": [
               {
@@ -3757,6 +3849,83 @@
           "member_count"
         ],
         "title": "PublicCircle"
+      },
+      "QuickRequest": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/Preferences"
+            },
+            "type": "array",
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Members"
+          },
+          "minutes": {
+            "type": "integer",
+            "maximum": 240.0,
+            "minimum": 15.0,
+            "title": "Minutes"
+          },
+          "neighborhood": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighborhood"
+          },
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
+          },
+          "excluded_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "title": "Excluded Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "members",
+          "minutes"
+        ],
+        "title": "QuickRequest"
+      },
+      "QuickResult": {
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            },
+            "type": "array",
+            "title": "Choices"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "duration_note": {
+            "type": "string",
+            "title": "Duration Note",
+            "default": "مدة التجربة تقديرية؛ لا تشمل الطريق أو الانتظار. تأكد من وقت الفتح وتوفر التجربة قبل الذهاب."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "choices",
+          "message"
+        ],
+        "title": "QuickResult"
       },
       "Registration": {
         "properties": {
@@ -4000,6 +4169,9 @@
             "type": "array",
             "maxItems": 9,
             "title": "Completed Ids"
+          },
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
           }
         },
         "additionalProperties": false,

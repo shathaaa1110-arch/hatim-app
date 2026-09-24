@@ -1,3 +1,4 @@
+import type { OutingContext } from "../../shared/contracts";
 import { request } from "../../shared/api/http";
 import type { Preferences, Settings } from "../../shared/contracts";
 import type { components } from "../../shared/api/schema";
@@ -54,11 +55,13 @@ export const groupsApi = {
     title: string,
     slots: number,
     coordinator_id?: string,
+    context?: OutingContext,
   ) =>
     call<Outing>(`/groups/${id}/outings`, token, "POST", {
       title,
       slots,
       coordinator_id,
+      context,
     }),
   outing: (token: string, id: string) => call<Outing>(`/outings/${id}`, token),
   attendance: (

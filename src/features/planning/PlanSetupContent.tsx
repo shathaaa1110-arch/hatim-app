@@ -1,5 +1,11 @@
+import { OutingContextForm } from "./OutingContextForm";
 import { View } from "react-native";
-import type { Experience, Group, Preferences } from "../../shared/contracts";
+import type {
+  Experience,
+  Group,
+  Preferences,
+  OutingContext,
+} from "../../shared/contracts";
 import { emptyPreferences } from "../../shared/preferences";
 import { ar } from "../../shared/theme";
 import { Chip, Notice, T } from "../../shared/ui/primitives";
@@ -15,6 +21,8 @@ export function PlanSetupContent({
   setInitialSlots,
   startIntent,
   catalog,
+  context,
+  setContext,
   onSave,
 }: {
   group: Group | null;
@@ -24,6 +32,8 @@ export function PlanSetupContent({
   setInitialSlots: (slots: number) => void;
   startIntent: StartIntent | null;
   catalog: Experience[];
+  context: OutingContext;
+  setContext: (context: OutingContext) => void;
   onSave: (preferences: Preferences) => Promise<void>;
 }) {
   return (
@@ -48,6 +58,11 @@ export function PlanSetupContent({
               />
             ))}
           </View>
+          <OutingContextForm
+            value={context}
+            onChange={setContext}
+            disabled={busy}
+          />
           {startIntent && (
             <Notice
               text={`اختيارك محفوظ: ${catalog.find((e) => e.id === startIntent.id)?.title ?? "التجربة"} ${startIntent.kind === "anchor" ? "ستكون الركيزة" : "ستُحفظ في الجيب"}.`}

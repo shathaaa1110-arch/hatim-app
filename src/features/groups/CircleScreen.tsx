@@ -1,3 +1,5 @@
+import { OutingContextForm, emptyOutingContext } from "../planning";
+import type { OutingContext } from "../../shared/contracts";
 import { useCallback, useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
@@ -60,6 +62,7 @@ export function CircleScreen({
   const [create, setCreate] = useState(false);
   const [title, setTitle] = useState("");
   const [slots, setSlots] = useState(3);
+  const [context, setContext] = useState<OutingContext>(emptyOutingContext);
   const [editName, setEditName] = useState(false);
   const [member, setMember] = useState<CircleMember | null>(null);
   const [confirm, setConfirm] = useState<Confirmation | null>(null);
@@ -145,6 +148,7 @@ export function CircleScreen({
                 onPress={() => {
                   setTitle("");
                   setSlots(3);
+                  setContext(emptyOutingContext);
                   setCoordinatorId(group.me.id);
                   setLocalError(null);
                   setCreate(true);
@@ -439,6 +443,11 @@ export function CircleScreen({
                 />
               ))}
             </View>
+            <OutingContextForm
+              value={context}
+              onChange={setContext}
+              disabled={r.busy}
+            />
             <T weight="semibold">مين قائد الطلعة؟</T>
             <T style={s.muted}>
               مسؤول الخطة والتصويت. إذا اخترت غيرك، تتولى القيادة تلك العضوية؛
@@ -483,6 +492,7 @@ export function CircleScreen({
                     title.trim(),
                     slots,
                     coordinatorId,
+                    context,
                   ),
                 )
                   .then((trip) => {

@@ -1,6 +1,18 @@
 """Pure, deterministic ranking. Time only truncates the ranking; it never reshuffles it."""
 
-from .models import Decision, Experience, Member, Plan, PocketItem, Settings
+from .models import Decision, Experience, Member, OutingContext, Plan, PocketItem, Settings
+
+PRIORITY_LABELS = {"quiet": "جلسة هادئة", "sharing": "أطباق للمشاركة", "discovery": "نكهات جديدة"}
+
+
+def context_match(experience: Experience, context: OutingContext) -> tuple[float, str]:
+    matches = [key for key in context.priorities if key in experience.outing_traits]
+    if not matches:
+        return 0, ""
+    label = {"any": "الطلعة", "family": "الطلعة العائلية", "friends": "طلعة الأصدقاء"}[context.kind]
+    return 8.0 * len(
+        matches
+    ), f" يناسب تفضيلات {label}: {'، '.join(PRIORITY_LABELS[key] for key in matches)}."
 
 
 def evaluate(experience: Experience, members: list[Member]) -> tuple[list[str], list[str], float]:
@@ -75,6 +87,9 @@ def build_plan(catalog: list[Experience], members: list[Member], settings: Setti
         )
         if not anchor and matched:
             reason += f" ويتوافق مع ذوق {(' و'.join(matched))}."
+        bonus, context_reason = context_match(experience, settings.context)
+        score += bonus
+        reason += context_reason
         candidates.append(
             Decision(
                 experience_id=experience.id,

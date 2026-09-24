@@ -1,5 +1,7 @@
+import { QuickDecision } from "../features/quickDecision";
 import {
   PlanSetupContent,
+  emptyOutingContext,
   PlanExperienceContent,
   GroupScreen,
   PlanScreen,
@@ -12,7 +14,7 @@ import {
   ExperienceCard,
   experiencesApi,
 } from "../features/experiences";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -46,7 +48,7 @@ import { PUBLIC_ORIGIN } from "../shared/api/http";
 import {
   type Experience,
   type Member,
-  type Settings,
+  type OutingContext,
 } from "../shared/contracts";
 import { ar, colors as c } from "../shared/theme";
 import {
@@ -93,6 +95,14 @@ export function PlannerHome({
   const [planTitle, setPlanTitle] = useState("");
   const [startIntent, setStartIntent] = useState<StartIntent | null>(null);
   const [initialSlots, setInitialSlots] = useState(9);
+  const [initialContext, setInitialContext] =
+    useState<OutingContext>(emptyOutingContext);
+  const [quick, setQuick] = useState(false);
+  const quickScroll = useRef<ScrollView>(null);
+  const resetQuickScroll = useCallback(
+    () => quickScroll.current?.scrollTo({ y: 0, animated: false }),
+    [],
+  );
   const startPlanning = (intent: StartIntent | null = null) => {
     if (error && !group) return;
     setStartIntent(intent);
@@ -127,13 +137,6 @@ export function PlannerHome({
   const navigate = (next: Tab) => {
     setTab(next);
     scroll.current?.scrollTo({ y: 0, animated: false });
-  };
-  const update = async (settings: Settings) => {
-    try {
-      await organizer.settings(settings);
-    } catch {
-      /* Persistent error appears in the page. */
-    }
   };
   const save = (e: Experience) => {
     if (busy) return;
@@ -339,6 +342,7 @@ export function PlannerHome({
               onSave={save}
               onPlan={() => navigate("plan")}
               onGroup={() => navigate("group")}
+              onQuick={() => setQuick(true)}
             />
           )}
           {!group && tab !== "discover" && (
@@ -393,7 +397,7 @@ export function PlannerHome({
                 catalog={catalog}
                 group={group}
                 busy={busy}
-                update={update}
+                update={organizer.settings}
                 onOpen={setDetail}
                 onPocket={() => navigate("pocket")}
               />
@@ -515,6 +519,48 @@ export function PlannerHome({
       )}
 
       <Sheet
+        title="وش يناسبني الحين؟"
+        scrollRef={quickScroll}
+        visible={quick}
+        onClose={() => {
+          if (!busy) setQuick(false);
+        }}
+      >
+        {quick && (
+          <QuickDecision
+            catalog={catalog}
+            group={group}
+            onStageChange={resetQuickScroll}
+            accountName={account.session?.account.name ?? ""}
+            busy={busy}
+            onChoose={async (experience, context, preferences) => {
+              if (error && !group) throw new Error(error);
+              if (group && group.plan.available === 0)
+                throw new Error(
+                  "خانات خطتك مكتملة. زد الخانات من الخطة أو ابدأ خطة جديدة من حسابي قبل اعتماد تجربة أخرى.",
+                );
+              if (group)
+                await organizer.settings({
+                  ...group.settings,
+                  anchor_id: experience.id,
+                  context,
+                });
+              else
+                await organizer.create(preferences, {
+                  slots: 1,
+                  anchor_id: experience.id,
+                  pocket_ids: [],
+                  completed_ids: [],
+                  context,
+                });
+              setQuick(false);
+              navigate("plan");
+            }}
+          />
+        )}
+      </Sheet>
+
+      <Sheet
         title={
           profile
             ? group
@@ -538,6 +584,8 @@ export function PlannerHome({
             busy={busy}
             initialSlots={initialSlots}
             setInitialSlots={setInitialSlots}
+            context={initialContext}
+            setContext={setInitialContext}
             startIntent={startIntent}
             catalog={catalog}
             onSave={async (preferences) => {
@@ -545,6 +593,7 @@ export function PlannerHome({
               else {
                 await organizer.create(preferences, {
                   slots: initialSlots,
+                  context: initialContext,
                   anchor_id:
                     startIntent?.kind === "anchor" ? startIntent.id : null,
                   pocket_ids:

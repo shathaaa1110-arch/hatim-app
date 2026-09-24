@@ -6,7 +6,7 @@ from psycopg.types.json import Jsonb
 from hatim.core.db import connect, digest
 from hatim.core.models import Acknowledged, TitleChange
 from hatim.domain.models import Member, Preferences, Settings
-from hatim.domain.planner import build_plan
+from hatim.domain.planner import build_plan, context_match
 from hatim.features import accounts
 from hatim.features.experiences import catalog
 from hatim.integrations.legacy_plans import reject_upgraded_write
@@ -206,6 +206,9 @@ def update_settings(group_id: str, body: PlanSettingsChange, authorization: str 
         if body.expected is not None and body.expected != Settings.model_validate(row["settings"]):
             raise HTTPException(409, "تغيّرت الخطة من جهاز آخر. حدّثها وراجع التغيير قبل الحفظ.")
         settings = Settings.model_validate(body.model_dump(exclude={"expected"}))
+        if "context" not in body.model_fields_set:
+            # Older native builds must not erase the new outing preferences.
+            settings.context = Settings.model_validate(row["settings"]).context
         validate_settings(db, settings)
         db.execute(
             "UPDATE groups SET settings=%s WHERE id=%s", (Jsonb(settings.model_dump()), group_id)
@@ -244,12 +247,17 @@ def invite(code: str):
             d.model_copy(
                 update={
                     "adaptations": [],
-                    "reason": next(e.why for e in entries if e.id == d.experience_id),
+                    "reason": next(
+                        e.why + context_match(e, group.settings.context)[1]
+                        for e in entries
+                        if e.id == d.experience_id
+                    ),
                 }
             )
             for d in group.plan.selected
         ]
         return InviteView(
+            context=group.settings.context,
             title=group.title,
             member_names=[m.preferences.name for m in group.members],
             slots=group.settings.slots,

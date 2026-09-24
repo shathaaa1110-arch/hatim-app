@@ -1,7 +1,7 @@
 from pydantic import Field, SecretStr
 
 from hatim.core.models import Model
-from hatim.domain.models import Decision, Member, Plan, Preferences, Settings
+from hatim.domain.models import Decision, Member, OutingContext, Plan, Preferences, Settings
 
 
 class PlanSettingsChange(Settings):
@@ -47,6 +47,7 @@ class MemberCreated(Model):
 
 
 class InviteView(Model):
+    context: OutingContext = Field(default_factory=OutingContext)
     title: str
     member_names: list[str]
     slots: int

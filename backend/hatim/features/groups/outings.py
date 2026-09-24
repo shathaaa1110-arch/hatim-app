@@ -39,7 +39,9 @@ def create(circle_id: str, body: OutingCreate, user: User):
                 circle_id,
                 body.title,
                 coordinator_id,
-                Jsonb(Settings(slots=body.slots, anchor_id=None).model_dump()),
+                Jsonb(
+                    Settings(slots=body.slots, anchor_id=None, context=body.context).model_dump()
+                ),
             ),
         )
         db.execute(
@@ -102,10 +104,11 @@ def settings(outing_id: str, change: SettingsChange, user: User):
             "UPDATE outings SET settings=%s WHERE id=%s", (Jsonb(body.model_dump()), outing_id)
         )
         # Slots alone are deliberately excluded: shrinking time preserves the choice.
-        if (before.anchor_id, before.pocket_ids, before.completed_ids) != (
+        if (before.anchor_id, before.pocket_ids, before.completed_ids, before.context) != (
             body.anchor_id,
             body.pocket_ids,
             body.completed_ids,
+            body.context,
         ):
             invalidate(db, outing_id)
         return outing_view(db, *outing_access(db, outing_id, user.id))

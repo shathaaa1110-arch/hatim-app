@@ -103,6 +103,10 @@ After registering or signing in on the original organizer device, choose **ار�
 
 The same invitation code continues under the current tunnel origin. For new groups, invited members sign in once and confirm attendance for each outing. Password reset is not yet available; keep the username and password you choose.
 
+## Quick decisions and outing preferences
+
+**وش يناسبني الحين؟** opens from discovery without login. Choose a neighborhood, experience duration and outing context; the API returns up to three choices using every direct-plan companion’s hard constraints. Confirming creates a one-slot plan or explicitly replaces the current anchor. Family/friends context has editable quiet/sharing/discovery priorities, also available in normal plan and group-outing creation/editing. Demo data has no live availability or travel estimates. Read [chapter18](docs/learning-python-postgres/18-quick-decision.ar.md) and [the API contract](docs/api-quick-decision.ar.md). [Skins](docs/proposals/outing-skins.ar.md) remain a proposal.
+
 ## Small architecture
 
 - **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and native GlassEffect. Account, group, outing and decision screens reuse the existing components.

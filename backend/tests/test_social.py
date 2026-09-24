@@ -329,6 +329,7 @@ def test_legacy_claim_requires_capability_and_preserves_data_and_member_claim(cl
         "anchor_id": "fire",
         "pocket_ids": ["coffee"],
         "completed_ids": ["sushi"],
+        "context": {"kind": "family", "priorities": ["quiet", "sharing"]},
     }
     client.put(f"/api/groups/{group_id}/settings", headers=legacy_owner, json=original)
     auth, _ = account(client)

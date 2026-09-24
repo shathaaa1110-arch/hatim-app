@@ -13,7 +13,7 @@ from psycopg import Error as DatabaseError
 from .core.db import connect, initialize
 from .core.middleware import ResponsePolicyMiddleware
 from .core.models import ErrorResponse
-from .features import accounts, experiences, groups, planning
+from .features import accounts, experiences, groups, planning, quick_decision
 
 
 @asynccontextmanager
@@ -44,7 +44,13 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 app.add_middleware(ResponsePolicyMiddleware)
-for router in (accounts.router, experiences.router, groups.router, planning.router):
+for router in (
+    accounts.router,
+    experiences.router,
+    groups.router,
+    planning.router,
+    quick_decision.router,
+):
     app.include_router(router)
 
 

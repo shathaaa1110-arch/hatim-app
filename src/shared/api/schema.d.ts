@@ -707,6 +707,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/quick-decisions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Quick Decision */
+    post: operations["quick_decision_api_quick_decisions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/health": {
     parameters: {
       query?: never;
@@ -945,6 +962,8 @@ export interface components {
         | "بيض"
         | "صويا"
       )[];
+      /** Outing Traits */
+      outing_traits?: ("quiet" | "sharing" | "discovery")[];
     };
     /** FunCard */
     FunCard: {
@@ -978,6 +997,7 @@ export interface components {
     };
     /** InviteView */
     InviteView: {
+      context?: components["schemas"]["OutingContext"];
       /** Title */
       title: string;
       /** Member Names */
@@ -1030,6 +1050,17 @@ export interface components {
       /** Fun Opt In */
       fun_opt_in?: boolean | null;
     };
+    /** OutingContext */
+    OutingContext: {
+      /**
+       * Kind
+       * @default any
+       * @enum {string}
+       */
+      kind: "any" | "family" | "friends";
+      /** Priorities */
+      priorities?: ("quiet" | "sharing" | "discovery")[];
+    };
     /** OutingCreate */
     OutingCreate: {
       /** Title */
@@ -1041,6 +1072,7 @@ export interface components {
       slots: number;
       /** Coordinator Id */
       coordinator_id?: string | null;
+      context?: components["schemas"]["OutingContext"];
     };
     /** OutingSummary */
     OutingSummary: {
@@ -1155,6 +1187,7 @@ export interface components {
       pocket_ids?: string[];
       /** Completed Ids */
       completed_ids?: string[];
+      context?: components["schemas"]["OutingContext"];
       expected?: components["schemas"]["Settings"] | null;
     };
     /** PlanSummary */
@@ -1230,6 +1263,30 @@ export interface components {
       title: string;
       /** Member Count */
       member_count: number;
+    };
+    /** QuickRequest */
+    QuickRequest: {
+      /** Members */
+      members: components["schemas"]["Preferences"][];
+      /** Minutes */
+      minutes: number;
+      /** Neighborhood */
+      neighborhood?: string | null;
+      context?: components["schemas"]["OutingContext"];
+      /** Excluded Ids */
+      excluded_ids?: string[];
+    };
+    /** QuickResult */
+    QuickResult: {
+      /** Choices */
+      choices: components["schemas"]["Decision"][];
+      /** Message */
+      message: string;
+      /**
+       * Duration Note
+       * @default مدة التجربة تقديرية؛ لا تشمل الطريق أو الانتظار. تأكد من وقت الفتح وتوفر التجربة قبل الذهاب.
+       */
+      duration_note: string;
     };
     /** Registration */
     Registration: {
@@ -1315,6 +1372,7 @@ export interface components {
       pocket_ids?: string[];
       /** Completed Ids */
       completed_ids?: string[];
+      context?: components["schemas"]["OutingContext"];
     };
     /** SettingsChange */
     SettingsChange: {
@@ -2874,6 +2932,39 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Member"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  quick_decision_api_quick_decisions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["QuickRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["QuickResult"];
         };
       };
       /** @description Invalid request */

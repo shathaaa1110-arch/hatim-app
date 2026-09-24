@@ -128,13 +128,6 @@ export function OutingScreen({
     if (!o) return;
     await update(() => groupsApi.settings(token, id, value, o.settings));
   };
-  const safeSettings = async (value: Settings) => {
-    try {
-      await settings(value);
-    } catch {
-      /* shown by resource */
-    }
-  };
   const manage = !!o?.can_manage && o.status === "open";
   const attend = (value: "going" | "pending" | "declined") => {
     const parsed = budget.trim() ? Number(budget) : null;
@@ -259,7 +252,7 @@ export function OutingScreen({
             <PlanScreen
               group={planGroup}
               catalog={catalog}
-              update={safeSettings}
+              update={settings}
               busy={r.busy}
               onOpen={setDetail}
               onPocket={() => setTab("الجيب")}
