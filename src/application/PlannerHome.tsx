@@ -394,6 +394,15 @@ export function PlannerHome({
                 onPress={() => navigate("group")}
               />
               <PlanScreen
+                sharing={
+                  organizer.session
+                    ? {
+                        kind: "plan",
+                        id: group.id,
+                        token: organizer.session.token,
+                      }
+                    : undefined
+                }
                 catalog={catalog}
                 group={group}
                 busy={busy}

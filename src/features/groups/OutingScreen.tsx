@@ -275,6 +275,9 @@ export function OutingScreen({
             <>
               <SkinPeople participants={o.participants} />
               <PlanScreen
+                sharing={
+                  o.can_manage ? { kind: "outing", id: o.id, token } : undefined
+                }
                 group={planGroup}
                 catalog={catalog}
                 update={settings}

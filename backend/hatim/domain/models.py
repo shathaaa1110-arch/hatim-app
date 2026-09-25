@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
 
@@ -58,6 +58,11 @@ class Experience(Model):
     # Only allergens whose absence AND cross-contact handling were verified belong here.
     verified_free_of: list[Allergen] = Field(default_factory=list)
     outing_traits: list[OutingPriority] = Field(default_factory=list)
+    suggested_dishes: list[Annotated[str, Field(min_length=1, max_length=100)]] = Field(
+        default_factory=list, max_length=5
+    )
+    google_place_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{3,255}$")
+    is_demo: bool = True
 
 
 class Settings(Model):
@@ -105,3 +110,12 @@ class Plan(Model):
     consumed: int
     available: int
     unfilled: int
+
+
+class ShareablePlan(Model):
+    """Feature boundary for sharing; never carries accounts, tokens or member profiles."""
+
+    title: str
+    settings: Settings
+    plan: Plan
+    archived: bool = False

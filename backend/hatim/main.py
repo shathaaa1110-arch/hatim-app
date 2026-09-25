@@ -13,7 +13,7 @@ from psycopg import Error as DatabaseError
 from .core.db import connect, initialize
 from .core.middleware import ResponsePolicyMiddleware
 from .core.models import ErrorResponse
-from .features import accounts, experiences, groups, planning, quick_decision
+from .features import accounts, experiences, groups, plan_sharing, planning, quick_decision
 
 
 @asynccontextmanager
@@ -50,6 +50,7 @@ for router in (
     groups.router,
     planning.router,
     quick_decision.router,
+    plan_sharing.router,
 ):
     app.include_router(router)
 
@@ -91,6 +92,10 @@ if dist.is_dir():
 
     @app.get("/join/{code}", include_in_schema=False)
     def join_page(code: str):
+        return FileResponse(dist / "index.html", headers={"Cache-Control": "no-store"})
+
+    @app.get("/s/{code}", include_in_schema=False)
+    def shared_plan_page(code: str):
         return FileResponse(dist / "index.html", headers={"Cache-Control": "no-store"})
 
     app.mount("/", StaticFiles(directory=dist, html=True), name="web")

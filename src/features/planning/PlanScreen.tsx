@@ -27,6 +27,7 @@ import {
   T,
 } from "../../shared/ui/primitives";
 import { MealControl } from "../../shared/ui/MealControl";
+import { SharePlanButton, type SharingSource } from "../planSharing";
 
 export function PlanScreen({
   group,
@@ -36,6 +37,7 @@ export function PlanScreen({
   onOpen,
   onPocket,
   readOnly = false,
+  sharing,
 }: {
   group: Group;
   catalog: Experience[];
@@ -44,6 +46,7 @@ export function PlanScreen({
   onOpen: (e: Experience) => void;
   onPocket: () => void;
   readOnly?: boolean;
+  sharing?: SharingSource;
 }) {
   const [contextDraft, setContextDraft] = useState<OutingContext | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
@@ -67,6 +70,7 @@ export function PlanScreen({
           الأهم يبقى. وكل اختيار له سبب واضح.
         </T>
       </View>
+      {sharing && <SharePlanButton source={sharing} disabled={busy} />}
       {!readOnly && (
         <MealControl
           slots={group.settings.slots ?? 9}

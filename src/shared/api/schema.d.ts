@@ -73,6 +73,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v2/experiences/{experience_id}/google-rating": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Google Rating */
+    get: operations["google_rating_api_v2_experiences__experience_id__google_rating_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v2/experiences": {
     parameters: {
       query?: never;
@@ -758,6 +775,42 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/plan-invitations/{kind}/{source_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Editor */
+    get: operations["get_editor_api_plan_invitations__kind___source_id__get"];
+    /** Save */
+    put: operations["save_api_plan_invitations__kind___source_id__put"];
+    post?: never;
+    /** Revoke */
+    delete: operations["revoke_api_plan_invitations__kind___source_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/shared-plans/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Public Invitation */
+    get: operations["public_invitation_api_shared_plans__code__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/health": {
     parameters: {
       query?: never;
@@ -999,6 +1052,15 @@ export interface components {
       )[];
       /** Outing Traits */
       outing_traits?: ("quiet" | "sharing" | "discovery")[];
+      /** Suggested Dishes */
+      suggested_dishes?: string[];
+      /** Google Place Id */
+      google_place_id?: string | null;
+      /**
+       * Is Demo
+       * @default true
+       */
+      is_demo: boolean;
     };
     /** FunCard */
     FunCard: {
@@ -1008,6 +1070,22 @@ export interface components {
       target_name: string;
       /** Remaining Seconds */
       remaining_seconds: number;
+    };
+    /** GoogleRating */
+    GoogleRating: {
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "available" | "demo" | "unlinked" | "unavailable";
+      /** Rating */
+      rating?: number | null;
+      /** Review Count */
+      review_count?: number | null;
+      /** Checked At */
+      checked_at?: string | null;
+      /** Attributions */
+      attributions?: components["schemas"]["RatingAttribution"][];
     };
     /** GroupCreated */
     GroupCreated: {
@@ -1029,6 +1107,52 @@ export interface components {
       /** Members */
       members: components["schemas"]["Member"][];
       plan: components["schemas"]["Plan"];
+    };
+    /** InvitationChange */
+    InvitationChange: {
+      details: components["schemas"]["InvitationDetails"];
+      /** Expected Revision */
+      expected_revision: number | null;
+    };
+    /** InvitationDetails */
+    InvitationDetails: {
+      /** Title */
+      title: string;
+      /**
+       * Message
+       * @default لكم مكان على الطاولة.
+       */
+      message: string;
+      /**
+       * When Label
+       * @default
+       */
+      when_label: string;
+      /**
+       * Meeting Note
+       * @default
+       */
+      meeting_note: string;
+      /**
+       * Theme
+       * @default palm
+       * @enum {string}
+       */
+      theme: "palm" | "saffron" | "rose";
+    };
+    /** InvitationEditor */
+    InvitationEditor: {
+      details: components["schemas"]["InvitationDetails"];
+      plan: components["schemas"]["SharedPlan"];
+      /** Code */
+      code: string | null;
+      /** Revision */
+      revision: number | null;
+    };
+    /** InvitationRevoke */
+    InvitationRevoke: {
+      /** Expected Revision */
+      expected_revision: number;
     };
     /** InviteView */
     InviteView: {
@@ -1301,6 +1425,15 @@ export interface components {
       /** Member Count */
       member_count: number;
     };
+    /** PublicInvitation */
+    PublicInvitation: {
+      details: components["schemas"]["InvitationDetails"];
+      plan: components["schemas"]["SharedPlan"];
+      /** Read At */
+      read_at: string;
+      /** Created At */
+      created_at: string;
+    };
     /** QuickRequest */
     QuickRequest: {
       /** Members */
@@ -1324,6 +1457,13 @@ export interface components {
        * @default مدة التجربة تقديرية؛ لا تشمل الطريق أو الانتظار. تأكد من وقت الفتح وتوفر التجربة قبل الذهاب.
        */
       duration_note: string;
+    };
+    /** RatingAttribution */
+    RatingAttribution: {
+      /** Provider */
+      provider: string;
+      /** Provider Uri */
+      provider_uri: string;
     };
     /** Registration */
     Registration: {
@@ -1415,6 +1555,58 @@ export interface components {
     SettingsChange: {
       settings: components["schemas"]["Settings"];
       expected: components["schemas"]["Settings"];
+    };
+    /** SharedExperience */
+    SharedExperience: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Venue */
+      venue: string;
+      /** Neighborhood */
+      neighborhood: string;
+      /** Cuisine */
+      cuisine: string;
+      /** Image */
+      image: string;
+      /** Price */
+      price: number;
+      /** Minutes */
+      minutes: number;
+      /**
+       * Priority
+       * @enum {string}
+       */
+      priority: "ركيزة" | "أساسية" | "مرنة";
+      /** Reason */
+      reason: string;
+      /** Dishes */
+      dishes: string[];
+      /** Options */
+      options: string[];
+      /** Is Demo */
+      is_demo: boolean;
+      /** Maps Url */
+      maps_url: string;
+      /** Maps Verified */
+      maps_verified: boolean;
+    };
+    /** SharedPlan */
+    SharedPlan: {
+      context: components["schemas"]["OutingContext"];
+      /** Entries */
+      entries: components["schemas"]["SharedExperience"][];
+      /** Consumed */
+      consumed: number;
+      /** Available */
+      available: number;
+      /** Unfilled */
+      unfilled: number;
+      /** Anchor Unavailable */
+      anchor_unavailable: boolean;
+      /** Archived */
+      archived: boolean;
     };
     /** Skin */
     Skin: {
@@ -1634,6 +1826,37 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Acknowledged"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  google_rating_api_v2_experiences__experience_id__google_rating_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        experience_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GoogleRating"];
         };
       };
       /** @description Invalid request */
@@ -3127,6 +3350,147 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["QuickResult"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  get_editor_api_plan_invitations__kind___source_id__get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        kind: "plan" | "outing";
+        source_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvitationEditor"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  save_api_plan_invitations__kind___source_id__put: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        kind: "plan" | "outing";
+        source_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InvitationChange"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvitationEditor"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  revoke_api_plan_invitations__kind___source_id__delete: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        kind: "plan" | "outing";
+        source_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InvitationRevoke"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Acknowledged"];
+        };
+      };
+      /** @description Invalid request */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  public_invitation_api_shared_plans__code__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicInvitation"];
         };
       };
       /** @description Invalid request */

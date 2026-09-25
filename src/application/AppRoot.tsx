@@ -14,6 +14,7 @@ import { colors } from "../shared/theme";
 import { WebDocument } from "../shared/ui/WebDocument";
 import { AccountProvider } from "../features/accounts";
 import { AccountPage } from "./AccountPage";
+import { PublicInvitationScreen } from "../features/planSharing";
 
 export default function App() {
   const [screen, setScreen] = useState<"organizer" | "groups" | "account">(
@@ -38,6 +39,9 @@ export default function App() {
     ? (window.location.pathname.match(/^\/join\/([A-Za-z0-9_-]+)\/?$/)?.[1] ??
       null)
     : null;
+  const sharedCode = web
+    ? window.location.pathname.match(/^\/s\/([A-Za-z0-9_-]+)\/?$/)?.[1]
+    : null;
   return (
     <SafeAreaProvider>
       <AccountProvider>
@@ -46,6 +50,8 @@ export default function App() {
           <StatusBar style="dark" />
           {!loaded && !fontError ? (
             <ActivityIndicator style={{ flex: 1 }} color={colors.green} />
+          ) : sharedCode ? (
+            <PublicInvitationScreen code={sharedCode} />
           ) : web && !organizerPreview && !inviteCode ? (
             <InviteScreen code={null} />
           ) : inviteCode ? (

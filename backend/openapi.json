@@ -203,6 +203,48 @@
         ]
       }
     },
+    "/api/v2/experiences/{experience_id}/google-rating": {
+      "get": {
+        "tags": [
+          "Experiences"
+        ],
+        "summary": "Google Rating",
+        "operationId": "google_rating_api_v2_experiences__experience_id__google_rating_get",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleRating"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/experiences": {
       "get": {
         "tags": [
@@ -2543,6 +2585,277 @@
         }
       }
     },
+    "/api/plan-invitations/{kind}/{source_id}": {
+      "get": {
+        "tags": [
+          "Plan invitations"
+        ],
+        "summary": "Get Editor",
+        "operationId": "get_editor_api_plan_invitations__kind___source_id__get",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan",
+                "outing"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationEditor"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Plan invitations"
+        ],
+        "summary": "Save",
+        "operationId": "save_api_plan_invitations__kind___source_id__put",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan",
+                "outing"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationEditor"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Plan invitations"
+        ],
+        "summary": "Revoke",
+        "operationId": "revoke_api_plan_invitations__kind___source_id__delete",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan",
+                "outing"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationRevoke"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Acknowledged"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shared-plans/{code}": {
+      "get": {
+        "tags": [
+          "Plan invitations"
+        ],
+        "summary": "Public Invitation",
+        "operationId": "public_invitation_api_shared_plans__code__get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicInvitation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Health",
@@ -3133,6 +3446,33 @@
             },
             "type": "array",
             "title": "Outing Traits"
+          },
+          "suggested_dishes": {
+            "items": {
+              "type": "string",
+              "maxLength": 100,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 5,
+            "title": "Suggested Dishes"
+          },
+          "google_place_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{3,255}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Google Place Id"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo",
+            "default": true
           }
         },
         "additionalProperties": false,
@@ -3176,6 +3516,69 @@
           "remaining_seconds"
         ],
         "title": "FunCard"
+      },
+      "GoogleRating": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "demo",
+              "unlinked",
+              "unavailable"
+            ],
+            "title": "Status"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "review_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Count"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "attributions": {
+            "items": {
+              "$ref": "#/components/schemas/RatingAttribution"
+            },
+            "type": "array",
+            "title": "Attributions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "GoogleRating"
       },
       "GroupCreated": {
         "properties": {
@@ -3252,6 +3655,132 @@
           "plan"
         ],
         "title": "GroupView"
+      },
+      "InvitationChange": {
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/InvitationDetails"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "details",
+          "expected_revision"
+        ],
+        "title": "InvitationChange"
+      },
+      "InvitationDetails": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Message",
+            "default": "لكم مكان على الطاولة."
+          },
+          "when_label": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "When Label",
+            "default": ""
+          },
+          "meeting_note": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Meeting Note",
+            "default": ""
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "palm",
+              "saffron",
+              "rose"
+            ],
+            "title": "Theme",
+            "default": "palm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "InvitationDetails"
+      },
+      "InvitationEditor": {
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/InvitationDetails"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SharedPlan"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "details",
+          "plan",
+          "code",
+          "revision"
+        ],
+        "title": "InvitationEditor"
+      },
+      "InvitationRevoke": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision"
+        ],
+        "title": "InvitationRevoke"
       },
       "InviteView": {
         "properties": {
@@ -3994,6 +4523,33 @@
         ],
         "title": "PublicCircle"
       },
+      "PublicInvitation": {
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/InvitationDetails"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SharedPlan"
+          },
+          "read_at": {
+            "type": "string",
+            "title": "Read At"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "details",
+          "plan",
+          "read_at",
+          "created_at"
+        ],
+        "title": "PublicInvitation"
+      },
       "QuickRequest": {
         "properties": {
           "members": {
@@ -4070,6 +4626,28 @@
           "message"
         ],
         "title": "QuickResult"
+      },
+      "RatingAttribution": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Provider"
+          },
+          "provider_uri": {
+            "type": "string",
+            "maxLength": 2048,
+            "pattern": "^https://",
+            "title": "Provider Uri"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "provider",
+          "provider_uri"
+        ],
+        "title": "RatingAttribution"
       },
       "Registration": {
         "properties": {
@@ -4338,6 +4916,147 @@
           "expected"
         ],
         "title": "SettingsChange"
+      },
+      "SharedExperience": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue"
+          },
+          "neighborhood": {
+            "type": "string",
+            "title": "Neighborhood"
+          },
+          "cuisine": {
+            "type": "string",
+            "title": "Cuisine"
+          },
+          "image": {
+            "type": "string",
+            "title": "Image"
+          },
+          "price": {
+            "type": "integer",
+            "title": "Price"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "ركيزة",
+              "أساسية",
+              "مرنة"
+            ],
+            "title": "Priority"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "dishes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dishes"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "maps_url": {
+            "type": "string",
+            "title": "Maps Url"
+          },
+          "maps_verified": {
+            "type": "boolean",
+            "title": "Maps Verified"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "venue",
+          "neighborhood",
+          "cuisine",
+          "image",
+          "price",
+          "minutes",
+          "priority",
+          "reason",
+          "dishes",
+          "options",
+          "is_demo",
+          "maps_url",
+          "maps_verified"
+        ],
+        "title": "SharedExperience"
+      },
+      "SharedPlan": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/OutingContext"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/SharedExperience"
+            },
+            "type": "array",
+            "title": "Entries"
+          },
+          "consumed": {
+            "type": "integer",
+            "title": "Consumed"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "unfilled": {
+            "type": "integer",
+            "title": "Unfilled"
+          },
+          "anchor_unavailable": {
+            "type": "boolean",
+            "title": "Anchor Unavailable"
+          },
+          "archived": {
+            "type": "boolean",
+            "title": "Archived"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "context",
+          "entries",
+          "consumed",
+          "available",
+          "unfilled",
+          "anchor_unavailable",
+          "archived"
+        ],
+        "title": "SharedPlan"
       },
       "Skin": {
         "properties": {

@@ -113,6 +113,7 @@ export function useOrganizer() {
     }
   };
   return {
+    session,
     group,
     loading,
     busy,

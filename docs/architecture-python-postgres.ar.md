@@ -1,6 +1,6 @@
 # معمارية حاتم — التجارب والخطة، والقروبات إضافة اختيارية
 
-النسخة المنفذة على الفرع `codex/persistent-groups`، آخر تحديث24سبتمبر2026. الواجهة React Native وExpo SDK 57، والخادم Python/FastAPI، وقاعدة البيانات PostgreSQL. نسخة .NET مستقلة ولم تتغير.
+النسخة المنفذة على الفرع `codex/persistent-groups`، آخر تحديث25سبتمبر2026. الواجهة React Native وExpo SDK 57، والخادم Python/FastAPI، وقاعدة البيانات PostgreSQL. نسخة .NET مستقلة ولم تتغير.
 
 [تصحيح مسار البداية](learning-python-postgres/15-experiences-first.ar.md) · [شرح إضافة القروبات](learning-python-postgres/13-social-groups.ar.md) · [API القروبات](api-social.ar.md) · [API الخطة المباشرة](api-planning.ar.md) · [معمارية النسخة السابقة 59d45d3](architecture-python-postgres-v1.ar.md) · [النقاش الأصلي](proposals/persistent-groups.ar.md).
 
@@ -23,6 +23,12 @@ flowchart TB
     A --> F[dist: ملفات رفيق الويب]
     A --> Q[خطة مباشرة ورفقتها: /api/groups]
     A --> Quick[قرار سريع: الوقت والحي وسياق الطلعة]
+    A --> Sharing[دعوة مصممة عامة للعرض: plan_sharing]
+    Sharing --> Q
+    Sharing --> O
+    Sharing --> DB
+    A --> Rating[experiences: تقييم عند الطلب]
+    Rating --> Google[Google Places API: مكان حقيقي فقط]
     Quick --> P
     Quick -->|قراءة كتالوج فقط| DB
     Q --> P
@@ -56,6 +62,7 @@ src/
     experiences/                  الاكتشاف وبطاقة التجربة وكتالوج التجارب
     quickDecision/                بحث سريع واختيار صريح بلا حساب
     planning/                     الخطة المباشرة ورفقتها ودعوتها وإعدادها وطلباتها
+    planSharing/                  تصميم دعوة عامة ومشاركتها وتصدير PDF على الجهاز
     groups/                       القروبات والطلعات والأدوار والجولات والمزاح والشخصيات
       skins/                      رسومات الشخصيات ومحررها وعرض الرفقة
   shared/
@@ -72,6 +79,7 @@ backend/hatim/
   features/experiences/           مسارا الكتالوج ومستودع القراءة وبيانات الاختبار
   features/quick_decision/        API بحث بلا حفظ؛ يستعمل المحرك نفسه
   features/planning/              نماذج الخطة وrouter وخدمة المعاملات والدعوات
+  features/plan_sharing/          صلاحية المصدر، إسقاط عام، تصميم الدعوة وإلغاء الرابط
   features/groups/                circles/outings/rounds/skins ونماذج ومساعدات داخلية
   domain/                         محرك القرار النقي وبياناته المشتركة
   core/                           PostgreSQL والترحيلات وسياسة HTTP والنماذج العامة
@@ -96,6 +104,17 @@ Dockerfile وdeploy/              ملفات نشر التطبيق؛ الاست�
 
 ```mermaid
 erDiagram
+    plan_invitations {
+        text code PK
+        text plan_id FK,UK "nullable: exactly one source"
+        text outing_id FK,UK "nullable: exactly one source"
+        jsonb details "title, message, theme, meeting notes"
+        bigint revision "global sequence: avoids stale link edits"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    groups o|--o| plan_invitations : shares_direct_plan
+    outings o|--o| plan_invitations : shares_outing
     circle_members {
         text id PK
         jsonb skin "nullable default appearance"
@@ -142,8 +161,9 @@ erDiagram
 | `outing_fun_cards` | المستهدف والمرسل والطلعة ووقت نهاية البطاقة وحالة إغلاقها |
 | `groups` و`members` | الخطة المباشرة ورفقتها؛ owner_account_id اختياري: null للضيف، وإلا جلسة الحساب المالك تدير الخطة. لا تتطلب circle |
 | `schema_migrations` | أسماء الترحيلات وبصماتها وتواريخ تطبيقها |
+| `plan_invitations` | رابط عرض واحد لكل خطة أو طلعة؛ تصميم الدعوة ومراجعتها، دون نسخ بيانات المشاركين أو الخطة |
 
-المجموع ١٥ جدولًا، منها ١٢ أضيفت في الترحيل الثاني. الترحيل003 يضيف إلى groups عمود owner_account_id بمفتاح أجنبي إلى accounts وفهرس جزئي لترتيب خطط الحساب؛ لا ينقل بيانات الضيف آليًا. التسمية circles تميز القروبات الدائمة عن جدول groups للخطة المباشرة، بينما اسم القروبات في API هو /api/v2/groups والخطط /api/groups. لم تتغير ملفات الترحيل001 و002.
+المجموع ١٦ جدولًا، منها ١٢ أضيفت في الترحيل الثاني وplan_invitations في007. الترحيل003 يضيف إلى groups عمود owner_account_id بمفتاح أجنبي إلى accounts وفهرس جزئي لترتيب خطط الحساب؛ لا ينقل بيانات الضيف آليًا. الترحيل006 يضيف أطباقًا مقترحة إلى JSONB التجارب التوضيحية، دون تغيير العلاقات. التسمية circles تميز القروبات الدائمة عن جدول groups للخطة المباشرة، بينما اسم القروبات في API هو /api/v2/groups والخطط /api/groups. لم تتغير الترحيلات المطبقة001–005.
 
 `UNIQUE(circle_id, account_id)` يمنع انضمام الحساب مرتين. المفاتيح الأجنبية المركبة تمنع مشاركة عضو في طلعة لقروب آخر، أو صوت لتجربة خارج الجولة. فهرس جزئي يسمح بجولة واحدة حالتها open/tied/resolved لكل طلعة. النتائج السابقة تبقى كسجلات invalidated عند الاستبدال؛ API تعرض أحدث جولة فقط، وليس متصفحًا كاملًا للتاريخ.
 
@@ -298,3 +318,34 @@ sequenceDiagram
 ```
 
 الرسوم محلية باستخدام react-native-svg الموجودة بالمشروع؛ قاعدة البيانات تحفظ اختيارات صغيرة لا ملفات صور. لا اعتماد جديد بين الوحدات، ولا تعديل في planner أو planning_revision أو احتمالات القرعة. التحديث يصل لأعضاء القروب عبر التحديث الدوري الموجود كل٦ثوانٍ. [عقد الشخصيات](api-social.ar.md) و[شرح البناء والتحقق](learning-python-postgres/19-outing-skins.ar.md).
+
+## الدعوة المصممة ونسخة PDF —25سبتمبر2026
+
+زر «دعوة ومشاركة الخطة» في الخطة المباشرة وفي طلعة القروب للقائد أو المالك. يفتح معاينة بثلاثة تصاميم، وعنوان ورسالة وموعد ومكان تجمع اختياريين. إنشاء الرابط إجراء صريح؛ القراءة لا تنشر الدعوة. `/s/{code}` صفحة عامة للعرض بلا حساب؛ `/join/{code}` يبقى مستقلًا لتسجيل الرفقة وتفضيلاتهم.
+
+```mermaid
+sequenceDiagram
+    actor Owner as المنظم
+    participant UI as planSharing
+    participant API as plan_sharing
+    participant Source as planning أو groups
+    participant DB as PostgreSQL
+    actor Guest as صاحب الرابط
+    Owner->>UI: مراجعة التصميم والتفاصيل ثم إنشاء الرابط
+    UI->>API: PUT المصدر والتفاصيل وexpected_revision
+    API->>Source: تحقق وقفل المصدر داخل المعاملة
+    API->>DB: حفظ التصميم ورمز عشوائي ومراجعة جديدة
+    API-->>UI: رابط وإسقاط عام للخطة
+    Guest->>API: GET shared-plans بالرمز
+    API->>Source: قراءة آخر خطة من محركها القائم
+    API-->>Guest: تجارب مختارة دون بيانات الأشخاص الخاصة
+    Guest->>Guest: PDF محلي مؤرخ وروابط إلى الخطة والخرائط
+```
+
+التغيير في الخانات والحضور والقيود يُحسب من المصدر نفسه؛ المشاركة لا تنشئ محركًا آخر ولا تعيد الجيب أو المكتمل. أسباب العضو الخاصة لا تُنشر؛ الرتب تأتي من المحرك، والشرح العام من التنسيق التحريري. عند تعذر الركيزة يظهر تنبيه عام دون كشف حساسية أو اسم شخص. تعديل التصميم يحتفظ بالرابط، وإلغاؤه يحذف السجل. المراجعات تمنع كتابة نسخة قديمة فوق تعديل جديد، بما في ذلك إلغاء الرابط وإعادة إنشائه.
+
+PDF يُنشأ محليًا: Expo Print ثم Sharing فيiOS، ومعاينة طباعة عربية في الويب. يضم التجارب المختارة والأطباق والخيارات التحريرية والسعر والمدة التقديريين وروابط Google Maps و«آخر خطة». هو نسخة ثابتة؛ إلغاء الدعوة لا يمحو ملفًا نزّله شخص. لا يلزم حساب أو قروب دائم للميزة الأساسية.
+
+Google rating رقمي عند الطلب في الدعوة للمكان الحقيقي المربوط فقط، مع المصدر والتاريخ وعدد المراجعات. لا تُخزن الأرقام أو تُصدّر للملف؛ PDF يفتح التقييم الحالي عبر Google Maps. التجارب الحالية وهمية، مع بحث اسم فقط وعلامة توضيح. API key خادمي اختياري ولم يُضبط في الاختبار. [العقد والتفاصيل](api-plan-sharing.ar.md) و[الفصل20](learning-python-postgres/20-designed-invitations.ar.md).
+
+تنفيذ iOS يستكمل Expo Print بوحدة Expo محلية في modules/hatim-pdf-links تستخدم PDFKit لإبقاء روابط الملف قابلة للضغط. هي محوّل ملفات فقط تحت مسؤولية planSharing، بلا خدمة خلفية أو اعتماد أعمال إضافي. لم يقتصر التحقق على ظهور النص الأزرق: تُفحص annotations في ملف المحاكي الفعلي. [شرح الجزء الأصلي](learning-python-postgres/20-designed-invitations.ar.md).

@@ -3,9 +3,11 @@ from fastapi import APIRouter
 from hatim.core.db import connect
 from hatim.domain.models import Experience
 
+from .ratings import router as ratings_router
 from .repository import catalog
 
 router = APIRouter()
+router.include_router(ratings_router)
 
 
 @router.get("/api/experiences", response_model=list[Experience])
