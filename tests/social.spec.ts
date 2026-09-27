@@ -150,6 +150,7 @@ test("persistent group: two accounts join, attend, vote, draw and preserve a sha
   });
 
   await button(page, "خطتنا").click();
+  await button(page, "تعديل الوقت والجو").click();
   await button(page, "عشاء واحد").click();
   await button(page, "حدّث الخطة إلى ١ خانات").click();
   await button(page, "الاختيار").click();

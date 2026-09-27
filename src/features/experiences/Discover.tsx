@@ -84,8 +84,8 @@ export function Discover({
             </T>
           </View>
           <T style={[s.intro, wide && { fontSize: 16, lineHeight: 29 }]}>
-            تجارب أكل مختارة، وخطة تراعي الذوق والقيود. من تسع وجبات إلى عشاء
-            واحد، تعرف وش يبقى وليش.
+            تجارب أكل مختارة على ذوقكم. اختاروا تجربة، وحاتم يرتّب الباقي على
+            قدّ وقتكم.
           </T>
           <View style={{ alignSelf: "flex-end", marginTop: 9 }}>
             <Button
@@ -101,7 +101,7 @@ export function Discover({
             </Row>
           )}
         </View>
-        {hero && (
+        {hero && wide && (
           <Pressable
             onPress={() => onOpen(hero)}
             accessibilityRole="button"
@@ -160,7 +160,7 @@ export function Discover({
           </Pressable>
         )}
       </View>
-      {group && (
+      {group && wide && (
         <Pressable
           onPress={onGroup}
           accessibilityRole="button"
@@ -226,7 +226,7 @@ export function Discover({
             </T>
           </View>
           <T style={{ fontSize: 12, color: c.muted }}>
-            {ar(catalog.length)} تجارب
+            {ar(filtered.length)} تجارب
           </T>
         </Row>
         <View
@@ -284,11 +284,21 @@ export function Discover({
           ))}
         </View>
         {filtered.length === 0 && (
-          <Empty
-            icon={Search}
-            title="ما لقيناها هالمرة"
-            text="جرّب كلمة ثانية أو وسّع نوع التجربة."
-          />
+          <View style={{ gap: 12 }}>
+            <Empty
+              icon={Search}
+              title="ما لقيناها هالمرة"
+              text="جرّب كلمة ثانية أو وسّع نوع التجربة."
+            />
+            <Button
+              secondary
+              label="عرض كل التجارب"
+              onPress={() => {
+                setSearch("");
+                setCategory("الكل");
+              }}
+            />
+          </View>
         )}
       </View>
       <View style={s.philosophy}>
@@ -309,7 +319,7 @@ const s = StyleSheet.create({
   heroCopy: { gap: 10 },
   dot: { width: 6, height: 6, backgroundColor: c.coral, borderRadius: 3 },
   eyebrow: { color: c.muted, fontSize: 12, lineHeight: 23 },
-  headline: { fontSize: 42, lineHeight: 61, letterSpacing: -0.7 },
+  headline: { fontSize: 30, lineHeight: 43, letterSpacing: -0.7 },
   wideHeadline: { fontSize: 55, lineHeight: 79 },
   intro: { color: "#758078", fontSize: 14, lineHeight: 26 },
   heroPhoto: {

@@ -1,15 +1,35 @@
-import { useCallback, useEffect, useState } from "react";
-import { Linking, Share, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Keyboard, Linking, ScrollView, Share, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import { Share2 } from "lucide-react-native";
-import { Button, Chip, Notice, Sheet, T } from "../../shared/ui/primitives";
-import { ErrorNotice, Field, Loading, s } from "../../shared/ui/layout";
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  Eye,
+  FileDown,
+  Link2,
+  Pencil,
+  Settings2,
+  Share2,
+  Trash2,
+} from "lucide-react-native";
+import {
+  ActionRow,
+  Button,
+  Notice,
+  Sheet,
+  T,
+} from "../../shared/ui/primitives";
+import { ErrorNotice, Loading, s } from "../../shared/ui/layout";
 import { PUBLIC_ORIGIN } from "../../shared/api/http";
+import { ar, colors as c } from "../../shared/theme";
 import { useRemote } from "../../shared/useRemote";
 import { sharingApi, type InvitationDetails, type SharingSource } from "./api";
 import { InvitationCard } from "./InvitationCard";
-import { themes } from "./presentation";
+import { InvitationForm } from "./InvitationForm";
 import { exportPdf } from "./exportPdf";
+
+type Stage = "overview" | "edit" | "preview" | "options" | "revoke" | "discard";
 
 function Editor({
   source,
@@ -28,112 +48,213 @@ function Editor({
     details: InvitationDetails;
     revision: number | null;
   } | null>(null);
+  const [stage, setStage] = useState<Stage>("overview");
+  const [returnStage, setReturnStage] = useState<Stage>("overview");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [confirmRevoke, setConfirmRevoke] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [working, setWorking] = useState(false);
+  const inFlight = useRef(false);
+  const scroll = useRef<ScrollView>(null);
   useEffect(() => {
     if (r.data && !baseline) {
       setDraft(r.data.details);
       setBaseline({ details: r.data.details, revision: r.data.revision });
     }
   }, [r.data, baseline]);
+  const move = (next: Stage) => {
+    Keyboard.dismiss();
+    setStage(next);
+    scroll.current?.scrollTo({ y: 0, animated: false });
+  };
   const dirty =
     !!draft && JSON.stringify(draft) !== JSON.stringify(baseline?.details);
-  const stale = baseline && r.data && baseline.revision !== r.data.revision;
+  const stale = !!(baseline && r.data && baseline.revision !== r.data.revision);
   const url = r.data?.code ? `${PUBLIC_ORIGIN}/s/${r.data.code}` : null;
+  const busy = r.busy || working;
+  const unavailable = busy || stale || !!r.error;
   const attempt = (operation: () => Promise<unknown>) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setWorking(true);
     setError(null);
-    void operation().catch((e) =>
-      setError(e instanceof Error ? e.message : "تعذّرت المشاركة."),
-    );
+    void operation()
+      .catch((e) =>
+        setError(e instanceof Error ? e.message : "تعذّرت المشاركة."),
+      )
+      .finally(() => {
+        inFlight.current = false;
+        setWorking(false);
+      });
   };
-  const busy = r.busy || exporting;
-  return (
-    <Sheet
-      title="دعوة تليق باللمّة"
-      visible
-      onClose={() => {
-        if (!busy) close();
-      }}
-    >
-      <ErrorNotice
-        error={r.error ?? error}
-        retry={() => {
-          void r.refresh();
-        }}
-      />
-      {r.loading && <Loading />}
-      {draft && r.data && (
-        <>
-          <InvitationCard
-            compact={!showDetails}
-            details={draft}
-            plan={r.data.plan}
+  const save = async () => {
+    if (!draft || !draft.title.trim() || stale) return;
+    const result = await r.mutate(
+      () => sharingApi.save(source, draft, baseline?.revision ?? null),
+      (next) => next,
+    );
+    setDraft(result.details);
+    setBaseline({ details: result.details, revision: result.revision });
+    setCopied(false);
+    move("overview");
+  };
+  const requestClose = () => {
+    if (busy) return;
+    if (dirty) {
+      setReturnStage(stage === "discard" ? returnStage : stage);
+      move("discard");
+    } else close();
+  };
+  const title = {
+    overview: "مشاركة الخطة",
+    edit: "تعديل الدعوة",
+    preview: "معاينة الدعوة",
+    options: "خيارات المشاركة",
+    revoke: "إلغاء رابط الدعوة؟",
+    discard: "عندك تعديلات غير محفوظة",
+  }[stage];
+  const footer =
+    draft && r.data ? (
+      <>
+        <ErrorNotice
+          error={error ?? r.error}
+          retry={
+            r.error
+              ? () => {
+                  setError(null);
+                  void r.refresh();
+                }
+              : undefined
+          }
+        />
+        {stage === "overview" && (
+          <>
+            <T style={[s.muted, { fontSize: 12 }]}>
+              {url
+                ? "رابط للعرض يتحدّث مع خطتك. تفضيلات الرفقة وأسماؤهم تبقى خاصة."
+                : "إنشاء الرابط يتيح مشاهدة الخطة لأي شخص معه الرابط، بدون بيانات الرفقة الخاصة."}
+            </T>
+            <Button
+              icon={url && !dirty ? Share2 : Link2}
+              label={
+                !url
+                  ? "إنشاء رابط الدعوة"
+                  : dirty
+                    ? "حفظ التعديلات"
+                    : "مشاركة الدعوة"
+              }
+              busy={busy}
+              disabled={!draft.title.trim() || unavailable}
+              onPress={() =>
+                attempt(
+                  url && !dirty
+                    ? () =>
+                        Share.share({
+                          title: draft.title,
+                          message: `${draft.title}\n${draft.message ?? ""}\n${url}`,
+                          url,
+                        })
+                    : save,
+                )
+              }
+            />
+            {url && !dirty && (
+              <Button
+                secondary
+                small
+                icon={copied ? Check : Copy}
+                label={copied ? "تم نسخ الرابط" : "نسخ الرابط"}
+                disabled={unavailable}
+                onPress={() =>
+                  attempt(async () => {
+                    await Clipboard.setStringAsync(url);
+                    setCopied(true);
+                  })
+                }
+              />
+            )}
+          </>
+        )}
+        {stage === "edit" && (
+          <Button
+            icon={url ? Check : Eye}
+            label={url ? "حفظ التعديلات" : "معاينة الدعوة"}
+            busy={busy}
+            disabled={!draft.title.trim() || unavailable}
+            onPress={() => (url ? attempt(save) : move("overview"))}
           />
+        )}
+        {stage === "preview" && (
           <Button
             secondary
-            label={
-              showDetails ? "إخفاء تفاصيل المعاينة" : "معاينة الأماكن والأطباق"
+            label="رجوع إلى الدعوة"
+            onPress={() => move("overview")}
+          />
+        )}
+        {stage === "revoke" && (
+          <>
+            <Button
+              icon={Trash2}
+              label="تأكيد إلغاء الرابط"
+              busy={busy}
+              disabled={unavailable}
+              onPress={() =>
+                attempt(async () => {
+                  await r.mutate(() =>
+                    sharingApi.revoke(source, r.data!.revision!),
+                  );
+                  setBaseline(null);
+                  setCopied(false);
+                  move("overview");
+                })
+              }
+            />
+            <Button
+              secondary
+              label="الاحتفاظ بالرابط"
+              disabled={busy}
+              onPress={() => move("options")}
+            />
+          </>
+        )}
+        {stage === "discard" && (
+          <>
+            <Button label="متابعة التعديل" onPress={() => move(returnStage)} />
+            <Button secondary label="تجاهل التعديلات وإغلاق" onPress={close} />
+          </>
+        )}
+      </>
+    ) : undefined;
+  return (
+    <Sheet
+      title={title}
+      visible
+      scrollRef={scroll}
+      onClose={requestClose}
+      onBack={
+        stage !== "overview" && stage !== "discard"
+          ? () => {
+              if (!busy) move(stage === "revoke" ? "options" : "overview");
             }
-            onPress={() => setShowDetails(!showDetails)}
-          />
-          <View style={s.wrap}>
-            {Object.entries(themes).map(([key, theme]) => (
-              <Chip
-                key={key}
-                label={theme.name}
-                selected={draft.theme === key}
-                onPress={() => {
-                  if (!busy)
-                    setDraft({
-                      ...draft,
-                      theme: key as InvitationDetails["theme"],
-                    });
-                }}
-              />
-            ))}
-          </View>
-          <Field
-            label="عنوان الدعوة"
-            value={draft.title}
-            onChangeText={(title) => setDraft({ ...draft, title })}
-            maxLength={60}
-            editable={!busy}
-          />
-          <Field
-            label="رسالتك للرفقة"
-            value={draft.message ?? ""}
-            onChangeText={(message) => setDraft({ ...draft, message })}
-            maxLength={200}
-            multiline
-            editable={!busy}
-          />
-          <Field
-            label="متى نتلاقى؟ (اختياري)"
-            value={draft.when_label ?? ""}
-            onChangeText={(when_label) => setDraft({ ...draft, when_label })}
-            maxLength={80}
-            placeholder="الخميس ١ أكتوبر، ٨ مساءً بتوقيت الرياض"
-            editable={!busy}
-          />
-          <Field
-            label="مكان التجمع (اختياري)"
-            value={draft.meeting_note ?? ""}
-            onChangeText={(meeting_note) =>
-              setDraft({ ...draft, meeting_note })
-            }
-            maxLength={100}
-            placeholder="نتلاقى عند مدخل المكان"
-            editable={!busy}
-          />
-          <Notice text="أي شخص معه الرابط يقدر يشوف الدعوة والأماكن المختارة، وتتحدث مع خطتك. أسماء الأعضاء وحساسياتهم وتفضيلاتهم الخاصة ما تظهر. تقدر تلغي الرابط متى ما بغيت." />
+          : undefined
+      }
+      footer={footer}
+    >
+      {r.loading && <Loading />}
+      {!r.data && (
+        <ErrorNotice
+          error={r.error}
+          retry={() => {
+            void r.refresh();
+          }}
+        />
+      )}
+      {draft && r.data && (
+        <>
           {stale && (
             <>
               <Notice
                 warning
-                text="تغيّرت الدعوة من جهاز آخر؛ راجع أحدث نسخة قبل الحفظ."
+                text="تغيّرت الدعوة من جهاز آخر. مسودتك محفوظة هنا؛ راجعي أحدث نسخة قبل الحفظ أو المشاركة."
               />
               <Button
                 secondary
@@ -150,134 +271,109 @@ function Editor({
               />
             </>
           )}
-          <Button
-            label={url ? "حفظ تصميم الدعوة" : "أنشئ رابط الدعوة"}
-            busy={r.busy}
-            disabled={exporting || !draft.title.trim() || !!stale}
-            onPress={() =>
-              attempt(async () => {
-                const result = await r.mutate(
-                  () =>
-                    sharingApi.save(source, draft, baseline?.revision ?? null),
-                  (next) => next,
-                );
-                setDraft(result.details);
-                setBaseline({
-                  details: result.details,
-                  revision: result.revision,
-                });
-                setCopied(false);
-              })
-            }
-          />
-          {url && (
+          {stage === "overview" && (
+            <>
+              <InvitationCard compact details={draft} plan={r.data.plan} />
+              <T accessibilityLiveRegion="polite" style={s.muted}>
+                {ar(r.data.plan.entries.length)} تجارب في الدعوة ·{" "}
+                {dirty
+                  ? "تعديلات لم تُحفظ بعد"
+                  : url
+                    ? "الرابط جاهز للمشاركة"
+                    : "معاينة فقط · لم يُنشأ رابط بعد"}
+              </T>
+              <View style={{ borderTopWidth: 1, borderTopColor: c.line }}>
+                <ActionRow
+                  label="تعديل الدعوة"
+                  icon={Pencil}
+                  disabled={busy}
+                  onPress={() => move("edit")}
+                />
+                <ActionRow
+                  label="معاينة الأماكن والأطباق"
+                  icon={Eye}
+                  disabled={busy}
+                  onPress={() => move("preview")}
+                />
+                {url && (
+                  <ActionRow
+                    label="خيارات المشاركة"
+                    description="PDF، فتح الرابط أو إلغاؤه"
+                    icon={Settings2}
+                    disabled={busy}
+                    onPress={() => move("options")}
+                  />
+                )}
+              </View>
+            </>
+          )}
+          {stage === "edit" && (
+            <InvitationForm value={draft} onChange={setDraft} disabled={busy} />
+          )}
+          {stage === "preview" && (
+            <InvitationCard details={draft} plan={r.data.plan} />
+          )}
+          {stage === "options" && (
             <>
               {dirty && (
-                <Notice text="احفظ تعديلات التصميم قبل مشاركة الدعوة." />
+                <Notice text="احفظي تعديلات الدعوة من الشاشة السابقة قبل فتحها أو تصديرها." />
               )}
-              <T
-                selectable
-                style={{
-                  writingDirection: "ltr",
-                  textAlign: "left",
-                  fontSize: 12,
-                }}
-              >
-                {url}
-              </T>
-              <Button
-                secondary
-                label={copied ? "تم نسخ رابط الدعوة" : "نسخ رابط الدعوة"}
-                disabled={busy || dirty || !!stale || !!r.error}
+              <ActionRow
+                label="افتح الدعوة"
+                description="افتحي النسخة التي يشوفها المستلم"
+                icon={ExternalLink}
+                disabled={unavailable || dirty || !url}
+                onPress={() => attempt(() => Linking.openURL(url!))}
+              />
+              <ActionRow
+                label={working ? "جارٍ تجهيز الملف…" : "حفظ نسخة PDF"}
+                description="نسخة ثابتة بالأماكن والأطباق وروابط الخرائط"
+                icon={FileDown}
+                disabled={unavailable || dirty || !url}
                 onPress={() =>
-                  attempt(async () => {
-                    await Clipboard.setStringAsync(url);
-                    setCopied(true);
+                  attempt(() => {
+                    const now = new Date().toISOString();
+                    return exportPdf(
+                      {
+                        details: r.data!.details,
+                        plan: r.data!.plan,
+                        read_at: now,
+                        created_at: now,
+                      },
+                      url!,
+                    );
                   })
                 }
               />
-              <Button
-                icon={Share2}
-                label="أرسل الدعوة"
-                disabled={busy || dirty || !!stale || !!r.error}
-                onPress={() =>
-                  attempt(() =>
-                    Share.share({
-                      title: draft.title,
-                      message: `${draft.title}\n${draft.message ?? ""}\n${url}`,
-                      url,
-                    }),
-                  )
-                }
-              />
-              <Button
-                secondary
-                label="افتح الدعوة"
-                disabled={busy || dirty || !!stale}
-                onPress={() => attempt(() => Linking.openURL(url))}
-              />
-              <Button
-                secondary
-                label="حفظ نسخة PDF"
-                disabled={busy || dirty || !!stale || !!r.error}
-                onPress={() => {
-                  setExporting(true);
-                  setError(null);
-                  // Export precisely the reviewed public projection, never the organizer's private plan.
-                  const now = new Date().toISOString();
-                  void exportPdf(
-                    {
-                      details: r.data!.details,
-                      plan: r.data!.plan,
-                      read_at: now,
-                      created_at: now,
-                    },
-                    url,
-                  )
-                    .catch((e) =>
-                      setError(
-                        e instanceof Error ? e.message : "تعذّر إنشاء الملف.",
-                      ),
-                    )
-                    .finally(() => setExporting(false));
+              <View
+                style={{
+                  borderTopWidth: 1,
+                  borderColor: c.line,
+                  paddingTop: 16,
                 }}
-              />
-              {!confirmRevoke ? (
-                <Button
-                  secondary
+              >
+                <ActionRow
                   label="إلغاء رابط الدعوة"
-                  disabled={busy}
-                  onPress={() => setConfirmRevoke(true)}
+                  description="إيقاف مشاهدة الخطة من هذا الرابط"
+                  icon={Trash2}
+                  destructive
+                  disabled={unavailable || !url}
+                  onPress={() => move("revoke")}
                 />
-              ) : (
-                <>
-                  <Notice
-                    warning
-                    text="يتوقف الرابط عند الجميع. النسخ المحفوظة كـPDF تبقى لدى أصحابها. تقدر تنشئ رابطًا جديدًا لاحقًا."
-                  />
-                  <Button
-                    label="تأكيد إلغاء الرابط"
-                    busy={r.busy}
-                    onPress={() =>
-                      attempt(async () => {
-                        await r.mutate(() =>
-                          sharingApi.revoke(source, r.data!.revision!),
-                        );
-                        setBaseline(null);
-                        setConfirmRevoke(false);
-                        setCopied(false);
-                      })
-                    }
-                  />
-                  <Button
-                    secondary
-                    label="خلّ الرابط"
-                    disabled={busy}
-                    onPress={() => setConfirmRevoke(false)}
-                  />
-                </>
-              )}
+              </View>
             </>
+          )}
+          {stage === "revoke" && (
+            <Notice
+              warning
+              text="يتوقف الرابط عند الجميع. النسخ المحفوظة كـPDF تبقى لدى أصحابها. تقدر تنشئ رابطًا جديدًا لاحقًا."
+            />
+          )}
+          {stage === "discard" && (
+            <T style={{ lineHeight: 27 }}>
+              إذا أغلقتِ الآن، تفقدين تعديلات التصميم غير المحفوظة. الدعوة
+              المنشورة تبقى كما كانت.
+            </T>
           )}
         </>
       )}
@@ -296,9 +392,8 @@ export function SharePlanButton({
   return (
     <>
       <Button
-        secondary
         icon={Share2}
-        label="دعوة ومشاركة الخطة"
+        label="مشاركة الخطة"
         disabled={disabled}
         onPress={() => setOpen(true)}
       />

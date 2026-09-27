@@ -138,19 +138,25 @@ export function InvitationCard({
         {anchor && photos[anchor.image] && (
           <Image
             source={photos[anchor.image]}
-            style={{ height: compact ? 125 : 190, width: "100%" }}
+            style={{ height: compact ? 96 : 190, width: "100%" }}
             accessibilityLabel="صورة توضيحية لأجواء التجربة"
           />
         )}
-        <View style={{ alignItems: "center", gap: 14, padding: 25 }}>
+        <View
+          style={{
+            alignItems: "center",
+            gap: compact ? 8 : 14,
+            padding: compact ? 18 : 25,
+          }}
+        >
           <T style={{ fontSize: 12, color: theme.ink }}>
             حــاتم · {contexts[plan.context.kind ?? "any"]}
           </T>
-          <Utensils size={24} color={theme.ink} />
+          {!compact && <Utensils size={24} color={theme.ink} />}
           <T
             weight="bold"
             style={{
-              fontSize: compact ? 27 : 34,
+              fontSize: compact ? 24 : 34,
               textAlign: "center",
               color: theme.ink,
             }}
@@ -177,12 +183,16 @@ export function InvitationCard({
               نتلاقى: {details.meeting_note}
             </T>
           )}
-          <View
-            style={{ height: 1, width: 65, backgroundColor: theme.accent }}
-          />
-          <T style={{ textAlign: "center", fontSize: 13, color: theme.ink }}>
-            الطعم يبقى… والخطة تتغيّر.
-          </T>
+          {!compact && (
+            <View
+              style={{ height: 1, width: 65, backgroundColor: theme.accent }}
+            />
+          )}
+          {!compact && (
+            <T style={{ textAlign: "center", fontSize: 13, color: theme.ink }}>
+              الطعم يبقى… والخطة تتغيّر.
+            </T>
+          )}
         </View>
       </View>
       {!compact && (

@@ -30,8 +30,9 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   );
   await page.goto("/?preview=organizer");
   await page.getByRole("tab", { name: "خطّتنا", exact: true }).click();
-  await button(page, "دعوة ومشاركة الخطة").click();
+  await button(page, "مشاركة الخطة").click();
   const sheet = page.getByRole("dialog");
+  await button(page, "تعديل الدعوة").click();
   await sheet
     .getByRole("textbox", { name: "عنوان الدعوة", exact: true })
     .fill("خميسنا على سفرة");
@@ -39,18 +40,21 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
     .getByRole("textbox", { name: "رسالتك للرفقة", exact: true })
     .fill("الجوع يجمعنا… والباقي على حاتم.");
   await button(page, "سهرة زعفران").click();
+  await button(page, "معاينة الدعوة").click();
   await button(page, "معاينة الأماكن والأطباق").click();
   await expect(sheet.getByText("وش نطلب؟", { exact: true })).toHaveCount(3);
-  await button(page, "أنشئ رابط الدعوة").click();
-  await expect(button(page, "أرسل الدعوة")).toBeEnabled();
+  await button(page, "رجوع إلى الدعوة").click();
+  await button(page, "إنشاء رابط الدعوة").click();
+  await expect(button(page, "مشاركة الدعوة")).toBeEnabled();
   const saved = await (await request.get(endpoint, { headers: auth })).json();
   expect(saved.details.theme).toBe("saffron");
+  await button(page, "تعديل الدعوة").click();
   await sheet
     .getByRole("textbox", { name: "رسالتك للرفقة", exact: true })
     .fill("الكل معزوم");
-  await expect(button(page, "أرسل الدعوة")).toBeDisabled();
-  await button(page, "حفظ تصميم الدعوة").click();
-  await expect(button(page, "أرسل الدعوة")).toBeEnabled();
+  await expect(button(page, "مشاركة الدعوة")).toHaveCount(0);
+  await button(page, "حفظ التعديلات").click();
+  await expect(button(page, "مشاركة الدعوة")).toBeEnabled();
 
   const guest = await browser.newContext({
     baseURL: test.info().project.use.baseURL as string,
@@ -98,13 +102,14 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   await expect(viewer.getByText("وش نطلب؟", { exact: true })).toHaveCount(1, {
     timeout: 12000,
   });
+  await button(page, "خيارات المشاركة").click();
   await button(page, "إلغاء رابط الدعوة").click();
   await button(page, "تأكيد إلغاء الرابط").click();
   await expect(
     viewer.getByText(/الدعوة غير متاحة أو أُلغي رابطها/),
   ).toBeVisible({ timeout: 12000 });
   await expect(button(viewer, "حفظ نسخة PDF")).toHaveCount(0);
-  await expect(button(page, "أنشئ رابط الدعوة")).toBeVisible();
+  await expect(button(page, "إنشاء رابط الدعوة")).toBeVisible();
   expect(errors).toEqual([]);
   await guest.close();
 });
@@ -138,7 +143,8 @@ test("invitation conflict keeps draft, and public PDF escapes user text", async 
   );
   await page.goto("/?preview=organizer");
   await page.getByRole("tab", { name: "خطّتنا", exact: true }).click();
-  await button(page, "دعوة ومشاركة الخطة").click();
+  await button(page, "مشاركة الخطة").click();
+  await button(page, "تعديل الدعوة").click();
   const title = page.getByRole("textbox", {
     name: "عنوان الدعوة",
     exact: true,
@@ -156,7 +162,7 @@ test("invitation conflict keeps draft, and public PDF escapes user text", async 
     timeout: 12000,
   });
   await expect(title).toHaveValue("مسودة جهاز أول");
-  await expect(button(page, "حفظ تصميم الدعوة")).toBeDisabled();
+  await expect(button(page, "حفظ التعديلات")).toBeDisabled();
   await button(page, "استخدام أحدث دعوة").click();
   await expect(title).toHaveValue("دعوة جهاز آخر");
   await page.goto(`/s/${saved.code}`);

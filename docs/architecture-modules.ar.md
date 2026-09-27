@@ -261,7 +261,7 @@ quickDecision يستورد عرض التجربة ونموذج سياق الطل�
 
 ## إضافة الدعوات المصممة —25سبتمبر2026
 
-في الواجهة، `features/planSharing` يملك api.ts للاتصال، SharePlanButton.tsx للمسودة والنشر والإلغاء، InvitationCard.tsx للتصميم والمعاينة، PublicInvitationScreen.tsx للقراءة العامة، presentation.ts للألوان والتاريخ، وpdfHtml.ts للقالب الآمن. exportPdf.ts ينفذ الطباعة والمشاركة على الهاتف، وexportPdf.web.ts يفتح معاينة الطباعة في المتصفح. index.ts هو المدخل العام؛ AppRoot يختار الصفحة عند `/s/{code}`، وPlanScreen يستقبل SharingSource اختياريًا. PlannerHome يأخذ session من useOrganizer لتمرير الصلاحية، وOutingScreen يمررها فقط لمن يملك can_manage. لا يخزّن planSharing جلسة جديدة، ولا يرسل رمز الإدارة ضمن الدعوة العامة.
+في الواجهة، `features/planSharing` يملك api.ts للاتصال، SharePlanButton.tsx لمراحل المعاينة والتعديل والخيارات والمسودة والنشر والإلغاء، InvitationForm.tsx لحقول التصميم دون اتصال بالشبكة، InvitationCard.tsx للتصميم والمعاينة، PublicInvitationScreen.tsx للقراءة العامة، presentation.ts للألوان والتاريخ، وpdfHtml.ts للقالب الآمن. exportPdf.ts ينفذ الطباعة والمشاركة على الهاتف، وexportPdf.web.ts يفتح معاينة الطباعة في المتصفح. index.ts هو المدخل العام؛ AppRoot يختار الصفحة عند `/s/{code}`، وPlanScreen يستقبل SharingSource اختياريًا. PlannerHome يأخذ session من useOrganizer لتمرير الصلاحية، وOutingScreen يمررها فقط لمن يملك can_manage. لا يخزّن planSharing جلسة جديدة، ولا يرسل رمز الإدارة ضمن الدعوة العامة.
 
 الاعتمادات الجديدة محدودة: planning → planSharing → experiences في الواجهة؛ groups يستعمل PlanScreen القائم. في الخادم plan_sharing → planning، groups، experiences. لا اعتماد معاكس؛ `planning/sharing.py` و`groups/sharing.py` يصدّران authorize_share وshareable_plan عبر __init__.py. النتيجة ShareablePlan في domain/models.py عقد بيانات مشترك، لا منطق HTTP أو مشاركة داخل domain.
 
@@ -272,3 +272,12 @@ experiences/places.py يبني رابط Google Maps من بيانات الكتا
 تحديثات خريطة الملفات أعلاه تُستكمل بهذه الفقرة؛ [المعمارية وERD](architecture-python-postgres.ar.md)، [العقد](api-plan-sharing.ar.md)، و[شرح كل ملف جديد والتحقق](learning-python-postgres/20-designed-invitations.ar.md) توثق الإضافة المنفذة. فحص architecture.json يثبت اتجاهات الاستيراد المذكورة. كتاب48ملفًا ونسخته59d45d3 لم يتغيرا.
 
 محوّل iOS الصغير `modules/hatim-pdf-links/ios/HatimPdfLinksModule.swift` تابع لتصدير planSharing: يستعمل PDFKit لإضافة Link annotations إلى الملف الذي أنشأه Expo Print؛ اختبار المحاكي كشف أن الطباعة وحدها لا تحفظها. config يعلن الوحدة وpodspec يربطها آليًا مع ExpoModulesCore وPDFKit. الواجهة تستدعيها من exportPdf فقط؛ لا تعرف حسابًا أو خطة أو شبكة. ليست ميزة أعمال جديدة ولا تملك جدولًا. حدود AST في architecture.json تفحص TypeScript/Python؛ بناء Xcode وفحص PDF يتحققان من هذا الجزء Swift. labels وروابطها تأتي من pdfLinks في الميزة، والكتابة على ملف cache محلي فقط. هذا المصدر محفوظ في modules، لا كتعديل يدوي لمجلد ios المولد.
+
+
+## تحسين رحلة الاستخدام — ٢٧ سبتمبر ٢٠٢٦
+
+يبقى التركيب في PlannerHome: زر البداية يفتح نموذج الخطة مباشرة عند غيابها، ويمرر أدوات الرفقة والإدارة عبر actions إلى PlanScreen. عنوان الخطة وتجاربها يسبقان التفاصيل الثانوية؛ showControls حالة محلية لطي أدوات الوقت والجو. OutingContextForm.compact يحافظ على ظهور نوع الطلعة. لا تعتمد planning على application.
+
+داخل planSharing يملك Editor مراحل overview/edit/preview/options/revoke/discard. InvitationForm يعرض الحقول فقط، وSharePlanButton يملك المسودة والمراجعة ومنع الإغلاق غير المقصود. Sheet المشترك يقبل footer ثابتًا وonBack اختياريًا، وActionRow صف إجراء ثانوي عام؛ لا منطق دعوات في shared. لم تُضف تبعيات بين الميزات، لذلك يبقى architecture.json كما هو وتُفحص حدوده.
+
+لا تغيير في Python أو ملكية SQL أو المعاملات أو ERD أو OpenAPI. تغيير الشاشة لا يساوي نشرًا: المعاينة المحلية لا تستدعي PUT؛ الإنشاء والحفظ صريحان. [شرح الملفات الجديدة والسلوك](learning-python-postgres/21-clear-user-journey.ar.md)، و[الأدلة ونتائج التحقق](ux/2026-09-27/review.ar.md).

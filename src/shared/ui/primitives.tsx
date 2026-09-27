@@ -14,7 +14,13 @@ import {
 } from "react-native";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { BlurView } from "expo-blur";
-import { X, ArrowLeft, type LucideIcon } from "lucide-react-native";
+import {
+  X,
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  type LucideIcon,
+} from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors as c, fonts } from "../theme";
 
@@ -75,6 +81,9 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled: !!(disabled || busy), busy: !!busy }}
+      aria-disabled={!!(disabled || busy)}
+      aria-busy={!!busy}
       disabled={disabled || busy}
       onPress={onPress}
       style={({ pressed }) => [
@@ -88,6 +97,8 @@ export function Button({
       <T
         weight="semibold"
         style={{
+          flexShrink: 1,
+          textAlign: "center",
           color: secondary ? c.ink : c.white,
           fontSize: small ? 13 : 15,
         }}
@@ -99,6 +110,62 @@ export function Button({
       ) : (
         <Icon size={18} strokeWidth={1.8} color={secondary ? c.ink : c.white} />
       )}
+    </Pressable>
+  );
+}
+/** A secondary action with a label and optional explanation, not another primary CTA. */
+export function ActionRow({
+  label,
+  description,
+  icon: Icon,
+  onPress,
+  disabled = false,
+  destructive = false,
+  expanded,
+}: {
+  label: string;
+  description?: string;
+  icon: LucideIcon;
+  onPress: () => void;
+  disabled?: boolean;
+  destructive?: boolean;
+  expanded?: boolean;
+}) {
+  const color = destructive ? c.warning : c.green;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={description}
+      accessibilityState={{ disabled, expanded }}
+      aria-disabled={disabled}
+      aria-expanded={expanded}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 12,
+          minHeight: 52,
+          paddingVertical: 12,
+          paddingHorizontal: 4,
+          opacity: disabled ? 0.5 : pressed ? 0.7 : 1,
+        },
+      ]}
+    >
+      <Icon size={20} color={color} />
+      <View style={{ flex: 1, gap: 3 }}>
+        <T weight="medium" style={{ color }}>
+          {label}
+        </T>
+        {description && (
+          <T style={{ color: c.muted, fontSize: 12, lineHeight: 21 }}>
+            {description}
+          </T>
+        )}
+      </View>
+      <ChevronLeft size={18} color={c.muted} />
     </Pressable>
   );
 }
@@ -162,6 +229,7 @@ export function Chip({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
+      aria-pressed={!!selected}
       onPress={onPress}
       style={[
         s.chip,
@@ -192,12 +260,18 @@ export function Sheet({
   onClose,
   children,
   scrollRef,
+  footer,
+  onBack,
+  backLabel = "رجوع",
 }: {
   title: string;
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
   scrollRef?: RefObject<ScrollView | null>;
+  footer?: ReactNode;
+  onBack?: () => void;
+  backLabel?: string;
 }) {
   return (
     <Modal
@@ -218,6 +292,13 @@ export function Sheet({
         <SafeAreaView edges={["bottom"]} style={s.sheet}>
           <View style={s.handle} />
           <Row style={s.sheetHeader}>
+            {onBack && (
+              <IconButton
+                icon={ArrowRight}
+                label={backLabel}
+                onPress={onBack}
+              />
+            )}
             <T weight="semibold" style={{ fontSize: 23, flex: 1 }}>
               {title}
             </T>
@@ -230,6 +311,20 @@ export function Sheet({
           >
             <View style={{ gap: 20 }}>{children}</View>
           </ScrollView>
+          {footer && (
+            <View
+              style={{
+                paddingHorizontal: 24,
+                paddingVertical: 14,
+                gap: 10,
+                borderTopWidth: 1,
+                borderTopColor: c.line,
+                backgroundColor: c.background,
+              }}
+            >
+              {footer}
+            </View>
+          )}
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>

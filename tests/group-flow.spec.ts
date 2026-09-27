@@ -64,6 +64,9 @@ test("organizer and invited member coordinate a persistent, shrinking plan", asy
   });
 
   await page.getByRole("tab", { name: "خطّتنا", exact: true }).click();
+  await page
+    .getByRole("button", { name: "تعديل الوقت والجو", exact: true })
+    .click();
   await page.getByRole("button", { name: "عشاء واحد", exact: true }).click();
   await page
     .getByRole("button", { name: "حدّث الخطة إلى ١ خانات", exact: true })

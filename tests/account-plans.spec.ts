@@ -50,10 +50,10 @@ test("account entry, standalone plan CRUD and recovery on another device", async
   expect(created.organizer_token).toBeNull();
   expect(created.group.owner_account_id).toBe(session.account.id);
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  await button(page, "إدارة الخطة").click();
   await expect(
     page.getByText("هذه الخطة محفوظة في حسابك.", { exact: true }),
   ).toBeVisible();
-  await button(page, "إدارة الخطة").click();
   await page.getByLabel("اسم الخطة", { exact: true }).fill("عشاء الاختبار");
   await button(page, "حفظ اسم الخطة").click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -183,6 +183,7 @@ test("saving an existing guest plan keeps companions and retries a failed write"
   for (const key of ["settings", "members", "plan", "invite_code"])
     expect(saved[key]).toEqual(original[key]);
   await button(page, `افتح ${created.group.title}`).click();
+  await button(page, "إدارة الخطة").click();
   await expect(
     page.getByText("هذه الخطة محفوظة في حسابك.", { exact: true }),
   ).toBeVisible();

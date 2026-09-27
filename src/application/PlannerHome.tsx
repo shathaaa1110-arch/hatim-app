@@ -42,6 +42,7 @@ import {
   Users,
   UserRound,
   Utensils,
+  Settings2,
   X,
 } from "lucide-react-native";
 import { PUBLIC_ORIGIN } from "../shared/api/http";
@@ -206,6 +207,7 @@ export function PlannerHome({
           accessibilityRole={Platform.OS === "web" ? "tab" : "button"}
           accessibilityLabel={title}
           accessibilityState={{ selected: tab === key }}
+          aria-selected={tab === key}
           onPress={() => (key === "circles" ? openGroups() : navigate(key))}
           style={[
             s.tab,
@@ -340,7 +342,7 @@ export function PlannerHome({
               group={group}
               onOpen={setDetail}
               onSave={save}
-              onPlan={() => navigate("plan")}
+              onPlan={() => (group ? navigate("plan") : startPlanning())}
               onGroup={() => navigate("group")}
               onQuick={() => setQuick(true)}
             />
@@ -370,30 +372,32 @@ export function PlannerHome({
           )}
           {tab === "plan" && group && (
             <>
-              <Button
-                secondary
-                small
-                label="إدارة الخطة"
-                onPress={() => {
-                  setPlanTitle(group.title);
-                  setManage("title");
-                }}
-              />
-              <Notice
-                text={
-                  group.owner_account_id
-                    ? "هذه الخطة محفوظة في حسابك."
-                    : "هذه الخطة على هذا الجهاز. افتح حسابي لحفظها والوصول إليها من أجهزتك."
-                }
-              />
-              <Button
-                secondary
-                small
-                label="رفقة الطلعة وذوقي"
-                icon={Users}
-                onPress={() => navigate("group")}
-              />
               <PlanScreen
+                actions={
+                  <Row style={{ flexWrap: "wrap" }}>
+                    <View style={{ flexGrow: 1 }}>
+                      <Button
+                        secondary
+                        small
+                        label="رفقة الطلعة وذوقي"
+                        icon={Users}
+                        onPress={() => navigate("group")}
+                      />
+                    </View>
+                    <View style={{ flexGrow: 1 }}>
+                      <Button
+                        secondary
+                        small
+                        label="إدارة الخطة"
+                        icon={Settings2}
+                        onPress={() => {
+                          setPlanTitle(group.title);
+                          setManage("title");
+                        }}
+                      />
+                    </View>
+                  </Row>
+                }
                 sharing={
                   organizer.session
                     ? {
@@ -649,7 +653,7 @@ export function PlannerHome({
         )}
       </Sheet>
       <Sheet
-        title="لكم مكان على الطاولة"
+        title="اجمع تفضيلات الرفقة"
         visible={invite}
         onClose={() => setInvite(false)}
       >
@@ -660,10 +664,11 @@ export function PlannerHome({
             <Link size={35} color={c.green} />
           </View>
           <T weight="semibold" style={{ fontSize: 25 }}>
-            أرسلها للي تحب لَمّتهم.
+            خلّ كل واحد يضيف ذوقه.
           </T>
           <T style={{ textAlign: "center", color: c.muted, lineHeight: 27 }}>
-            يفتحون الرابط، يكتبون أذواقهم، ويشوفون الخطة. بدون حساب وبدون تطبيق.
+            هذا رابط انضمام للطلعة وإضافة التفضيلات، بدون حساب أو تطبيق. لإرسال
+            الخطة للعرض فقط، استخدم «مشاركة الخطة».
           </T>
         </View>
         <View
@@ -683,11 +688,12 @@ export function PlannerHome({
           </T>
         </View>
         <Button
-          label={copied ? "تم نسخ رابط الدعوة" : "نسخ رابط الدعوة"}
+          secondary
+          label={copied ? "تم نسخ رابط الانضمام" : "نسخ رابط الانضمام"}
           icon={copied ? Check : Copy}
           onPress={copy}
         />
-        <Button secondary label="مشاركة الدعوة" icon={Share2} onPress={share} />
+        <Button label="إرسال رابط الانضمام" icon={Share2} onPress={share} />
         <Notice text="كل شخص يعدّل بياناته من نفس المتصفح. المنظّم يشوف القيود، والأعضاء يشوفون الخطة وأسماء اللَمّة." />
       </Sheet>
       <Sheet
@@ -724,6 +730,13 @@ export function PlannerHome({
           </>
         ) : (
           <>
+            <Notice
+              text={
+                group?.owner_account_id
+                  ? "هذه الخطة محفوظة في حسابك."
+                  : "هذه الخطة على هذا الجهاز. افتح حسابي لحفظها والوصول إليها من أجهزتك."
+              }
+            />
             <Field
               label="اسم الخطة"
               value={planTitle}

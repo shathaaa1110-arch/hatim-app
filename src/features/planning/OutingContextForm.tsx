@@ -30,23 +30,27 @@ export function OutingContextForm({
   value,
   onChange,
   disabled = false,
+  compact = false,
 }: {
   value: OutingContext;
   onChange?: (value: OutingContext) => void;
   disabled?: boolean;
+  compact?: boolean;
 }) {
   const editable = !!onChange && !disabled;
   if (!onChange)
     return (
       <View style={{ gap: 10 }}>
         <T weight="semibold">جوّ هذه الطلعة: {kinds[value.kind ?? "any"]}</T>
-        <View
-          style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 }}
-        >
-          {(value.priorities ?? []).map((key) => (
-            <Chip key={key} label={priorities[key]} />
-          ))}
-        </View>
+        {!compact && (
+          <View
+            style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 }}
+          >
+            {(value.priorities ?? []).map((key) => (
+              <Chip key={key} label={priorities[key]} />
+            ))}
+          </View>
+        )}
       </View>
     );
   return (

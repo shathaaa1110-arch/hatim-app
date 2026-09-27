@@ -25,7 +25,7 @@ export function GroupScreen({
           مين معنا في اللَمّة؟
         </T>
         <T style={{ color: c.muted, lineHeight: 26 }}>
-          كل واحد يضيف ذوقه من رابط الدعوة. وحاتم يجمعها في قرار.
+          كل واحد يضيف ذوقه من رابط الانضمام. وحاتم يجمعها في قرار.
         </T>
       </View>
       <View style={s.invite}>
@@ -45,7 +45,7 @@ export function GroupScreen({
         >
           رابط واحد، بدون تحميل تطبيق. يختارون تفضيلاتهم وتوصلك تلقائيًا.
         </T>
-        <Button label="اعزم الربع" onPress={onInvite} icon={Link} />
+        <Button label="اجمع تفضيلات الرفقة" onPress={onInvite} icon={Link} />
       </View>
       <Row style={{ justifyContent: "space-between" }}>
         <T weight="semibold" style={{ fontSize: 22 }}>

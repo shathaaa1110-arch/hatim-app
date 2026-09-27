@@ -134,6 +134,7 @@ test("existing companions constrain quick picks; context save failure keeps draf
   );
   await button(page, "إغلاق").click();
   await page.getByRole("tab", { name: "خطّتنا", exact: true }).click();
+  await button(page, "تعديل الوقت والجو").click();
   await button(page, "تعديل جوّ الطلعة").click();
   await button(page, "مع أصدقاء").click();
   const endpoint = `**/api/groups/${group.id}/settings`;

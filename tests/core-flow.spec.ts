@@ -145,6 +145,7 @@ for (const kind of ["anchor", "pocket"] as const) {
     await page.reload();
     await expect(page.getByText("الطعم يبقى.", { exact: true })).toBeVisible();
     await tab(page, "خطّتنا").click();
+    await button(page, "تعديل الوقت والجو").click();
     await button(page, "عشاء واحد").click();
     const shrinking = page.waitForResponse(
       (r) =>
@@ -164,7 +165,7 @@ for (const kind of ["anchor", "pocket"] as const) {
       expect(current.plan.selected[0].experience_id).toBe("sushi");
     else expect(current.settings.pocket_ids).toContain("sushi");
     await button(page, "رفقة الطلعة وذوقي").click();
-    await expect(button(page, "اعزم الربع")).toBeVisible();
+    await expect(button(page, "اجمع تفضيلات الرفقة")).toBeVisible();
     await expect(button(page, "افتح قروباتي")).toBeVisible();
     expect(errors).toEqual([]);
   });

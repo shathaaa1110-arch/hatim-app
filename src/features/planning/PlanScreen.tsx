@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { OutingContextForm, emptyOutingContext } from "./OutingContextForm";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import {
@@ -9,6 +9,7 @@ import {
   Leaf,
   Sparkles,
   Utensils,
+  SlidersHorizontal,
 } from "lucide-react-native";
 import {
   type Experience,
@@ -25,6 +26,7 @@ import {
   Row,
   Sheet,
   T,
+  ActionRow,
 } from "../../shared/ui/primitives";
 import { MealControl } from "../../shared/ui/MealControl";
 import { SharePlanButton, type SharingSource } from "../planSharing";
@@ -38,6 +40,7 @@ export function PlanScreen({
   onPocket,
   readOnly = false,
   sharing,
+  actions,
 }: {
   group: Group;
   catalog: Experience[];
@@ -47,7 +50,9 @@ export function PlanScreen({
   onPocket: () => void;
   readOnly?: boolean;
   sharing?: SharingSource;
+  actions?: ReactNode;
 }) {
+  const [showControls, setShowControls] = useState(false);
   const [contextDraft, setContextDraft] = useState<OutingContext | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
   const safeUpdate = async (value: Settings) => {
@@ -60,36 +65,57 @@ export function PlanScreen({
   return (
     <View style={{ gap: 23 }}>
       <View>
-        <T style={{ fontSize: 12, color: c.muted }}>
-          على قدّ وقتكم، وعلى ذوقكم
-        </T>
-        <T weight="semibold" style={{ fontSize: 34 }}>
-          خطّة تعرف تتغيّر.
+        <T weight="semibold" style={{ fontSize: 30 }}>
+          {group.title}
         </T>
         <T style={{ color: c.muted, lineHeight: 25 }}>
-          الأهم يبقى. وكل اختيار له سبب واضح.
+          {ar(group.plan.selected.length)} تجارب مناسبة لكم · الأهم يبقى إذا
+          تغيّر الوقت.
         </T>
       </View>
       {sharing && <SharePlanButton source={sharing} disabled={busy} />}
-      {!readOnly && (
-        <MealControl
-          slots={group.settings.slots ?? 9}
-          consumed={group.plan.consumed}
-          onChange={(slots) => safeUpdate({ ...group.settings, slots })}
-          busy={busy}
+      {actions}
+      {!readOnly && !showControls && (
+        <OutingContextForm
+          compact
+          value={group.settings.context ?? emptyOutingContext}
         />
       )}
-      <OutingContextForm value={group.settings.context ?? emptyOutingContext} />
       {!readOnly && (
-        <Button
-          secondary
-          small
-          label="تعديل جوّ الطلعة"
-          disabled={busy}
-          onPress={() => {
-            setContextError(null);
-            setContextDraft(group.settings.context ?? emptyOutingContext);
-          }}
+        <ActionRow
+          label="تعديل الوقت والجو"
+          icon={SlidersHorizontal}
+          description={`${ar(group.plan.available)} وجبات متبقية · ${ar(group.plan.consumed)} عشناها`}
+          expanded={showControls}
+          onPress={() => setShowControls(!showControls)}
+        />
+      )}
+      {!readOnly && showControls && (
+        <View style={{ gap: 14 }}>
+          <MealControl
+            slots={group.settings.slots ?? 9}
+            consumed={group.plan.consumed}
+            onChange={(slots) => safeUpdate({ ...group.settings, slots })}
+            busy={busy}
+          />
+          <OutingContextForm
+            value={group.settings.context ?? emptyOutingContext}
+          />
+          <Button
+            secondary
+            small
+            label="تعديل جوّ الطلعة"
+            disabled={busy}
+            onPress={() => {
+              setContextError(null);
+              setContextDraft(group.settings.context ?? emptyOutingContext);
+            }}
+          />
+        </View>
+      )}
+      {readOnly && (
+        <OutingContextForm
+          value={group.settings.context ?? emptyOutingContext}
         />
       )}
       <Sheet
