@@ -65,7 +65,8 @@ src/
     planSharing/                  تصميم دعوة عامة ومشاركتها وتصدير PDF على الجهاز
     groups/                       القروبات والطلعات والأدوار والجولات والمزاح والشخصيات
       skins/                      عرض شخصيات الحاضرين وردة فعلهم للنتيجة
-    skins/                        رسم الشخصية ومنتقيها ومحررها؛ تستعمله groups وplanSharing
+    skins/                        تركيب الشخصية ومنتقيها ومحررها؛ تستعمله groups وplanSharing
+      artwork.ts                  خريطة القيم إلى ملفات PNG الشفافة
   shared/
     api/http.ts                    عنوان المنصة وHTTP والأخطاء والمهلة
     api/schema.d.ts                عقد مولد من OpenAPI
@@ -74,6 +75,7 @@ src/
     ui/                           نصوص وأزرار ونماذج وزجاج وExpo UI
     theme.ts                      الألوان والخطوط والصور
     useRemote.ts                  القراءة والتحديث وحارس الردود القديمة
+assets/skins/v1/                 20 صورة مستقلة وطلبات توليدها؛ ضمن حزمة التطبيق
 backend/hatim/
   main.py                         تشغيل الخادم وربط وحدات الميزات وخدمة الويب
   features/accounts/              نماذج الحساب وrouter والجلسة والصلاحية العامة
@@ -318,7 +320,9 @@ sequenceDiagram
     end
 ```
 
-الرسوم محلية باستخدام react-native-svg الموجودة بالمشروع؛ قاعدة البيانات تحفظ اختيارات صغيرة لا ملفات صور. لا اعتماد جديد بين الوحدات، ولا تعديل في planner أو planning_revision أو احتمالات القرعة. التحديث يصل لأعضاء القروب عبر التحديث الدوري الموجود كل٦ثوانٍ. [عقد الشخصيات](api-social.ar.md) و[شرح البناء والتحقق](learning-python-postgres/19-outing-skins.ar.md). تحديث28سبتمبر2026 أضاف headwear ودرجتي بشرة داخل JSONB نفسها، وحقل character اختياريًا داخل details في plan_invitations؛ لا جداول أو أعمدة أو علاقات جديدة، فالـERD كما هو. [الفصل22](learning-python-postgres/22-expressive-skins.ar.md).
+الرسوم الحالية محلية:20 طبقة PNG شفافة يولّفها React Native Image داخل SkinAvatar، بدل SVG المستخدم في النسخة السابقة. قاعدة البيانات تحفظ اختيارات صغيرة لا ملفات صور. SkinPicker يعرض الجزء المطلوب تغييره ومعاينة مباشرة، وSkinEditor يثبّت الحفظ أسفل النافذة. color يغيّر الخلفية؛ ألوان الملابس وغطاء الرأس جزء من الصور. لا خدمة توليد أثناء التشغيل، ولا تعديل في planner أو planning_revision أو احتمالات القرعة. التحديث يصل لأعضاء القروب عبر التحديث الدوري الموجود كل٦ثوانٍ. [عقد الشخصيات](api-social.ar.md) و[شرح الطبقات والتحقق](learning-python-postgres/23-layered-character-art.ar.md).
+
+تحديث28سبتمبر2026 السابق أضاف headwear ودرجتي بشرة داخل JSONB نفسها، وحقل character اختياريًا داخل details في plan_invitations؛ [الفصل22 التاريخي](learning-python-postgres/22-expressive-skins.ar.md). تحديث الصور اللاحق لا يغيّر هذه الحقول أو أنواعها أو ملكيتها: circle_members.skin وouting_participants.skin_override وskin_snapshot لوحدة groups، وplan_invitations.details لوحدة plan_sharing. لا جداول أو أعمدة أو علاقات جديدة، فالـERD والمعاملات كما هي. skin_snapshot يثبت اختيارات العضو عند الإغلاق، ولا يثبت بكسلات الرسم؛ تظهر الصور الجديدة عند عرض أرشيف قديم بنفس اختياراته.
 
 ## الدعوة المصممة ونسخة PDF —25سبتمبر2026
 

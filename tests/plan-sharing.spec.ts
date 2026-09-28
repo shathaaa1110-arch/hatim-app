@@ -55,7 +55,9 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   // The sender may add their own character; nobody else's appearance is shared.
   await button(page, "أضف شخصيتك للدعوة").click();
   await button(page, "شخصية عند الإشارة").click();
+  await button(page, "تعديل غطاء الرأس").click();
   await button(page, "حجاب").click();
+  await button(page, "تعديل البشرة").click();
   await button(page, "أسمر").click();
   await expect(button(page, "مشاركة الدعوة")).toHaveCount(0);
   await button(page, "حفظ التعديلات").click();

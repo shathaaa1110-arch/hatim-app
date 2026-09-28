@@ -1,0 +1,132 @@
+{
+  "generator": "Built-in image_gen",
+  "generatedAt": "2026-09-28",
+  "sourceRevision": "d306a92",
+  "style": "Playful, cute 2D cartoon; moderate detail and a shared head/neck/bust reference",
+  "reference": {
+    "file": "../../../docs/skins/2026-09-28/character-master.png",
+    "prompt": "Create ONE funny, lovable CARTOON MASCOT portrait for a Saudi friends-and-food app. This must be unmistakably a playful illustrated character, NOT a portrait of a human, NOT realistic, NOT a detailed 3D human model. STYLE: cozy hand-drawn 2D mobile-game sticker art with rounded chunky shapes, a soft warm brown outline, very simple two-tone shading, muted sage/cream/terracotta palette. Think charming storybook comedy character. FACE: plump rounded cheeks, little bean-shaped black eyes with tiny white glints, thick short expressive curved eyebrows, small squishy button nose, a cheeky asymmetric closed-mouth smile lifting one cheek, subtle peach blush. Slightly raised eyebrow gives gentle Saudi-friend 'I already ordered dessert' energy. NO teeth or huge grin, NO skin texture, NO individual hairs, NO realistic eyelashes, NO photographic face. Hair is 3-4 big soft dark-brown swoops. Ears small. Head is softly round and a little oversized, connected naturally to a SHORT STURDY NECK and rounded shoulders; no floating head and no narrow long stalk. Wears a relaxed sage-green crew-neck TOP BUST with simple seams and a tiny embroidered palm doodle. Clothing must fit the body naturally and meet neck exactly. Head-and-upper-chest only, straight front view and symmetric shoulders, completely visible in a square canvas except chest cropped at bottom. Center face x=.5, crown at y=.12, chin y=.64, collar y=.70, shoulders x=.12..88 y=.74, chest to bottom. Plain warm ivory background. No words, no border, no objects, no hands. The result must feel silly and cute and warm, but still a distinct illustrated character rather than a yellow emoji. Keep visual detail deliberately low-to-medium and focus on strong appealing silhouette and gentle humor."
+  },
+  "prompts": [
+    {
+      "key": "head-warm",
+      "prompt": "Use case: edit / modular game avatar asset. From the reference cute playful 2D cartoon, output ONLY the head BASE as one transparent PNG layer. Maintain EXACT original square canvas, size, positioning and silhouette: DO NOT crop, recenter or zoom. Keep original rounded plump head, little ears, squishy button nose, blush cheeks, and FULL SHORT WIDE NECK extending down to the ORIGINAL shirt neckline, with skin covering the whole original collar opening. Keep all these shapes in the EXACT reference positions, same cartoon outline and warm peach-honey skin color. Remove hair, eyebrows, eyes, mouth, and shirt to actual transparency EXCEPT areas of removed hair/eyes/brows/mouth on the head must be filled with smooth matching skin. Draw a simple smooth bald dome underneath the removed hair, not a cutout. Keep nose and rosy cheeks. Upper chest/shirt and background empty transparent. Neck must keep its original full width, not become skinny. Skin will appear under a fitted garment in a separate layer. No realism, no 3D rendering, no new texture; preserve soft hand-painted sticker look. Large empty bottom area below neckline. True alpha, no checkerboard pattern. This is intentionally a faceless bald ingredient, not a completed character.",
+      "file": "head-warm.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "head-fair",
+      "prompt": "Strict recolor of supplied modular cartoon head PNG. Change ONLY the skin color to a light ivory-peach complexion, including nose, ears and neck, keeping subtle rosy cheek blush appropriate for this complexion. EXACT same shape, contour, pixels placement, canvas, neck width, nose, shading pattern and cartoon linework as reference. DO NOT add eyes, eyebrows, mouth, hair, clothing or anything else. No realism. Preserve all transparent areas and original square canvas; don't recenter/crop/scale. It is a skin-tone variant of the same cute plump head ingredient, for exact interchangeable layers. True transparent alpha background.",
+      "file": "head-fair.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "head-light",
+      "prompt": "Strict recolor of supplied modular cartoon head PNG. Change ONLY the skin color to a light warm peach complexion, a little warmer/deeper than ivory, including nose, ears and neck, keeping subtle rosy cheek blush appropriate for this complexion. EXACT same shape, contour, pixels placement, canvas, neck width, nose, shading pattern and cartoon linework as reference. DO NOT add eyes, eyebrows, mouth, hair, clothing or anything else. No realism. Preserve all transparent areas and original square canvas; don't recenter/crop/scale. It is a skin-tone variant of the same cute plump head ingredient, for exact interchangeable layers. True transparent alpha background.",
+      "file": "head-light.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "head-tan",
+      "prompt": "Strict recolor of supplied modular cartoon head PNG. Change ONLY the skin color to a medium warm golden-brown complexion, including nose, ears and neck, keeping subtle rosy cheek blush appropriate for this complexion. EXACT same shape, contour, pixels placement, canvas, neck width, nose, shading pattern and cartoon linework as reference. DO NOT add eyes, eyebrows, mouth, hair, clothing or anything else. No realism. Preserve all transparent areas and original square canvas; don't recenter/crop/scale. It is a skin-tone variant of the same cute plump head ingredient, for exact interchangeable layers. True transparent alpha background.",
+      "file": "head-tan.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "head-deep",
+      "prompt": "Strict color edit of the supplied faceless cute cartoon head PNG. Recolor all skin, ears, nose and neck to a rich deep warm brown complexion, with subtle warm cheek blush. Keep every shape and position IDENTICAL to reference, including full short broad neck. Retain the friendly 2D warm-brown linework and simple painted shading. Do not add eyes, mouth, eyebrows, hair, clothes or background. Same canvas and transparent alpha, no cropping, zooming or recentering. Only skin tone changes.",
+      "file": "head-deep.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "face-smile",
+      "prompt": "Extract a modular layer from this cute cheeky hand-painted 2D cartoon. EXACT same canvas size, positions, proportions, tilt and scale as reference. Never crop or recenter. True transparent alpha background and all removed areas. Keep simple warm-brown outline and two-tone cartoon shading, not 3D or realistic. Keep ONLY the eyebrows, the two eyes and the thin asymmetric closed smiling mouth from the original reference, exactly at their original positions. Remove ALL skin, blush, nose, ears, hair, neck, clothing and background, leaving just eyes/brows/mouth floating at their original coordinates. The nose region must be entirely transparent. Smile is a thin curved brown cartoon stroke without lips or teeth; remove the little skin-shaded chin mark. Keep raised brow expression and small white glints. Do not add anything or redesign features. Features-only layer, big transparent margins.",
+      "file": "face-smile.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "face-wink",
+      "prompt": "Modify ONLY the expression of the floating cartoon features to a cheeky friendly WINK: close the left eye (viewer left) into a simple curved dark-brown eyelid stroke, leave right eye open and bright, keep a gently mischievous curved closed-mouth smile with no teeth. Keep EXACT original positions, size, tilt, scale, eyebrows and right-eye anchor. Do NOT add skin, head, nose, cheeks, hair or background. Same warm-brown simple 2D cartoon lines and gentle texture. Keep transparent canvas and all margins exactly, don't crop or recenter.",
+      "file": "face-wink.png",
+      "reference": "face-smile.png"
+    },
+    {
+      "key": "face-side_eye",
+      "prompt": "Modify ONLY the expression of these floating cartoon facial features into a cute amused SIDE-EYE: half-lidded eyes glance toward viewer-right, one raised eyebrow, subtle crooked CLOSED mouth smirk as if saying 'you said you weren't hungry'. Friendly funny mock suspicion, not angry or intimidating. Keep EXACT original positions, sizes, tilt, spacing and canvas. Only eyebrows, eyes and mouth; no skin, nose, hair, head, cheeks or background. Same simple warm brown cartoon line art and gentle painted texture. Preserve true transparent alpha, no cropping or recentering.",
+      "file": "face-side_eye.png",
+      "reference": "face-smile.png"
+    },
+    {
+      "key": "outfit-casual",
+      "prompt": "Extract a modular layer from this cute cheeky hand-painted 2D cartoon. EXACT same canvas size, positions, proportions, tilt and scale as reference. Never crop or recenter. True transparent alpha background and all removed areas. Keep simple warm-brown outline and two-tone cartoon shading, not 3D or realistic. Keep ONLY the existing sage shirt upper chest and collar at the ORIGINAL exact position in the lower portion of canvas. Remove ALL head, neck, skin, hair and background to transparency. The neckline hole must be transparent and match exactly the removed original skin shape. Collar must touch the same original neck edge. Keep original rounded shoulders, palm doodle and bottom crop. Do not extend to a full shirt or add waist/sleeves. This is only the garment BUST in bottom third of full canvas, upper two-thirds empty. Do not center the shirt.",
+      "file": "outfit-casual.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "outfit-thobe",
+      "prompt": "Restyle ONLY this garment layer as an ivory Saudi THOBE UPPER CHEST, same cute 2D storybook cartoon style, warm-brown soft outlines and simple two-tone shading. Preserve EXACT shoulder outline, bust scale, original position at bottom of canvas and crop. Add a small neat stand collar that fits the SAME neck opening without shrinking its width; original neck transparency remains visible. Simple button placket and little chest pocket with tiny pen, no palm logo. This must be only a bust garment in bottom third, not a whole stretched full-length thobe. NO head, NO neck/skin, NO hands, NO mannequin, NO headwear. Huge empty transparent area above shoulders. Preserve full square canvas; no recenter or zoom.",
+      "file": "outfit-thobe.png",
+      "reference": "outfit-casual.png"
+    },
+    {
+      "key": "outfit-abaya",
+      "prompt": "Restyle ONLY this garment layer as a charcoal-black relaxed ABAYA UPPER CHEST, same cute 2D storybook cartoon style, soft warm-brown outlines, simple two-tone shading. Preserve EXACT broad rounded shoulder outline, bust scale, original position at bottom of canvas and crop. Neck opening must fit the SAME short broad neck, fully transparent, with a simple narrow round collar and minimal muted gold piping near center, tiny gold stitched star. No head cover attached. This is only upper-chest bust garment in bottom third, not a whole long dress. NO head, NO neck/skin, NO hands, NO mannequin. Huge empty transparent upper area. Preserve original full square canvas; no recenter or zoom.",
+      "file": "outfit-abaya.png",
+      "reference": "outfit-casual.png"
+    },
+    {
+      "key": "headwear-none",
+      "prompt": "Extract a modular layer from this cute cheeky hand-painted 2D cartoon. EXACT same canvas size, positions, proportions, tilt and scale as reference. Never crop or recenter. True transparent alpha background and all removed areas. Keep simple warm-brown outline and two-tone cartoon shading, not 3D or realistic. Keep ONLY the existing dark-brown chunky swooped cartoon HAIR in its ORIGINAL exact position at top of full canvas. Remove ALL face, skin, neck, ears, shirt and background to transparency. Preserve hairline, sideburn tips, top waves exactly, no new hair strands. Output a detached hair layer, no head under it, big transparent empty area below, do not center or rescale.",
+      "file": "headwear-none.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "headwear-shemagh",
+      "prompt": "Create ONE headwear overlay fitting the exact cute rounded cartoon head in the reference. Match soft hand-painted 2D sticker style, brown outlines and simple shading, no realism, no fine detailed fabric. IMPORTANT: keep the ORIGINAL full square canvas and head size/position as fitting guide, but remove the entire head/skin/ears/nose/neck from final output to TRANSPARENCY. Output ONLY the headwear, with transparent face opening and background, no person under it. Do not center the garment on canvas or crop. Forehead/face window should reveal eyebrows at y=.31-.38, eyes around y=.42, nose y=.48 and mouth y=.54; never put fabric across features. The original bald dome begins y=.145 and ears extend to x=.15 and .85 y=.4-.56. A playful Saudi red-and-cream SHEMAGH and soft black AGAL. Big simple red diamond check pattern, not fine weave. Crown gently rounded over original bald dome, black agal rests high across forehead near y=.24. Cloth hangs down outside both cheeks, covering ears with sides around x=.12-.24 and .77-.88 to y=.77. Preserve big wide transparent face area; no cloth across eyes or mouth. Loose ends rest over upper shoulders. Friendly softly rounded fabric.",
+      "file": "headwear-shemagh.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "headwear-ghutra",
+      "prompt": "Create ONE headwear overlay fitting the exact cute rounded cartoon head in the reference. Match soft hand-painted 2D sticker style, brown outlines and simple shading, no realism, no fine detailed fabric. IMPORTANT: keep the ORIGINAL full square canvas and head size/position as fitting guide, but remove the entire head/skin/ears/nose/neck from final output to TRANSPARENCY. Output ONLY the headwear, with transparent face opening and background, no person under it. Do not center the garment on canvas or crop. Forehead/face window should reveal eyebrows at y=.31-.38, eyes around y=.42, nose y=.48 and mouth y=.54; never put fabric across features. The original bald dome begins y=.145 and ears extend to x=.15 and .85 y=.4-.56. A clean ivory Saudi GHUTRA with charcoal black AGAL. Same fitting as a Saudi headscarf, large simple folds with warm beige shadows. Crown fits bald dome, black agal high across forehead near y=.24. Cloth hangs outside both cheeks, covering original ears with sides x=.12-.24 and .77-.88 to y=.77. Big wide transparent face window, no fabric across brows/eyes/mouth, loose ends on shoulders. No red pattern.",
+      "file": "headwear-ghutra.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "headwear-taqiyah",
+      "prompt": "Create ONE headwear overlay fitting the exact cute rounded cartoon head in the reference. Match soft hand-painted 2D sticker style, brown outlines and simple shading, no realism, no fine detailed fabric. IMPORTANT: keep the ORIGINAL full square canvas and head size/position as fitting guide, but remove the entire head/skin/ears/nose/neck from final output to TRANSPARENCY. Output ONLY the headwear, with transparent face opening and background, no person under it. Do not center the garment on canvas or crop. Forehead/face window should reveal eyebrows at y=.31-.38, eyes around y=.42, nose y=.48 and mouth y=.54; never put fabric across features. The original bald dome begins y=.145 and ears extend to x=.15 and .85 y=.4-.56. A small rounded ivory TAQIYAH cap closely fitted to the bald crown of this exact plump head. Subtle simple sage stitched zigzag band. Cap only over upper dome y=.135 to .30 and spans approximately x=.235..76 at lower edge. Do not include hanging cloth or cover ears, and do not extend below y=.30. Brown outline, soft cream cartoon shading. No head, no features, just the cap at the correct upper-canvas location.",
+      "file": "headwear-taqiyah.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "headwear-hijab",
+      "prompt": "Create ONE headwear overlay fitting the exact cute rounded cartoon head in the reference. Match soft hand-painted 2D sticker style, brown outlines and simple shading, no realism, no fine detailed fabric. IMPORTANT: keep the ORIGINAL full square canvas and head size/position as fitting guide, but remove the entire head/skin/ears/nose/neck from final output to TRANSPARENCY. Output ONLY the headwear, with transparent face opening and background, no person under it. Do not center the garment on canvas or crop. Forehead/face window should reveal eyebrows at y=.31-.38, eyes around y=.42, nose y=.48 and mouth y=.54; never put fabric across features. The original bald dome begins y=.145 and ears extend to x=.15 and .85 y=.4-.56. A cute dusty-rose/mauve HIJAB, rounded loose soft fabric with just a few illustrated folds. It snugly surrounds the original broad rounded face and covers all scalp, ears and neck. Face opening is transparent, shaped around forehead, cheeks and under chin, approximately x=.245..79 and y=.275..71, leaving original eyebrows/eyes/nose/mouth fully visible. Cover the scalp above window and both ears outside it. Fabric extends to shoulders at y=.85, gracefully below the short neck. No hair, no skin and no facial features in final output. Keep sufficient wide face opening so rosy cheeks remain.",
+      "file": "headwear-hijab.png",
+      "reference": "head-warm.png"
+    },
+    {
+      "key": "prop-host",
+      "prompt": "Cute playful 2D hand-painted mobile-game sticker art, softly rounded chunky shapes, warm brown outline, gentle simple two-tone shading, muted warm colors, no realism or fine texture. Match the reference cartoon character's art style only. Single isolated object group centered on true TRANSPARENT alpha square canvas with 8 percent padding. No head, person, hands, words, border, background or ground shadow. A comically plump golden Saudi dallah coffee pot with a swooping spout beside two tiny white finjan cups on a little round tray. Rounded cute silhouette, recognizable at small icon size, 3-4 large warm gold highlights only, no intricate pattern. Hospitality companion prop.",
+      "file": "prop-host.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "prop-on_way",
+      "prompt": "Cute playful 2D hand-painted mobile-game sticker art, softly rounded chunky shapes, warm brown outline, gentle simple two-tone shading, muted warm colors, no realism or fine texture. Match the reference cartoon character's art style only. Single isolated object group centered on true TRANSPARENT alpha square canvas with 8 percent padding. No head, person, hands, words, border, background or ground shadow. A chunky sage-cased smartphone tilted slightly, showing a simple winding route line ending at a big red map pin, with a small pair of cartoon car keys and one orange keyring beside it. Funny 'on my way' vibe. Very simple screen, no text/numbers or logos. Bold clean readable silhouettes.",
+      "file": "prop-on_way.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "prop-you_choose",
+      "prompt": "Cute playful 2D hand-painted mobile-game sticker art, softly rounded chunky shapes, warm brown outline, gentle simple two-tone shading, muted warm colors, no realism or fine texture. Match the reference cartoon character's art style only. Single isolated object group centered on true TRANSPARENT alpha square canvas with 8 percent padding. No head, person, hands, words, border, background or ground shadow. A cute slightly open cream and mustard cafe menu booklet with three tiny simple illustrated dishes inside: a bowl, a pizza slice, a little cupcake. No letters or readable text. Thick rounded pages and soft shadow within booklet, funny indecisive foodie companion prop, instantly readable when small.",
+      "file": "prop-you_choose.png",
+      "reference": "character-master.png"
+    },
+    {
+      "key": "accessory-glasses",
+      "prompt": "Create only a pair of cute chunky rounded warm-brown cartoon GLASSES that would fit the eyes of this reference character in their original positions. Exact same FULL CANVAS and original head/eye scale. DO NOT center the glasses or enlarge them: keep them across original eyes around x=.32..70, y=.37..48 with the same slight upward slope to viewer right. Thick softened brown frame, subtle tiny cream glints, fully transparent lens interiors so eyes show. True transparent background. Remove ALL character skin, eyes, hair, nose, body etc. Output only glasses floating at their correct face location, with large transparent margins. Soft hand-painted 2D outline style, no realism. No lens tint, no pupils, no head. Preserve canvas registration.",
+      "file": "accessory-glasses.png",
+      "reference": "character-master.png"
+    }
+  ]
+}

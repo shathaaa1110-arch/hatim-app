@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import { Pressable, View } from "react-native";
+import { useRef, useState, type ReactNode } from "react";
+import { Image, Pressable, View } from "react-native";
 import { Dices } from "lucide-react-native";
 import { Button, Notice, Sheet, T } from "../../shared/ui/primitives";
 import { ErrorNotice, s } from "../../shared/ui/layout";
@@ -18,8 +18,20 @@ import {
   type Skin,
 } from "./catalog";
 import { SkinAvatar } from "./SkinAvatar";
+import { clothes } from "./artwork";
 
-/** The choices themselves, usable inside a sheet or inline in another form. */
+const parts = {
+  persona: "الشخصية",
+  tone: "البشرة",
+  outfit: "اللبس",
+  headwear: "غطاء الرأس",
+  expression: "التعبير",
+  accessory: "النظارة",
+  color: "الخلفية",
+  phrase: "العبارة",
+} as const;
+
+/** Pick a part, then its appearance. All other choices stay in the same draft. */
 export function SkinPicker({
   name,
   value: draft,
@@ -31,50 +43,77 @@ export function SkinPicker({
   onChange: (value: Skin) => void;
   disabled?: boolean;
 }) {
-  const pick = <K extends keyof Skin>(field: K, value: Skin[K]) => {
-    if (!busy) onChange({ ...draft, [field]: value });
-  };
-  // Every choice is shown as what it looks like; the spoken label keeps its words.
+  const [part, setPart] = useState<keyof typeof parts>("persona");
+  const preview = (change: Partial<Skin>, bare = true) => (
+    <SkinAvatar
+      decorative
+      bare={bare}
+      name={name}
+      skin={{ ...draft, ...change }}
+      size={70}
+    />
+  );
   function choices<K extends keyof Skin>(
     field: K,
-    heading: string,
     items: readonly {
       value: Skin[K];
       label: string;
       look: ReactNode;
+      detail?: string;
       wide?: boolean;
     }[],
   ) {
     return (
-      <View style={{ gap: 8 }}>
-        <T weight="semibold">{heading}</T>
+      <View style={{ gap: 10 }}>
+        <T weight="semibold">{parts[part]}</T>
         <View style={s.wrap}>
-          {items.map(({ value, label, look, wide }) => {
+          {items.map(({ value, label, look, detail, wide }) => {
             const selected = draft[field] === value;
             return (
               <Pressable
                 key={String(value)}
                 accessibilityRole="button"
-                accessibilityLabel={label}
-                accessibilityState={{ selected }}
+                accessibilityLabel={
+                  field === "persona" ? `شخصية ${label}` : label
+                }
+                accessibilityState={{ selected, disabled: busy }}
                 aria-pressed={selected}
                 disabled={busy}
-                onPress={() => pick(field, value)}
+                onPress={() => {
+                  if (!busy) onChange({ ...draft, [field]: value });
+                }}
                 style={{
-                  minWidth: 58,
-                  minHeight: 58,
-                  flexGrow: wide ? 1 : 0,
-                  flexBasis: wide ? "40%" : undefined,
+                  minWidth: 80,
+                  minHeight: 80,
+                  flexGrow: 1,
+                  flexBasis: wide ? "44%" : "25%",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: 6,
+                  gap: 5,
+                  padding: 8,
                   borderRadius: 18,
                   borderWidth: 2,
                   borderColor: selected ? c.green : c.line,
                   backgroundColor: selected ? c.sage : c.white,
+                  opacity: busy ? 0.65 : 1,
                 }}
               >
                 {look}
+                {!wide && (
+                  <T
+                    weight="semibold"
+                    style={{ textAlign: "center", fontSize: 12 }}
+                  >
+                    {label}
+                  </T>
+                )}
+                {detail && (
+                  <T
+                    style={{ textAlign: "center", fontSize: 10, color: c.ink }}
+                  >
+                    {detail}
+                  </T>
+                )}
               </Pressable>
             );
           })}
@@ -82,43 +121,124 @@ export function SkinPicker({
       </View>
     );
   }
-  const emoji = (value: string) => (
-    <T style={{ fontSize: 30, lineHeight: 38 }}>{value}</T>
-  );
-  const dot = (fill: string, ring: string) => (
-    <View
-      style={{
-        width: 38,
-        height: 38,
-        borderRadius: 19,
-        backgroundColor: fill,
-        borderWidth: 5,
-        borderColor: ring,
-      }}
-    />
-  );
-  const preview = (change: Partial<Skin>) => (
-    <SkinAvatar
-      decorative
-      bare
-      name={name}
-      skin={{ ...draft, ...change }}
-      size={60}
-    />
-  );
+  const panel = {
+    persona: () =>
+      choices(
+        "persona",
+        Object.entries(personas).map(([key, p]) => ({
+          value: key as Skin["persona"],
+          label: p.name,
+          detail: p.detail,
+          look: preview({ persona: key as Skin["persona"] }, false),
+        })),
+      ),
+    tone: () =>
+      choices(
+        "tone",
+        Object.entries(tones).map(([key, t]) => ({
+          value: key as Skin["tone"],
+          label: t.name,
+          look: preview({ tone: key as Skin["tone"] }),
+        })),
+      ),
+    outfit: () =>
+      choices(
+        "outfit",
+        Object.entries(outfits).map(([key, label]) => ({
+          value: key as Skin["outfit"],
+          label,
+          look: (
+            // Focus the thumbnail on the garment; full-canvas padding is for assembly.
+            <View style={{ width: 70, height: 54, overflow: "hidden" }}>
+              <Image
+                source={clothes[key as Skin["outfit"]]}
+                accessible={false}
+                aria-hidden
+                resizeMode="contain"
+                fadeDuration={0}
+                style={{
+                  position: "absolute",
+                  width: 126,
+                  height: 126,
+                  left: -28,
+                  top: -77,
+                }}
+              />
+            </View>
+          ),
+        })),
+      ),
+    headwear: () =>
+      choices(
+        "headwear",
+        Object.entries(headwears).map(([key, label]) => ({
+          value: key as Skin["headwear"],
+          label,
+          look: preview({ headwear: key as Skin["headwear"] }),
+        })),
+      ),
+    expression: () =>
+      choices(
+        "expression",
+        Object.entries(expressions).map(([key, e]) => ({
+          value: key as Skin["expression"],
+          label: e.name,
+          look: preview({ expression: key as Skin["expression"] }),
+        })),
+      ),
+    accessory: () =>
+      choices(
+        "accessory",
+        Object.entries(accessories).map(([key, a]) => ({
+          value: key as Skin["accessory"],
+          label: a.name,
+          look: preview({ accessory: key as Skin["accessory"] }),
+        })),
+      ),
+    color: () =>
+      choices(
+        "color",
+        Object.entries(palettes).map(([key, p]) => ({
+          value: key as Skin["color"],
+          label: p.name,
+          look: (
+            <View
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 19,
+                backgroundColor: p.light,
+                borderWidth: 5,
+                borderColor: p.ink,
+              }}
+            />
+          ),
+        })),
+      ),
+    phrase: () =>
+      choices(
+        "phrase",
+        Object.entries(personas[draft.persona].phrases).map(([key, text]) => ({
+          value: key as Skin["phrase"],
+          label: text,
+          wide: true,
+          look: <T style={{ textAlign: "center", fontSize: 13 }}>«{text}»</T>,
+        })),
+      ),
+  };
   return (
-    <>
+    <View style={{ gap: 16 }}>
       <View
         style={{
           alignItems: "center",
-          gap: 8,
-          padding: 16,
+          gap: 6,
+          padding: 14,
           borderRadius: 24,
           backgroundColor: palettes[draft.color ?? "palm"].light,
         }}
       >
-        <SkinAvatar skin={draft} name={name} size={152} />
-        <T weight="semibold" style={{ fontSize: 21 }}>
+        <SkinAvatar skin={draft} name={name} size={184} />
+        <T weight="semibold" style={{ fontSize: 19 }}>
           {name} · {personas[draft.persona].name}
         </T>
         <T style={{ textAlign: "center", color: c.ink }}>
@@ -133,109 +253,47 @@ export function SkinPicker({
           onPress={() => onChange(surprise(draft))}
         />
       </View>
-      <View style={{ flexDirection: "row-reverse", gap: 8, flexWrap: "wrap" }}>
-        {Object.entries(personas).map(([key, persona]) => (
+      <T style={s.muted}>
+        اختاري الجزء اللي تبغين تغيّرينه. باقي شخصيتك يبقى مثل ما هو.
+      </T>
+      <View style={s.wrap}>
+        {Object.entries(parts).map(([key, label]) => (
           <Pressable
             key={key}
             accessibilityRole="button"
-            accessibilityLabel={`شخصية ${persona.name}`}
-            accessibilityState={{ selected: draft.persona === key }}
+            accessibilityLabel={`تعديل ${label}`}
+            accessibilityState={{ selected: part === key, disabled: busy }}
+            aria-pressed={part === key}
             disabled={busy}
-            onPress={() =>
-              onChange({ ...draft, persona: key as Skin["persona"] })
-            }
-            style={{
-              flex: 1,
-              minWidth: 88,
-              alignItems: "center",
-              gap: 7,
-              padding: 8,
-              borderRadius: 18,
-              borderWidth: 2,
-              borderColor: draft.persona === key ? c.green : c.line,
-              backgroundColor: c.white,
-            }}
+            onPress={() => setPart(key as keyof typeof parts)}
+            style={[
+              {
+                minHeight: 44,
+                paddingHorizontal: 14,
+                paddingVertical: 9,
+                borderRadius: 22,
+                borderWidth: 1,
+                borderColor: c.line,
+                justifyContent: "center",
+                backgroundColor: c.white,
+              },
+              part === key && {
+                backgroundColor: c.green,
+                borderColor: c.green,
+              },
+            ]}
           >
-            <SkinAvatar
-              decorative
-              name={persona.name}
-              skin={{ ...draft, persona: key as Skin["persona"] }}
-              size={76}
-            />
-            <T weight="semibold" style={{ textAlign: "center", fontSize: 13 }}>
-              {persona.name}
-            </T>
-            <T style={{ textAlign: "center", fontSize: 11, color: c.ink }}>
-              {persona.detail}
+            <T
+              weight="medium"
+              style={{ fontSize: 13, color: part === key ? c.white : c.ink }}
+            >
+              {label}
             </T>
           </Pressable>
         ))}
       </View>
-      {choices(
-        "tone",
-        "✋ البشرة",
-        Object.entries(tones).map(([key, tone]) => ({
-          value: key as Skin["tone"],
-          label: tone.name,
-          look: dot(tone.fill, "#FFF9EA"),
-        })),
-      )}
-      {choices(
-        "outfit",
-        "👕 اللبس",
-        Object.entries(outfits).map(([key, label]) => ({
-          value: key as Skin["outfit"],
-          label,
-          look: preview({ outfit: key as Skin["outfit"] }),
-        })),
-      )}
-      {choices(
-        "headwear",
-        "🧣 غطاء الرأس",
-        Object.entries(headwears).map(([key, label]) => ({
-          value: key as Skin["headwear"],
-          label,
-          look: preview({ headwear: key as Skin["headwear"] }),
-        })),
-      )}
-      {choices(
-        "color",
-        "🎨 اللون",
-        Object.entries(palettes).map(([key, p]) => ({
-          value: key as Skin["color"],
-          label: p.name,
-          look: dot(p.ink, p.light),
-        })),
-      )}
-      {choices(
-        "expression",
-        "😊 التعبير",
-        Object.entries(expressions).map(([key, e]) => ({
-          value: key as Skin["expression"],
-          label: e.name,
-          look: emoji(e.emoji),
-        })),
-      )}
-      {choices(
-        "accessory",
-        "👓 الإكسسوار",
-        Object.entries(accessories).map(([key, a]) => ({
-          value: key as Skin["accessory"],
-          label: a.name,
-          look: emoji(a.emoji),
-        })),
-      )}
-      {choices(
-        "phrase",
-        "💬 العبارة",
-        Object.entries(personas[draft.persona].phrases).map(([key, text]) => ({
-          value: key as Skin["phrase"],
-          label: text,
-          wide: true,
-          look: <T style={{ textAlign: "center", fontSize: 13 }}>«{text}»</T>,
-        })),
-      )}
-    </>
+      {panel[part]()}
+    </View>
   );
 }
 
@@ -251,9 +309,7 @@ export function SkinEditor({
   close,
 }: {
   name: string;
-  /** The stored value the caller compares against; null when nothing is stored. */
   initial: Skin | null;
-  /** What is shown today, for example an inherited group look. */
   effective: Skin | null;
   title: string;
   note: string;
@@ -262,16 +318,18 @@ export function SkinEditor({
   save: (value: Skin | null, expected: Skin | null) => Promise<unknown>;
   close: () => void;
 }) {
-  // Mounted only while open. Polling must not replace a draft or its expected baseline.
+  // Baseline is frozen while editing; polling must not replace a user's draft.
   const [expected] = useState(initial);
   const [draft, setDraft] = useState<Skin>(() => ({
     ...defaultSkin,
     ...(initial ?? effective),
   }));
   const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const submit = async (value: Skin | null) => {
-    if (busy) return;
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError(null);
     try {
@@ -282,6 +340,7 @@ export function SkinEditor({
         e instanceof Error ? e.message : "تعذّر حفظ الشخصية. حاول مرة ثانية.",
       );
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
@@ -290,8 +349,29 @@ export function SkinEditor({
       title={title}
       visible
       onClose={() => {
-        if (!busy) close();
+        if (!inFlight.current) close();
       }}
+      footer={
+        <View style={{ gap: 8 }}>
+          <ErrorNotice error={error} />
+          <Button
+            label="حفظ الشخصية"
+            busy={busy}
+            onPress={() => {
+              void submit(draft);
+            }}
+          />
+          <Button
+            small
+            secondary
+            label={clearLabel}
+            disabled={busy}
+            onPress={() => {
+              void submit(null);
+            }}
+          />
+        </View>
+      }
     >
       <T style={s.muted}>{note}</T>
       <SkinPicker
@@ -301,22 +381,6 @@ export function SkinEditor({
         disabled={busy}
       />
       {notice && <Notice text={notice} />}
-      <ErrorNotice error={error} />
-      <Button
-        label="حفظ الشخصية"
-        busy={busy}
-        onPress={() => {
-          void submit(draft);
-        }}
-      />
-      <Button
-        secondary
-        label={clearLabel}
-        disabled={busy}
-        onPress={() => {
-          void submit(null);
-        }}
-      />
     </Sheet>
   );
 }

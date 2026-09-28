@@ -11,6 +11,30 @@ const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
 const host = { persona: "host", outfit: "thobe" };
 const late = { persona: "on_way", outfit: "abaya", color: "rose" };
 
+async function choose(page: Page, part: string, option: string) {
+  await button(page, `تعديل ${part}`).click();
+  await button(page, option).click();
+}
+
+async function artworkReady(page: Page) {
+  await expect
+    .poll(() =>
+      page
+        .getByRole("dialog")
+        .locator("img")
+        .evaluateAll(
+          (images) =>
+            images.length > 0 &&
+            images.every(
+              (image) =>
+                (image as HTMLImageElement).complete &&
+                (image as HTMLImageElement).naturalWidth > 0,
+            ),
+        ),
+    )
+    .toBe(true);
+}
+
 async function account(request: APIRequestContext, name: string) {
   const response = await request.post("/api/v2/auth/register", {
     data: {
@@ -84,18 +108,16 @@ test("mobile skins customize, sync to companions, override an outing and freeze 
     // The dice shuffles playful parts; explicit choices below still win.
     await button(page, "فاجئني").click();
     await button(page, "شخصية المعزّب").click();
-    await button(page, "ثوب").click();
-    await button(page, "قمحي غامق").click();
-    await button(page, "شماغ").click();
-    await button(page, "زعفران").click();
-    await button(page, "غمزة").click();
-    await button(page, "نظارة").click();
-    await button(page, "الحلى عليّ… مين قال شبعتوا؟").click();
-    // Choices are swatches, emoji and previews; their spoken labels keep the words.
-    await page
-      .getByRole("dialog")
-      .getByText("👕 اللبس", { exact: true })
-      .scrollIntoViewIfNeeded();
+    await choose(page, "اللبس", "ثوب");
+    await choose(page, "البشرة", "قمحي غامق");
+    await choose(page, "غطاء الرأس", "شماغ");
+    await choose(page, "الخلفية", "زعفران");
+    await choose(page, "التعبير", "غمزة");
+    await choose(page, "النظارة", "نظارة");
+    await choose(page, "العبارة", "الحلى عليّ… مين قال شبعتوا؟");
+    // Actual layered images replace emoji; all choices still have spoken labels.
+    await button(page, "تعديل اللبس").click();
+    await artworkReady(page);
     await page.screenshot({ path: "test-results/skins-choices-mobile.png" });
     // Scroll back to the artwork before capturing the mobile editor.
     await page
@@ -129,7 +151,7 @@ test("mobile skins customize, sync to companions, override an outing and freeze 
     await button(page, "افتح طلعة عشاء الشخصيات").click();
     await button(page, "شخصيتي لهذه الطلعة").click();
     await button(page, "شخصية اختاروا أنتم").click();
-    await button(page, "كاجوال").click();
+    await choose(page, "اللبس", "كاجوال");
     await save(page, "outings");
     await expect(
       page.getByRole("img", { name: "أمل · اختاروا أنتم", exact: true }),
@@ -193,7 +215,7 @@ test("editor preserves drafts on failure and rejects stale edits from another de
   await visit(page, owner.token, circle.invite_code);
   await button(page, "شخصيتي في القروب").click();
   await button(page, "شخصية اختاروا أنتم").click();
-  await button(page, "عباية").click();
+  await choose(page, "اللبس", "عباية");
   const path = `/api/v2/groups/${circle.id}/me/skin`;
   const changed = await request.put(path, {
     headers: auth(owner.token),
@@ -216,7 +238,7 @@ test("editor preserves drafts on failure and rejects stale edits from another de
   ).toBeVisible({ timeout: 15000 });
   await button(page, "شخصيتي في القروب").click();
   await button(page, "شخصية المعزّب").click();
-  await button(page, "غمزة").click();
+  await choose(page, "التعبير", "غمزة");
   await page.route(`**${path}`, (route) => route.abort("failed"), { times: 1 });
   await button(page, "حفظ الشخصية").click();
   await expect(
@@ -310,4 +332,70 @@ test("result reactions show my own vote privately and a shared dice for draws", 
     }),
   ).toBeVisible({ timeout: 15000 });
   await expect(page.getByText(/شخصيتك تحتفل/)).toHaveCount(0);
+});
+test("generated layers load, each part stays independent and narrow-screen edits persist", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+  const { owner, circle } = await seed(request);
+  await visit(page, owner.token, circle.invite_code);
+  await button(page, "شخصيتي في القروب").click();
+  const avatar = page
+    .getByRole("dialog")
+    .getByRole("img", { name: "أمل · المعزّب", exact: true });
+  const sources = () =>
+    avatar
+      .locator("img")
+      .evaluateAll((images) =>
+        images.map((image) => (image as HTMLImageElement).src),
+      );
+  await artworkReady(page);
+  const initial = await sources();
+  expect(initial.length).toBeGreaterThanOrEqual(5);
+  await avatar.screenshot({ path: "test-results/layered-casual.png" });
+  await choose(page, "البشرة", "أسمر");
+  await artworkReady(page);
+  const darker = await sources();
+  expect(darker.filter((source) => !initial.includes(source))).toHaveLength(1);
+  expect(darker.some((source) => source.includes("head-deep."))).toBe(true);
+  await choose(page, "اللبس", "عباية");
+  await artworkReady(page);
+  const dressed = await sources();
+  expect(dressed.filter((source) => !darker.includes(source))).toHaveLength(1);
+  expect(dressed.some((source) => source.includes("head-deep."))).toBe(true);
+
+  for (const cover of ["حجاب", "شماغ", "غترة", "طاقية", "بدون غطاء"]) {
+    await choose(page, "غطاء الرأس", cover);
+    await artworkReady(page);
+    await avatar.scrollIntoViewIfNeeded();
+    await avatar.screenshot({
+      path: `test-results/layered-cover-${cover}.png`,
+    });
+  }
+  await choose(page, "غطاء الرأس", "حجاب");
+  await choose(page, "التعبير", "نظرة جانبية");
+  await choose(page, "النظارة", "نظارة");
+  await artworkReady(page);
+  await avatar.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "test-results/layered-editor-320.png" });
+  await expect(button(page, "حفظ الشخصية")).toBeInViewport();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  const group = await save(page, "groups");
+  expect(group.me.skin).toMatchObject({
+    tone: "deep",
+    outfit: "abaya",
+    headwear: "hijab",
+    expression: "side_eye",
+    accessory: "glasses",
+  });
+  await page.reload();
+  await button(page, "شخصيتي في القروب").click();
+  await choose(page, "اللبس", "كاجوال");
+  const updated = await save(page, "groups");
+  expect(updated.me.skin).toEqual({ ...group.me.skin, outfit: "casual" });
 });

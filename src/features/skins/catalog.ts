@@ -39,7 +39,7 @@ export const palettes = {
   sky: { name: "سما", ink: "#547A9A", light: "#E3EDF6" },
 } as const;
 
-// Labels stay for screen readers and tests; the editor shows the swatch or emoji itself.
+// Labels accompany generated previews and remain available to screen readers.
 export const tones = {
   fair: { name: "فاتح جدًا", fill: "#F7DCC6" },
   light: { name: "فاتح", fill: "#F0C6A4" },
@@ -63,21 +63,21 @@ export const headwears = {
 } satisfies Record<Skin["headwear"], string>;
 
 export const expressions = {
-  smile: { name: "ابتسامة", emoji: "😊" },
-  wink: { name: "غمزة", emoji: "😉" },
-  side_eye: { name: "نظرة جانبية", emoji: "😒" },
-} satisfies Record<Skin["expression"], { name: string; emoji: string }>;
+  smile: { name: "ابتسامة" },
+  wink: { name: "غمزة" },
+  side_eye: { name: "نظرة جانبية" },
+} satisfies Record<Skin["expression"], { name: string }>;
 
 export const accessories = {
-  none: { name: "بدون نظارة", emoji: "🙂" },
-  glasses: { name: "نظارة", emoji: "👓" },
-} satisfies Record<Skin["accessory"], { name: string; emoji: string }>;
+  none: { name: "بدون نظارة" },
+  glasses: { name: "نظارة" },
+} satisfies Record<Skin["accessory"], { name: string }>;
 
 export const moods = {
-  win: { name: "فاز اختيارك", emoji: "🎉" },
-  lose: { name: "راح صوتك لغيره", emoji: "😒" },
-  draw: { name: "القرعة حسمت", emoji: "🎲" },
-} satisfies Record<Mood, { name: string; emoji: string }>;
+  win: { name: "فاز اختيارك" },
+  lose: { name: "راح صوتك لغيره" },
+  draw: { name: "القرعة حسمت" },
+} satisfies Record<Mood, { name: string }>;
 
 export const defaultSkin: Skin = {
   version: 1,

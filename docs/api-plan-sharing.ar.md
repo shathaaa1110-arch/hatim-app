@@ -33,6 +33,8 @@
 
 رد المنظّم `InvitationEditor`: details، plan، code nullable، revision nullable. رد العام `PublicInvitation`: details، plan، read_at، created_at؛ لا يرجع رقم المراجعة أو مفاتيح الإدارة. shared plan تحتوي context، entries، consumed، available، unfilled، anchor_unavailable، archived. كل entry: id، title، venue، neighborhood، cuisine، image، price، minutes، priority، reason تحريري عام، dishes، options العامة، is_demo، maps_url، maps_verified.
 
+من تحديث الصور28سبتمبر2026 تُعرض character نفسها بطبقات PNG المضمّنة عبر مكوّن skins المشترك. لا يتغير الطلب أو details المخزنة أو مراجعة الدعوة، ولا تُضاف روابط صور إلى الاستجابة. خيارات المحرر مصنفة حسب الجزء؛ التعديل يبقى داخل مسودة الدعوة إلى أن يحفظ صاحبها. PDF يبقى دون رسم الشخصية. [شرح التنفيذ والتحقق](learning-python-postgres/23-layered-character-art.ar.md).
+
 لا ترجع الدعوة أسماء أو شخصيات المشاركين أو حساسياتهم أو ميزانياتهم أو أسباب القرار الشخصية أو الجيب أو رمز الانضمام. النص الذي يكتبه المنظّم في الدعوة عام بموافقته؛ الواجهة تعرض تنبيهًا قبل النشر. أي شخص معه الرابط يستطيع قراءته وإعادة إرساله.
 
 الإلغاء DELETE يحذف السجل؛ القراءة بعدها404. إلغاء رابط غير موجود يعيد ok لتكرار الطلب، لكن مراجعة قديمة لا تستطيع إلغاء رابط جديد. حذف المصدر يحذف رابط المشاركة عبر FK cascade. نسخ PDF المحفوظة لا تُسحب من أجهزة المستلمين.

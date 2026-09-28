@@ -1,0 +1,12 @@
+# فحص الشخصيات الكرتونية · 28 سبتمبر 2026
+
+هذه أدلة التنفيذ بعد `d306a92`، وليست صورًا مقترحة لميزة مستقبلية. [الفصل23](../../learning-python-postgres/23-layered-character-art.ar.md) يشرح الكود والمعمارية والتخزين.
+
+- [character-master.png](character-master.png): مرجع التوليد الكرتوني الكامل، خارج حزمة صور التطبيق.
+- [editor-393.png](editor-393.png) و[outfits-393.png](outfits-393.png): المعاينة وأزرار الملابس في متصفح بعرض393.
+- [editor-320.png](editor-320.png): شاشة أضيق مع حفظ ثابت، وحجاب ونظارة وتعبير جانبي.
+- [casual.png](casual.png): التقاء الرأس والرقبة بياقة الكاجوال.
+- [hair.png](hair.png)، [shemagh.png](shemagh.png)، [ghutra.png](ghutra.png)، [taqiyah.png](taqiyah.png)، [hijab.png](hijab.png): مراجعة أغطية الرأس الخمسة بعد التركيب.
+- [ios-editor.jpg](ios-editor.jpg) و[ios-hijab-preview.jpg](ios-hijab-preview.jpg): النسخة الأصلية على محاكي iPhone17 Pro بنظام iOS26.4؛ الحجاب تغيّر في المسودة فقط، دون حفظ اختيارات اختبار في حساب المستخدم.
+
+نجحت302 اختبارات Python وفحص الحدود والأنواع والتنسيق. نجحت ست رحلات متصفح للشخصيات والدعوة، ثم أُعيدت رحلتا التحرير ومقاس320 بعد تكبير معاينات الملابس ونجحتا. البناء للويب وRelease للمحاكي ناجحان. بيانات المتصفح كانت داخل مخطط PostgreSQL مؤقت منفصل.
