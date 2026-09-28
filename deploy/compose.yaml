@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: ${DATABASE_URL:?Set the hosted PostgreSQL connection string}
+      HATIM_PUBLIC_ORIGIN: ${HATIM_PUBLIC_ORIGIN:?Set the public HTTPS origin for invitation PDFs}
       HATIM_CORS_ORIGINS: ${HATIM_CORS_ORIGINS:-}
       GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
     ports:

@@ -3,7 +3,6 @@ import { Linking, View } from "react-native";
 import { FileDown, RefreshCw } from "lucide-react-native";
 import { Button, Notice, T } from "../../shared/ui/primitives";
 import { ErrorNotice, Loading, Page, s } from "../../shared/ui/layout";
-import { PUBLIC_ORIGIN } from "../../shared/api/http";
 import { useRemote } from "../../shared/useRemote";
 import { sharingApi } from "./api";
 import { InvitationCard } from "./InvitationCard";
@@ -56,7 +55,7 @@ export function PublicInvitationScreen({ code }: { code: string }) {
               if (!r.data) return;
               setExporting(true);
               setExportError(null);
-              void exportPdf(r.data, `${PUBLIC_ORIGIN}/s/${code}`)
+              void exportPdf(code)
                 .catch((e) =>
                   setExportError(
                     e instanceof Error ? e.message : "تعذّر إنشاء الملف.",

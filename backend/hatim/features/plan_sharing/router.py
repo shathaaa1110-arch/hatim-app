@@ -1,21 +1,24 @@
+import logging
+import os
 import secrets
-from datetime import UTC, datetime
+from urllib.parse import urlsplit
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Request, Response
 from psycopg.types.json import Jsonb
+from reportlab.platypus import LayoutError
 
 from hatim.core.db import connect
-from hatim.core.models import Acknowledged
+from hatim.core.models import Acknowledged, ErrorResponse
 
 from .models import (
     InvitationChange,
-    InvitationDetails,
     InvitationEditor,
     InvitationRevoke,
     PublicInvitation,
     SourceKind,
 )
-from .service import COLUMNS, authorize, editor, invitation_row, project
+from .pdf import render_pdf
+from .service import COLUMNS, authorize, editor, invitation_row, public
 
 router = APIRouter(tags=["Plan invitations"])
 
@@ -72,19 +75,42 @@ def revoke(
 @router.get("/api/shared-plans/{code}", response_model=PublicInvitation)
 def public_invitation(code: str):
     with connect(read_only=True) as db:
-        row = db.execute("SELECT * FROM plan_invitations WHERE code=%s", (code,)).fetchone()
-        if row is None:
-            raise HTTPException(404, "الدعوة غير متاحة أو أُلغي رابطها. اطلب رابطًا جديدًا من المنظّم.")
-        kind = "plan" if row["plan_id"] else "outing"
-        try:
-            _, plan = project(db, kind, row[COLUMNS[kind]])
-        except HTTPException as error:
-            if error.status_code in (404, 409):
-                raise HTTPException(404, "هذه الدعوة لم تعد متاحة. اطلب رابطًا جديدًا.") from None
-            raise
-        return PublicInvitation(
-            details=InvitationDetails.model_validate(row["details"]),
-            plan=plan,
-            created_at=row["created_at"].isoformat(),
-            read_at=datetime.now(UTC).isoformat(),
-        )
+        return public(db, code)
+
+
+@router.get(
+    "/api/shared-plans/{code}/pdf",
+    response_class=Response,
+    responses={
+        200: {"content": {"application/pdf": {"schema": {"type": "string", "format": "binary"}}}},
+        404: {"model": ErrorResponse},
+        503: {"model": ErrorResponse},
+    },
+)
+def invitation_pdf(code: str, request: Request):
+    # Read the same allowlist as the public page; close the transaction before rendering.
+    with connect(read_only=True) as db:
+        invitation = public(db, code)
+    origin = (os.getenv("HATIM_PUBLIC_ORIGIN") or str(request.base_url)).rstrip("/")
+    parsed = urlsplit(origin)
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.netloc
+        or parsed.query
+        or parsed.fragment
+        or parsed.path
+        or parsed.username
+        or parsed.password
+    ):
+        raise HTTPException(503, "تعذّر تجهيز الملف. راجع إعداد عنوان حاتم العام.")
+    try:
+        content = render_pdf(invitation, f"{origin}/s/{code}")
+    except (ValueError, OSError, LayoutError) as error:
+        # Avoid logging capability URLs or invitation text.
+        logging.getLogger(__name__).error("PDF rendering failed: %s", type(error).__name__)
+        raise HTTPException(503, "تعذّر تجهيز الملف. حاول مرة ثانية بعد شوي.") from None
+    return Response(
+        content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="hatim-plan.pdf"'},
+    )

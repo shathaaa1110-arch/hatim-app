@@ -55,3 +55,7 @@ playwright-report/
 test-results/
 ios/Pods/
 ios/build/
+
+# Local PDF inspection artifacts
+/tmp/pdfs/
+/output/pdf/

@@ -8,6 +8,7 @@
 | `PUT /api/plan-invitations/{kind}/{source_id}` | إنشاء رابط أو تعديل تصميمه داخل معاملة |
 | `DELETE /api/plan-invitations/{kind}/{source_id}` | إلغاء الرابط؛ body يحتوي expected_revision |
 | `GET /api/shared-plans/{code}` | إسقاط عام لآخر خطة؛ بلا Authorization |
+| `GET /api/shared-plans/{code}/pdf` | ملف PDF من آخر إسقاط عام؛ بلا Authorization |
 | `GET /s/{code}` | صفحة Expo web للدعوة؛ بلا تسجيل دخول |
 | `GET /api/v2/experiences/{experience_id}/google-rating` | تقييم عند الطلب لمكان حقيقي موثق؛ بلا حفظ في PostgreSQL |
 
@@ -53,7 +54,11 @@ Experience تضيف suggested_dishes بحد أقصى5 أطباق، google_place_
 
 [اختبارات Python](../backend/tests/test_plan_sharing.py) تغطي الصلاحيات والتزامن والإلغاء وإعادة الإنشاء وحذف المصدر وتحويل الخطة والخصوصية وتقلص الخانات ومزود Google. [رحلتان للمتصفح](../tests/plan-sharing.spec.ts) تغطيان تصميمًا وتعديلًا ورابطًا عامًا وتحديثًا وإلغاءً، وتعارض جهازين، وتصدير العربية، ومنع تفسير نص المستخدم كـHTML. أدلة النسخ والتشغيل وحدودها في [الفصل20](learning-python-postgres/20-designed-invitations.ar.md).
 
-التصدير لا يضيف endpoint للـPDF: ملف المتصفح يحتفظ بروابطHTML، وفيiOS تُضاف Link annotations بواسطة وحدة PDFKit محلية بعد Expo Print. الوجهات هي نفسها المعادة في الإسقاط العام؛ لا تتضمن صلاحية المنظّم. تحتاج نسخةXcode مبنية بوحدةHatimPdfLinks المحلية، وليستExpo Go.
+من تحديث٢٨سبتمبر٢٠٢٦ أصبح `GET /api/shared-plans/{code}/pdf` مصدر الملف لكل الأجهزة. لا body ولا مسودة محلية: يعيد الخادم قراءة الرمز والخطة والتصميم المحفوظين، ثم يغلق معاملة القراءة وينشئ PDF في الذاكرة. الرد200 من نوع `application/pdf` مع `Content-Disposition: attachment; filename="hatim-plan.pdf"` و`Cache-Control: no-store`. الرمز المفقود/الملغى أو المصدر غير المتاح404؛ تعذر إنشاء الملف503 مع ErrorResponse. ملفات PDF السابقة على الإلغاء تبقى عند أصحابها. لا تحفظ نسخ أو وظائف تصدير في PostgreSQL.
+
+التصميم A4 عربي بثيم الدعوة، عنوان وموعد وتجمع، ملخص التجارب والخانات والتكلفة، وبطاقات لا تنقسم بين الصفحات، وأرقام صفحات ووقت إصدار بتوقيت الرياض. الروابط مضمنة في PDF نفسه؛ رابط Google لكل تجربة ورابط الدعوة وQR. مصدر عنوان الدعوة `HATIM_PUBLIC_ORIGIN` من إعداد الخادم؛ عند غيابه يُستخدم أصل الطلب للاختبار المحلي. لا يقبل المسار عنوانًا أو HTML من العميل. النصوص ترسم كنص حرفي، ولا تُجلب صور أو خطوط أو صفحات من الإنترنت أثناء التصدير. الخطان وترخيصهما داخل `plan_sharing/fonts`.
+
+الهاتف ينزل البايتات إلى cache ويشاركها بواسطة Expo Sharing. المتصفح ينزل الملف مباشرة دون نافذة طباعة. أخطاء التنزيل تظهر داخل الدعوة ويمكن إعادة المحاولة. حُذف `pdfHtml.ts` وExpo Print ووحدة HatimPdfLinks المحلية؛ بناء الهاتف الجديد لا يحتاج جسر PDF مخصصًا. [التنفيذ والاختبارات والحدود](learning-python-postgres/24-server-pdf.ar.md).
 
 
 ## استدعاء العقد من الرحلة المبسطة — ٢٧ سبتمبر ٢٠٢٦

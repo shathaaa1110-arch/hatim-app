@@ -84,27 +84,17 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
     path: "test-results/designed-invitation.png",
     fullPage: true,
   });
-  const popupPromise = viewer.waitForEvent("popup");
-  await button(viewer, "حفظ نسخة PDF").click();
-  const pdf = await popupPromise;
-  await expect(
-    pdf.getByRole("button", { name: "طباعة أو حفظ PDF" }),
-  ).toBeVisible();
-  await pdf.evaluate(() => document.fonts.ready);
-  await expect(pdf.getByRole("link", { name: "افتح آخر خطة" })).toHaveAttribute(
-    "href",
-    new RegExp(`/s/${saved.code}$`),
+  const responsePromise = viewer.waitForResponse((response) =>
+    response.url().endsWith(`/api/shared-plans/${saved.code}/pdf`),
   );
-  expect(await pdf.locator(".entry").count()).toBe(3);
-  expect(
-    await pdf.locator("a[href^='https://www.google.com/maps/search/']").count(),
-  ).toBe(3);
-  await pdf.pdf({
-    path: "test-results/invitation-ar.pdf",
-    printBackground: true,
-    preferCSSPageSize: true,
-  });
-  await pdf.close();
+  const downloadPromise = viewer.waitForEvent("download");
+  await button(viewer, "حفظ نسخة PDF").click();
+  const pdf = await downloadPromise;
+  expect(pdf.suggestedFilename()).toBe("hatim-plan.pdf");
+  await pdf.saveAs("test-results/invitation-ar.pdf");
+  expect((await (await responsePromise).body()).subarray(0, 5).toString()).toBe(
+    "%PDF-",
+  );
   await request.put(`/api/groups/${created.group.id}/settings`, {
     headers: auth,
     data: { slots: 1, anchor_id: "fire" },
@@ -124,7 +114,7 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   await guest.close();
 });
 
-test("invitation conflict keeps draft, and public PDF escapes user text", async ({
+test("invitation conflict keeps draft, and server PDF downloads safely", async ({
   page,
   request,
 }) => {
@@ -177,18 +167,30 @@ test("invitation conflict keeps draft, and public PDF escapes user text", async 
   await expect(title).toHaveValue("دعوة جهاز آخر");
   await page.goto(`/s/${saved.code}`);
   await expect(page.getByText(hostile, { exact: true })).toBeVisible();
-  const popupPromise = page.waitForEvent("popup");
+  await page.route("**/api/shared-plans/*/pdf", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        detail: "تعذّر تجهيز الملف. حاول مرة ثانية بعد شوي.",
+      }),
+    }),
+  );
   await button(page, "حفظ نسخة PDF").click();
-  const pdf = await popupPromise;
   await expect(
-    pdf.getByRole("button", { name: "طباعة أو حفظ PDF" }),
+    page.getByText("تعذّر تجهيز الملف. حاول مرة ثانية بعد شوي.", {
+      exact: true,
+    }),
   ).toBeVisible();
-  await expect(pdf.locator(".message")).toHaveText(hostile);
-  expect(await pdf.locator("script").count()).toBe(0);
-  await pdf.evaluate(() => document.fonts.ready);
-  await pdf.pdf({
-    path: "test-results/invitation-long-ar.pdf",
-    printBackground: true,
-    preferCSSPageSize: true,
-  });
+  await page.unroute("**/api/shared-plans/*/pdf");
+  const responsePromise = page.waitForResponse((response) =>
+    response.url().endsWith(`/api/shared-plans/${saved.code}/pdf`),
+  );
+  const downloadPromise = page.waitForEvent("download");
+  await button(page, "حفظ نسخة PDF").click();
+  const pdf = await downloadPromise;
+  await pdf.saveAs("test-results/invitation-long-ar.pdf");
+  expect((await (await responsePromise).body()).subarray(0, 5).toString()).toBe(
+    "%PDF-",
+  );
 });

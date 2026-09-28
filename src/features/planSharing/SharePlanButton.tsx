@@ -330,20 +330,7 @@ function Editor({
                 description="نسخة ثابتة بالأماكن والأطباق وروابط الخرائط"
                 icon={FileDown}
                 disabled={unavailable || dirty || !url}
-                onPress={() =>
-                  attempt(() => {
-                    const now = new Date().toISOString();
-                    return exportPdf(
-                      {
-                        details: r.data!.details,
-                        plan: r.data!.plan,
-                        read_at: now,
-                        created_at: now,
-                      },
-                      url!,
-                    );
-                  })
-                }
+                onPress={() => attempt(() => exportPdf(r.data!.code!))}
               />
               <View
                 style={{

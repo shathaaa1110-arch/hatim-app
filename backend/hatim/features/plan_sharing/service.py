@@ -1,11 +1,19 @@
 """Allowlisted public projection. Never serialize source models into an invitation."""
 
+from datetime import UTC, datetime
+
 from fastapi import HTTPException
 
 from hatim.features import groups, planning
 from hatim.features.experiences import catalog, maps_url
 
-from .models import InvitationDetails, InvitationEditor, SharedExperience, SharedPlan
+from .models import (
+    InvitationDetails,
+    InvitationEditor,
+    PublicInvitation,
+    SharedExperience,
+    SharedPlan,
+)
 
 SOURCES = {"plan": planning, "outing": groups}
 COLUMNS = {"plan": "plan_id", "outing": "outing_id"}
@@ -72,4 +80,23 @@ def editor(db, kind, source_id):
         plan=plan,
         code=row["code"] if row else None,
         revision=row["revision"] if row else None,
+    )
+
+
+def public(db, code: str) -> PublicInvitation:
+    row = db.execute("SELECT * FROM plan_invitations WHERE code=%s", (code,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "الدعوة غير متاحة أو أُلغي رابطها. اطلب رابطًا جديدًا من المنظّم.")
+    kind = "plan" if row["plan_id"] else "outing"
+    try:
+        _, plan = project(db, kind, row[COLUMNS[kind]])
+    except HTTPException as error:
+        if error.status_code in (404, 409):
+            raise HTTPException(404, "هذه الدعوة لم تعد متاحة. اطلب رابطًا جديدًا.") from None
+        raise
+    return PublicInvitation(
+        details=InvitationDetails.model_validate(row["details"]),
+        plan=plan,
+        created_at=row["created_at"].isoformat(),
+        read_at=datetime.now(UTC).isoformat(),
     )

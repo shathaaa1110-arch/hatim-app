@@ -122,6 +122,24 @@ if (!closing) {
     ".env.local",
     `${otherSettings}${otherSettings ? "\n" : ""}EXPO_PUBLIC_API_URL=${origin}\n`,
   );
+  // The PDF is produced in Python, so its links need the same public origin.
+  const backendEnv = "backend/.env.local";
+  const backendSettings = existsSync(backendEnv)
+    ? readFileSync(backendEnv, "utf8")
+        .split("\n")
+        .filter((line) => !/^HATIM_PUBLIC_ORIGIN=/.test(line))
+        .join("\n")
+        .trimEnd()
+    : "";
+  writeFileSync(
+    backendEnv,
+    `${backendSettings}\nHATIM_PUBLIC_ORIGIN=${origin}\n`,
+  );
+  if (reuseBackend) {
+    console.log(
+      "PDF origin saved. Restart the existing API to use this tunnel in PDF links and QR codes.",
+    );
+  }
   const compile = launch("uv", ["sync", "--project", "backend", "--locked"]);
   const compiled = await new Promise((resolve) =>
     compile.once("exit", resolve),
