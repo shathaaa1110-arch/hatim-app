@@ -1,95 +1,161 @@
 # حاتم · Hatim
 
-An Arabic-first React Native app for a group deciding which food experiences deserve its limited meal slots. The organizer uses the iPhone app. Invited members use a browser link, without installing anything.
+An Arabic-first React Native app for choosing food experiences within a limited number of meal slots. Discovery, an adaptable plan and the pocket are the core; persistent groups are an optional feature. The organizer uses the iPhone app; invited members use a browser link.
 
-## Run the public test
+This branch uses **Python 3.14 + FastAPI + PostgreSQL 18**. The .NET implementation remains on [codex/dotnet-backend](https://github.com/shathaaa1110-arch/hatim-app/tree/codex/dotnet-backend), including its Arabic learning guide. The persistent-group API lives under `/api/v2`; direct planning endpoints work without an account or persistent group. Both use the same planner.
 
-Requirements: Node 22.13+ (tested with 25.8.1), npm, Python through `uv`, Xcode 26.4+, CocoaPods, and `cloudflared`.
+For a beginner's explanation of this implementation, read [ابني حاتم بيدك — Python وPostgreSQL](docs/learning-python-postgres/README.ar.md). The Arabic guide includes the original lessons plus chapters on subsequent changes, an annotated reference covering 48 source/configuration files, school-requirement gaps, and the [application architecture](docs/architecture-python-postgres.ar.md). The 48-file codebook preserves revision `59d45d3`; newer chapters describe later code explicitly.
+
+The iPhone opens discovery without asking for an account. Starting a plan, choosing an anchor or saving a pocket item opens preferences and meal slots. **قروباتي** opens the saved-group feature with a route back to discovery. See [the core-flow explanation](docs/learning-python-postgres/15-experiences-first.ar.md) and [direct planning API](docs/api-planning.ar.md).
+
+**حسابي**, at the top of discovery, provides registration/login/logout, display-name editing and saved direct plans. Signed-in users can create multiple plans, recover them on another device, rename and delete them. Saving an existing guest plan to the account is explicit and preserves its companions, constraints and pocket. Accounts are shared with the optional group feature; browsing still needs no login. See the [account walkthrough](docs/learning-python-postgres/16-accounts-and-school.ar.md), [current school requirements](docs/school-readiness.ar.md), and [deployment files](docs/deployment.ar.md).
+
+Optional group features: saved preferences and personal pinning, independent outings and attendance, voting on the anchor, owner/coordinator/member permissions, a shared stored random draw, opt-in 30-second bench cards, real removal/restoration, and archived outings. Read the [current architecture](docs/architecture-python-postgres.ar.md), [v2 API reference](docs/api-social.ar.md), and [original proposal with implementation differences](docs/proposals/persistent-groups.ar.md). Architecture and learning material change with the code as required by AGENTS.md.
+
+**Designed invitations:** direct plans and managed group outings offer **مشاركة الخطة**: start with a compact preview and a fixed primary action. Edit the design separately; PDF, opening and revoking the link live under **خيارات المشاركة**. Explicitly create a revocable `/s/<code>` link. It opens without an account and follows the current plan, keeping personal preferences and member names private. An optional Arabic PDF snapshot includes suggested dishes and clickable Maps/current-plan links. Read [the sharing API](docs/api-plan-sharing.ar.md) and [chapter20](docs/learning-python-postgres/20-designed-invitations.ar.md). The separate `/join` flow, labeled **اجمع تفضيلات الرفقة**, still collects companions' preferences. See the [UX review](docs/ux/2026-09-27/review.ar.md) and [beginner walkthrough](docs/learning-python-postgres/21-clear-user-journey.ar.md).
+
+Current venues are fictional and Maps links are clearly labeled name searches. Live Google ratings require manually verified real catalog entries (`is_demo=false`, `google_place_id`) and a server-only `GOOGLE_PLACES_API_KEY`. Ratings are fetched on demand, attributed, and neither persisted nor exported into PDFs; PDFs link to the current Maps rating. Set Google project quotas in addition to the per-process request cap. No Google key or real-place mapping is included.
+
+The implemented [modular architecture](docs/architecture-modules.ar.md) separates accounts, experiences, planning and optional groups. `src/application` composes feature entrypoints; `src/shared` provides UI, HTTP and storage. Backend `features` use shared `domain` rules and `core` infrastructure. Public interfaces and dependency-cycle checks run with `npm run check:architecture` and `npm run check`. Read [chapter17](docs/learning-python-postgres/17-extensible-architecture.ar.md) for adding a feature by hand.
+
+## Start locally
+
+Requirements: Node 22.13+, npm, uv, Docker/OrbStack, Xcode 26.4+ and CocoaPods for iOS. Install cloudflared for public invitations.
 
 ```sh
 npm ci
-uv sync --project backend
+uv sync --project backend --locked
+npm run db:up
+npm run web:build
+npm run api
+```
+
+`db:up` starts the official PostgreSQL 18.4 container with a persistent Docker volume. It creates a random development password in ignored `.env.postgres.local` and a connection string in ignored `backend/.env.local`, with private file permissions. Existing files are preserved. PostgreSQL listens only on `127.0.0.1:5432`.
+
+The API applies numbered SQL migrations on startup and listens on port 8000. `GET /api/health` checks a real PostgreSQL connection and reports `backend: python`, `database: postgresql`. Missing `DATABASE_URL` or an unavailable database fails clearly; the application never falls back to SQLite.
+
+- Browser invitation entry: `http://127.0.0.1:8000/`
+- Organizer development preview: `http://127.0.0.1:8000/?preview=organizer`
+- API documentation: `http://127.0.0.1:8000/api/docs`
+- OpenAPI contract: `http://127.0.0.1:8000/api/openapi.json`
+
+`npm run db:stop` stops only Hatim's PostgreSQL container and preserves its volume. `npm run db:status` shows its state. Do not delete the volume or regenerate the password file to troubleshoot an ordinary connection error.
+
+For your own PostgreSQL server, copy `backend/.env.example` to `backend/.env.local` and set `DATABASE_URL` with the server's TLS settings. You can omit Docker. The database role needs privileges to create the schema/migrations and read/write the application tables. The local development role can also create the temporary schemas used by tests. Database credentials are server-only; never put them in `EXPO_PUBLIC_*` variables.
+
+## Public invitations
+
+With PostgreSQL running:
+
+```sh
 npm run public:test
 ```
 
-The script starts a temporary Cloudflare tunnel, writes its URL into `.env.local`, exports the Expo web companion, and starts FastAPI on port 8000. Leave the terminal open. Ctrl+C stops both services. If `cloudflared` is not on PATH, it also accepts `.tools/cloudflared`.
+The script starts a temporary Cloudflare tunnel, saves its HTTPS origin in the root `.env.local`, exports the Expo web companion, and starts FastAPI on port 8000. It can reuse a healthy Python/PostgreSQL Hatim API already serving the web companion on that port. It checks `api_generation: 2` and refuses an older, unrelated, or .NET service. Reusing a process does not reload modified backend code; restart your API after backend edits.
 
-Use **لَمّتنا → اعزم الربع** in the native app to copy a group's actual `/join/<random-code>` invitation. The root web page explains how to open an invitation. `/?preview=organizer` exposes the same organizer UI for development and browser QA; it cannot access an existing organizer's group without that device's token.
+Leave the terminal open. Ctrl+C stops only the API/tunnel processes started by the script; PostgreSQL keeps running. If cloudflared is not on PATH, `.tools/cloudflared` is also supported. Only the HTTP API is tunneled, never the PostgreSQL port.
 
-Quick Tunnel URLs change on restart. Rebuild the native app after that change and share the newly generated invitation URL. The Mac, API, and tunnel must remain running for members and the iPhone to connect. SQLite group data survives process restarts.
+For the current plan use **خطّتنا → رفقة الطلعة وذوقي → اعزم الربع**. For a persistent group use **قروباتي → القروب → اعزم الربع**. Both copy a real `/join/<random-code>` link; direct companions do not need accounts, while persistent-group members do. The root website remains the invitation entry. The Mac, database, API, and tunnel must remain running. Quick Tunnel origins change on restart: rebuild the native app with the new origin and share the refreshed invitation URL. IDs and invitation codes remain in PostgreSQL.
 
-## Run on iPhone through Xcode
+## iPhone and Simulator
 
-Start the backend/tunnel first, so `.env.local` contains the correct HTTPS API address.
+Start the API/tunnel before building for a physical phone:
 
 ```sh
 npx expo prebuild --platform ios
 open ios/Hatim.xcworkspace
 ```
 
-In Xcode, select the **Hatim** scheme, your connected iPhone, and your Apple development team under **Signing & Capabilities**. The bundle identifier is `com.hatim.app`; change it in `app.json` and regenerate if your team needs a different identifier.
+Select the **Hatim** scheme, connected iPhone, and Apple development team under Signing & Capabilities. The bundle identifier is `com.hatim.app`; change it in app.json and regenerate if needed. For a standalone test choose **Edit Scheme → Run → Build Configuration → Release**, then Run. Release bundles JavaScript/assets and does not require Metro. The Python server remains separate from the installed iPhone app.
 
-For a standalone phone test, set **Edit Scheme → Run → Build Configuration → Release**, then Run. Release bundles JavaScript and assets into the app, so Metro is unnecessary. Xcode signing and a physical iPhone are required for device installation.
-
-For the simulator:
+For the iOS simulator, start `npm run api`, then in another terminal:
 
 ```sh
 npm run ios:release
 ```
 
-The generated `ios/` project is reproducible from `app.json`, `package-lock.json`, and Expo prebuild. It is intentionally untracked. Keep app configuration in `app.json`; do not place permanent product changes in generated files. Native Liquid Glass renders on iOS 26+; earlier iOS and web use a translucent fallback. Expo UI provides native sliders and switches.
+The simulator uses `http://localhost:8000` directly. A physical iPhone uses `EXPO_PUBLIC_API_URL`; invitations copied in the simulator also use that public origin. A Release rebuild is required when its configured public address changes. Use `npm start` with a Debug native build for live development.
 
-## Local development
+The generated `ios/` and `android/` projects are intentionally untracked. Keep durable configuration in app.json and dependencies in package files. Native Liquid Glass is used when available on iOS; other platforms use a translucent fallback. Expo UI supplies the universal sliders and switches. The web development workflow here is export + API at one origin; `npm run web` alone does not proxy `/api` to port 8000.
+
+## Move existing SQLite groups to PostgreSQL
+
+The one-time importer preserves group/member IDs, invitation codes, token hashes, preferences, settings, timestamps, and member order. Stop the old API before importing so there are no writes after the snapshot. Start PostgreSQL, with an empty application destination, then run from the repository root:
 
 ```sh
-npm run web:build
-npm run api
-# Browser companion: http://127.0.0.1:8000
-# Organizer preview: http://127.0.0.1:8000/?preview=organizer
+npm run db:import -- data/hatim.sqlite3
 ```
 
-For native live reload, use `npm start` after generating the iOS project and use a Debug build. All food photos and Arabic font files are bundled. Web and native share React Native components.
+This command runs from `backend/`, so the source above means `backend/data/hatim.sqlite3`. An absolute source path also works. The importer opens the source read-only, creates a consistent SQLite backup including committed WAL data, and imports all records in one PostgreSQL transaction. It compares every imported record before commit and refuses a nonempty destination instead of merging or overwriting it. If validation fails, imported rows roll back. The original SQLite file stays unchanged; it is used only by this migration utility, never by the running API.
 
-## Small, explicit architecture
+Backups are written beside the source under `backups/`. Keep them private. PostgreSQL data lives in the named volume `hatim_postgres_data`; stopping a process does not delete it. For a local PostgreSQL backup:
 
-- **App:** Expo SDK 57, React Native 0.86.3, React 19.2, TypeScript 6, Expo UI and Expo GlassEffect. Four local tabs; no global state framework or unnecessary navigation dependency.
-- **API:** Python 3.14.4, FastAPI and Pydantic. Pure ranking functions in `backend/hatim/planner.py`; input/output types generated from OpenAPI into `src/api/schema.d.ts`.
-- **Storage:** SQLite with WAL and transactional writes. One organizer token per group, one private token per joining member, and a separate random invitation capability. Tokens are hashed at rest. Native organizer credentials use iOS SecureStore; browser member credentials stay in that browser.
-- **Synchronization:** active clients refresh every six seconds. Organizer mutations suppress stale poll results. Save failures stay visible and are retryable. Member profiles belong to the member; the organizer can view constraints and remove members, but cannot edit someone else's profile.
-- **Privacy:** invitation responses expose names and the shared plan, with private constraints and adaptation details removed. The organizer sees full constraints. Invitation links grant access to the group's public view; treat them as invitations, not public directory listings.
+```sh
+mkdir -p backend/data/backups
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > backend/data/backups/hatim-postgres.dump
+```
+
+That filename is an example; use a fresh filename when retaining multiple backups.
+
+## Leadership and member actions
+
+Choose the outing coordinator while creating an outing. The group owner or current coordinator can transfer that role to an active account-linked member without changing attendance. The outing shows both names and an **إدارة الطلعة والطرد** entry. Unavailable actions explain why; funny removal can be enabled there. Real group removal remains owner-only, available there and in **الأعضاء والطرد** on the group screen. Confirmations stay in one native sheet and failed writes remain visible for retry. Read the [Arabic walkthrough](docs/learning-python-postgres/14-leadership-and-removal.ar.md).
+
+## Link a previous group
+
+After registering or signing in on the original organizer device, choose **اربط قروبي السابق بحسابي**. The server verifies its existing owner token, preserves its members/preferences/settings and creates the first outing. Old writes are then disabled for that group. A returning browser member can claim their old membership while joining with an account if that browser still holds its previous member token. Without that token, no account can impersonate the old member. Existing data is not deleted by migration 002.
+
+The same invitation code continues under the current tunnel origin. For new groups, invited members sign in once and confirm attendance for each outing. Password reset is not yet available; keep the username and password you choose.
+
+## Quick decisions and outing preferences
+
+**وش يناسبني الحين؟** opens from discovery without login. Choose a neighborhood, experience duration and outing context; the API returns up to three choices using every direct-plan companion’s hard constraints. Confirming creates a one-slot plan or explicitly replaces the current anchor. Family/friends context has editable quiet/sharing/discovery priorities, also available in normal plan and group-outing creation/editing. Demo data has no live availability or travel estimates. Read [chapter18](docs/learning-python-postgres/18-quick-decision.ar.md) and [the API contract](docs/api-quick-decision.ar.md).
+
+**Optional group skins:** المعزّب، عند الإشارة، اختاروا أنتم are editable SVG characters with outfit, tone, color, expression, glasses and preset phrases. Members change only their own circle default or outing override. The plan, attendance and choice screen show the effective appearance; closed outings preserve a snapshot, including no skin. Cosmetics never change constraints, votes, roles or draw odds. Migration005 adds nullable JSONB columns without changing earlier migrations. See [chapter19](docs/learning-python-postgres/19-outing-skins.ar.md), [API](docs/api-social.ar.md), and [remaining proposals](docs/proposals/outing-skins.ar.md).
+
+## Small architecture
+
+- **UI:** Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript 6, Expo UI and native GlassEffect. Account, group, outing and decision screens reuse the existing components.
+- **API:** FastAPI routers in `backend/hatim/features/`, validated with Pydantic. `main.py` composes them; deterministic ranking stays in `domain/planner.py`. `psycopg` runs parameterized SQL without an ORM.
+- **Database:** 12 new tables alongside the 3 existing ones. Accounts, circle memberships, outings, participants, catalog, rounds, votes and fun cards have explicit keys and constraints. Numbered migrations remain checksum-verified.
+- **Direct account plans:** migration003 adds optional account ownership to groups, preserving existing guest plans. Both discovery endpoints and both planners read the same PostgreSQL catalog. Settings updates in the current UI send expected values to reject stale writes.
+- **Access:** Argon2 passwords and random opaque sessions stored as SHA-256 hashes, expiring in 30 days. Native sessions use SecureStore. Browser sessions are local to their origin. Owners and outing coordinators have separate permissions enforced on every request.
+- **Consistency:** writers lock circle → outing → round. One vote per member per round; resolving twice returns the same result. Settings writes compare the client's expected settings to prevent overwriting another device's choice.
+- **Updates:** active clients poll every six seconds; stale reads cannot replace local write results. No queue, WebSocket server or AI model is involved.
+
+See [the Arabic architecture and PostgreSQL migration guide](docs/architecture-python-postgres.ar.md).
 
 ## Decision rules
 
-1. Check every member's hard constraints before ranking: allergy declarations, verified absence and cross-contact handling, vegetarian availability, and each person's budget ceiling.
-2. Preserve a concrete vegetarian or mild-food adjustment where one exists. Allergies never get an ingredient-removal workaround. Missing allergy verification blocks the experience.
-3. Rank eligible experiences by editorial score plus a preference score: 70% average affinity and 30% least-served member affinity. Resident/visitor context adds a small explicit affinity bonus. The chosen anchor comes first.
-4. Time truncates one stable ranking. It never reshuffles that ranking. Anchor / core / flexible priorities and reasons stay visible.
-5. A blocked anchor reserves its slot and displays the conflict. Only the organizer can explicitly change or release it.
-6. Time-displaced experiences remain in the pocket and return when capacity increases. Manually pocketed experiences stay there until restored. Marking an experience as lived consumes a slot; consumed slots cannot vanish when time shrinks. Accidental completion can be undone.
+Hard constraints are checked before ranking: allergy conflicts or missing absence/cross-contact verification, vegetarian availability, and each person's budget. Concrete vegetarian and mild-food adjustments are retained. Heat preference without a workaround lowers affinity and shows a warning rather than excluding on that preference alone.
 
-One experience occupies one slot, including a deliberately chosen coffee/dessert occasion. Slots are a capacity budget, not a calendar with availability or opening hours.
+Eligible experiences receive editorial points plus 70% average member affinity and 30% lowest member affinity. The anchor comes first. Time takes a prefix of that stable order; anchor/core/flexible ranks and reasons remain explicit. A blocked anchor reserves its slot until the organizer changes/releases it. Time-displaced experiences return when slots expand; manually saved experiences stay in the pocket. Completed experiences consume slots and can be undone if marked accidentally. Each experience, including a coffee/dessert occasion, uses one slot; this is capacity planning, not calendar scheduling.
 
-## Verification
+## Verify
 
 ```sh
 npm run check
 npm run format:check
-uv run --project backend ruff check backend/hatim backend/tests
+uv run --project backend ruff check backend
+uv run --project backend ruff format --check backend
 npm run types:api
-# With a built web companion and running API:
-npx playwright install chromium
-npm run test:e2e
 ```
 
-Backend tests cover all nine contraction sizes, allergy uncertainty and conflicts, dietary adjustments, budgets, consumed capacity, pocket preservation, group isolation, member ownership, privacy, persistence, and capacity limits. Browser tests exercise separate organizer/member sessions, joining, profile edits, plan updates, a blocked anchor, completion/undo, search, saving, reload persistence, and mobile overflow.
+`test:api` runs against real PostgreSQL, using a fresh, randomly named schema per test and cleaning up only that schema. It uses `HATIM_TEST_DATABASE_URL` if configured, otherwise `DATABASE_URL`. Planner tests do not need a database. Coverage includes 180 preserved-decision fixtures, constraints, privacy, validation, concurrent joins, consistent snapshots, rollback, migrations and safe SQLite import.
 
-The narrow `xcode → uuid ^11.1.1` override fixes GHSA-w5hq-g745-h8pq in Expo's build dependency. `xcode` uses the unchanged `uuid.v4()` CommonJS API. No Expo SDK downgrade is needed. The OpenAPI generator runs in an isolated pinned TypeScript 5 environment because its peer dependency does not yet accept the app's TypeScript 6.
+Browser tests create records in the target API. Start `npm run test:e2e:server` after `npm run web:build`: it creates a randomly named PostgreSQL schema, serves8002 and removes only its own schema on normal termination. In another terminal:
 
-## Content and scope
+```sh
+npx playwright install chromium
+HATIM_TEST_URL=http://127.0.0.1:8002 npm run test:e2e
+```
 
-The nine curated experiences, venue names, prices, and dietary options are **fictional demo content**. Every screen labels that status. None of the demo's allergy-safety assertions is verified, so entering an allergy can correctly block the entire catalog. Replace fixtures with reviewed editorial content and documented cross-contact handling before using the app for real food decisions.
+The tests cover standalone account entry, direct plan CRUD/recovery from another browser, guest-plan linking, and permanent groups, attendance, opt-in fun, voting, tie-breaking draw, stored results, removal/restoration, plus direct organizer/member joining/editing, contraction, blocked anchor, completion/undo, search, pocket persistence, retry and mobile overflow. Backend OpenAPI export does not start the server or touch the database. Its TypeScript generator is isolated with TS5 because the app uses TS6.
 
-This test implementation does not claim live venue availability, make reservations, issue restaurant safety guarantees, provide account recovery, or run a production public service. A persistent deployment needs a stable domain, backups, invite revocation/expiry, abuse controls, and a deliberate account/recovery policy. Group data currently remains in the local ignored `backend/data/hatim.sqlite3`; no hosted database or third-party analytics is used.
+## Scope
 
-Photography: bundled illustrative images from [Unsplash](https://unsplash.com/), identified by their original photo IDs in `assets/ATTRIBUTION.md`. Typography: IBM Plex Sans Arabic, distributed by `@expo-google-fonts` under its bundled OFL license.
+The nine experiences, venue names, prices and options are fictional demo content. Allergy verification is intentionally absent, so entering an allergy can correctly block the whole demo catalog. No reservations, live availability, password recovery, catalog editing interface, or permanent hosting are implemented. Accounts, password login/logout and cross-device recovery of saved plans and groups are implemented. Docker deployment files are prepared; selecting hosting is deferred by the user. A hosted PostgreSQL URL can replace the local one; the local Docker setup is not a remote database deployment by itself.
 
+For the school project, this AI-assisted implementation is a learning reference; your own implementation evidence, Figma deliverables and permanent deployment still need their own work. Switching the database alone does not fulfill every academic requirement. The old untracked `docs/learning/` material describes the pre-migration SQLite implementation.
+
+Photography is bundled and attributed in `assets/ATTRIBUTION.md`. IBM Plex Sans Arabic comes from @expo-google-fonts under its bundled OFL license.

@@ -5,14 +5,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const commands = [
   [
     "uv",
-    [
-      "run",
-      "--project",
-      "backend",
-      "python",
-      "-c",
-      'import sys,json; sys.path.insert(0,"backend"); from hatim.main import app; open("backend/openapi.json","w").write(json.dumps(app.openapi(),ensure_ascii=False,indent=2)+"\\n")',
-    ],
+    ["run", "--directory", "backend", "python", "-m", "hatim.export_openapi"],
   ],
   // The generator's TS 5 peer dependency is isolated from the app's Expo-supported TS 6.
   [
@@ -26,9 +19,10 @@ const commands = [
       "openapi-typescript",
       "backend/openapi.json",
       "-o",
-      "src/api/schema.d.ts",
+      "src/shared/api/schema.d.ts",
     ],
   ],
+  ["npx", ["prettier", "--write", "src/shared/api/schema.d.ts"]],
 ];
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: "inherit" });

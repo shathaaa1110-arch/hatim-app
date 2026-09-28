@@ -1,0 +1,19 @@
+{
+  "frontend": {
+    "accounts": [],
+    "experiences": [],
+    "planning": ["accounts", "experiences", "planSharing"],
+    "groups": ["accounts", "experiences", "planning", "skins"],
+    "quickDecision": ["experiences", "planning"],
+    "planSharing": ["experiences", "skins"],
+    "skins": []
+  },
+  "backend": {
+    "accounts": [],
+    "experiences": [],
+    "planning": ["accounts", "experiences"],
+    "groups": ["accounts", "experiences"],
+    "quick_decision": ["experiences"],
+    "plan_sharing": ["planning", "groups", "experiences"]
+  }
+}
