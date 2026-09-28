@@ -54,6 +54,7 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
     .fill("الكل معزوم");
   // The sender may add their own character; nobody else's appearance is shared.
   await button(page, "أضف شخصيتك للدعوة").click();
+  await button(page, "بنت").click();
   await button(page, "شخصية عند الإشارة").click();
   await button(page, "تعديل غطاء الرأس").click();
   await button(page, "حجاب").click();
@@ -77,6 +78,11 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   await expect(
     viewer.getByRole("img", { name: "صاحب الدعوة · عند الإشارة", exact: true }),
   ).toBeVisible();
+  expect(
+    (await (await request.get(endpoint, { headers: auth })).json()).details
+      .character.gender,
+  ).toBe("girl");
+  await expect(viewer.locator('img[src*="girl-face-smile."]')).toHaveCount(1);
   await expect(viewer.getByText("وش نطلب؟", { exact: true })).toHaveCount(3);
   await expect(viewer.getByText("PRIVATE_OWNER")).toHaveCount(0);
   await expect(viewer.getByRole("textbox")).toHaveCount(0);

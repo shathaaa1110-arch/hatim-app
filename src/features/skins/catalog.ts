@@ -4,6 +4,11 @@ export type Skin = components["schemas"]["Skin"];
 /** A moment's reaction drawn over the saved look; it is never stored. */
 export type Mood = "win" | "lose" | "draw";
 
+export const genders = { girl: "بنت", boy: "ولد" } satisfies Record<
+  Skin["gender"],
+  string
+>;
+
 export const personas = {
   host: {
     name: "المعزّب",
@@ -15,12 +20,12 @@ export const personas = {
   },
   on_way: {
     name: "عند الإشارة",
-    detail: "المفاتيح بيده، والوصول قصة",
+    detail: "المفاتيح جاهزة، والوصول قصة",
     phrases: { classic: "قدامكم بدقيقتين", extra: "وصلت… باقي الموقف بس" },
   },
   you_choose: {
     name: "اختاروا أنتم",
-    detail: "كل المنيو معه، والقرار عندكم",
+    detail: "المنيو كامل، والقرار عندكم",
     phrases: { classic: "بس مو هذا", extra: "أي شيء… عندكم اقتراح ثاني؟" },
   },
 } satisfies Record<
@@ -60,6 +65,7 @@ export const headwears = {
   ghutra: "غترة",
   taqiyah: "طاقية",
   hijab: "حجاب",
+  cap: "قبعة كاجوال",
 } satisfies Record<Skin["headwear"], string>;
 
 export const expressions = {
@@ -69,9 +75,35 @@ export const expressions = {
 } satisfies Record<Skin["expression"], { name: string }>;
 
 export const accessories = {
-  none: { name: "بدون نظارة" },
+  none: { name: "بدون إكسسوار" },
   glasses: { name: "نظارة" },
+  sunglasses: { name: "نظارة شمسية" },
+  flower: { name: "مشبك وردة" },
 } satisfies Record<Skin["accessory"], { name: string }>;
+
+export function outfitsFor(skin: Skin) {
+  return skin.gender === "girl"
+    ? { casual: outfits.casual, abaya: outfits.abaya }
+    : outfits;
+}
+
+export function headwearsFor(skin: Skin) {
+  return skin.gender === "girl"
+    ? { none: headwears.none, hijab: headwears.hijab, cap: headwears.cap }
+    : headwears;
+}
+
+/** Same compatibility rule as Skin.girl_wardrobe on the server. */
+export function fitSkin(skin: Skin): Skin {
+  if (skin.gender !== "girl") return skin;
+  return {
+    ...skin,
+    outfit: skin.outfit === "thobe" ? "casual" : skin.outfit,
+    headwear: ["shemagh", "ghutra", "taqiyah"].includes(skin.headwear)
+      ? "none"
+      : skin.headwear,
+  };
+}
 
 export const moods = {
   win: { name: "فاز اختيارك" },
@@ -82,6 +114,7 @@ export const moods = {
 export const defaultSkin: Skin = {
   version: 1,
   persona: "host",
+  gender: "boy",
   tone: "warm",
   outfit: "casual",
   headwear: "none",
@@ -90,6 +123,12 @@ export const defaultSkin: Skin = {
   expression: "smile",
   phrase: "classic",
 };
+
+export function personaName(skin: Pick<Skin, "persona" | "gender">) {
+  return skin.persona === "host" && skin.gender === "girl"
+    ? "المعزّبة"
+    : personas[skin.persona].name;
+}
 
 export function skinPhrase(skin: Skin) {
   return personas[skin.persona].phrases[skin.phrase ?? "classic"];
@@ -101,7 +140,7 @@ const any = <T extends string>(values: Record<T, unknown>) => {
 };
 
 /**
- * «فاجئني» shuffles the playful parts only. Skin tone, clothing and head cover
+ * «فاجئني» shuffles the playful parts only. Gender, tone, clothing and head cover
  * describe the person, so a dice roll never changes them.
  */
 export function surprise(skin: Skin): Skin {

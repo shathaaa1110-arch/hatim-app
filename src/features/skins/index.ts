@@ -3,6 +3,7 @@ export { SkinEditor, SkinPicker } from "./SkinEditor";
 export {
   defaultSkin,
   personas,
+  personaName,
   skinPhrase,
   type Mood,
   type Skin,

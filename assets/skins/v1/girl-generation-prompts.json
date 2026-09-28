@@ -1,0 +1,155 @@
+{
+  "generator": "Built-in image_gen",
+  "generatedAt": "2026-09-28",
+  "sourceRevision": "bb0f139",
+  "style": "Distinct cute feminine girl geometry and wardrobe; cap, sunglasses and flower clip",
+  "prompts": [
+    {
+      "key": "girl-master-v2",
+      "file": "../../../docs/skins/2026-09-28/girl-boy/girl-character-master.png",
+      "references": [
+        "docs/skins/2026-09-28/character-master.png",
+        "docs/skins/2026-09-28/girl-boy/reference-first-girl.png"
+      ],
+      "prompt": "Create a NEW female counterpart for this friendly cute Saudi food-app cartoon, ONE completed girl head-and-upper-chest illustration, square canvas. Reference1 is the BOY whose STYLE we retain but NOT masculine face/hair. Reference2 is a previous failed girl attempt: do NOT keep that boy-like broad face, thick brows or quiff. Make the girl clearly DISTINCT: a softer gently oval face tapering to a little rounded chin, smaller dainty bean nose, large gentle dark-brown oval/almond cartoon eyes with 2-3 simple lashes, thin gently curved eyebrows, a sweet mischievous CLOSED smile, soft rosy cheeks. Hair dark chocolate, SMOOTH CENTER-PARTED soft shoulder-length waves framing her face, NO tall boy quiff or swoop, NO thick masculine brows. Cute and funny young adult illustrated woman, not a realistic woman, not glamorous, no makeup/lipstick, no 3D, not a serious portrait. Rounded cozy 2D storybook sticker style, warm brown outlines, 2-3 tone shading. Wears the peach blouse with small cream rounded collar and tiny palm embroidery. Keep reference1 canvas ANCHORS: head crown y=.14, ears around x=.19/.8 y=.45, chin y=.69, short neck ends at original broad neckline centeredx=.5 y=.78, shoulders y=.73, chest bottomcrop. Neck visibly connects to collar naturally, not floating; avoid long or skinny neck. Full bust centered, face frontal, hair does not cover eyebrows or eyes. Keep all hair and head within canvas and shoulders gently cropped bottom. True transparent alpha background, no text, props or accessories. Feminine facial geometry and center-parted hair are important; do not just add lashes to the boy."
+    },
+    {
+      "key": "girl-head-warm",
+      "file": "girl-head-warm.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "Strict modular extraction from this NEW girl cartoon. EXACT same square canvas, feature coordinates, proportions and scale as reference. Do not crop, recenter or zoom. True transparent alpha in ALL removed areas, no checkerboard. Same cute soft 2D warm-brown outline and simple painted shading. Keep ONLY the girl's softly oval HEAD including ears, small nose, blush, chin and COMPLETE NECK/chest inside the original collar opening. Remove hair, eyes, brows, mouth, clothing and background. Fill all removed facial features and hair area ON THE HEAD with matching smooth skin, including bald dome; no cutouts inside skin. Keep EXACT feminine face outline and short narrower neck widening to fill ALL original neckline, so garment fits. No eyebrows or eyes or mouth. Make bald upper scalp smooth, no male wide cheeks."
+    },
+    {
+      "key": "girl-hair",
+      "file": "girl-hair.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "Strict modular extraction from this NEW girl cartoon. EXACT same square canvas, feature coordinates, proportions and scale as reference. Do not crop, recenter or zoom. True transparent alpha in ALL removed areas, no checkerboard. Same cute soft 2D warm-brown outline and simple painted shading. Keep ONLY this girl's existing center-parted dark-brown shoulder-length wavy HAIR with EXACT SAME silhouette and scale. Remove all face/skin/eyes/brows/ears/neck/clothes/background to transparency. Preserve smooth center part, framing locks and original ending at shoulders. Do not add boy quiff, do not redraw haircut. Large transparent face window and margins."
+    },
+    {
+      "key": "girl-face-smile",
+      "file": "girl-face-smile.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "Strict modular extraction from this NEW girl cartoon. EXACT same square canvas, feature coordinates, proportions and scale as reference. Do not crop, recenter or zoom. True transparent alpha in ALL removed areas, no checkerboard. Same cute soft 2D warm-brown outline and simple painted shading. Keep ONLY the existing two eyes with tiny lashes, gently arched eyebrows and thin CLOSED smiling mouth, EXACT original locations and size. Remove skin, nose, cheeks, ears, hair, neck, shirt and background to transparency. The nose region MUST be transparent. Do not include the little skin chin mark. No redesign or moving features. Features-only layer."
+    },
+    {
+      "key": "girl-outfit-casual",
+      "file": "girl-outfit-casual.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "Strict modular extraction from this NEW girl cartoon. EXACT same square canvas, feature coordinates, proportions and scale as reference. Do not crop, recenter or zoom. True transparent alpha in ALL removed areas, no checkerboard. Same cute soft 2D warm-brown outline and simple painted shading. Keep ONLY the peach blouse and cream scalloped collar from the original at EXACT original position at bottom. Remove ALL head, skin, neck, hair and background to transparency. Neck hole matches reference EXACTLY. Complete any tiny garment areas previously covered by hair matching cloth. Do not add a head/mannequin/skin. Large empty upper canvas."
+    },
+    {
+      "key": "girl-head-fair",
+      "file": "girl-head-fair.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png"
+      ],
+      "prompt": "Strict color-only edit of this faceless GIRL cartoon head asset. Change ALL skin including ears/nose/neck to light ivory-peach complexion, keeping subtle rosy cheek blush. EVERY shape, contour, canvas dimension, position, neck shape and cartoon line unchanged. No eye/brow/mouth/hair/clothes/background. Do not recenter/crop/zoom. Same full transparent square canvas and original alpha. Preserve softly oval feminine face and small nose. Only skin tone changes."
+    },
+    {
+      "key": "girl-head-light",
+      "file": "girl-head-light.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png"
+      ],
+      "prompt": "Strict color-only edit of this faceless GIRL cartoon head asset. Change ALL skin including ears/nose/neck to light warm peach complexion, keeping subtle rosy cheek blush. EVERY shape, contour, canvas dimension, position, neck shape and cartoon line unchanged. No eye/brow/mouth/hair/clothes/background. Do not recenter/crop/zoom. Same full transparent square canvas and original alpha. Preserve softly oval feminine face and small nose. Only skin tone changes."
+    },
+    {
+      "key": "girl-head-tan",
+      "file": "girl-head-tan.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png"
+      ],
+      "prompt": "Strict color-only edit of this faceless GIRL cartoon head asset. Change ALL skin including ears/nose/neck to medium warm golden brown complexion, keeping subtle rosy cheek blush. EVERY shape, contour, canvas dimension, position, neck shape and cartoon line unchanged. No eye/brow/mouth/hair/clothes/background. Do not recenter/crop/zoom. Same full transparent square canvas and original alpha. Preserve softly oval feminine face and small nose. Only skin tone changes."
+    },
+    {
+      "key": "girl-head-deep",
+      "file": "girl-head-deep.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png"
+      ],
+      "prompt": "Strict color-only edit of this faceless GIRL cartoon head asset. Change ALL skin including ears/nose/neck to rich deep warm brown complexion, keeping subtle rosy cheek blush. EVERY shape, contour, canvas dimension, position, neck shape and cartoon line unchanged. No eye/brow/mouth/hair/clothes/background. Do not recenter/crop/zoom. Same full transparent square canvas and original alpha. Preserve softly oval feminine face and small nose. Only skin tone changes."
+    },
+    {
+      "key": "girl-face-wink",
+      "file": "girl-face-wink.png",
+      "references": [
+        "assets/skins/v1/girl-face-smile.png"
+      ],
+      "prompt": "Edit expression ONLY of this girl features layer. Keep original full square canvas and EXACT positions, eye anchors, scale, tilt and transparent margins; no crop or recenter. Keep soft arched brows and lashes, thin closed mouth, same cute warm-brown linework. Output eyes+brows+mouth ONLY, all surrounding and nose area genuine alpha transparent. No head, nose, skin, cheeks, hair, neck, clothing or background. Friendly WINK: viewer-left eye closed as curved eyelid with lashes, right eye stays open, mischievous closed smile."
+    },
+    {
+      "key": "girl-face-side_eye",
+      "file": "girl-face-side_eye.png",
+      "references": [
+        "assets/skins/v1/girl-face-smile.png"
+      ],
+      "prompt": "Edit expression ONLY of this girl features layer. Keep original full square canvas and EXACT positions, eye anchors, scale, tilt and transparent margins; no crop or recenter. Keep soft arched brows and lashes, thin closed mouth, same cute warm-brown linework. Output eyes+brows+mouth ONLY, all surrounding and nose area genuine alpha transparent. No head, nose, skin, cheeks, hair, neck, clothing or background. Amused SIDE-EYE: both eyes half-lidded and pupils glance to viewer-right, one brow lifted a little, little lopsided closed smile."
+    },
+    {
+      "key": "girl-outfit-abaya",
+      "file": "girl-outfit-abaya.png",
+      "references": [
+        "assets/skins/v1/girl-outfit-casual.png"
+      ],
+      "prompt": "Restyle this isolated cute 2D girl upper-chest blouse layer into a feminine charcoal-black ABAYA bust with soft round neckline and delicate tiny muted-gold flower embroidery along one side. Remove cream scalloped collar; replace with neat narrow black neckline edging, preserving EXACT SAME NECK HOLE and shoulders/frame/size. Gentle rounded shoulder folds, minimal cute cartoon illustration, not realistic. Keep entire full square canvas, original garment at bottom, no recenter/crop/zoom. ONLY abaya garment; no head or hair/skin/neck/hands/mannequin or attached head cover. True transparent alpha everywhere above shoulders and inside neck hole."
+    },
+    {
+      "key": "girl-headwear-hijab",
+      "file": "girl-headwear-hijab.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png"
+      ],
+      "prompt": "Draw ONE dusty-rose soft HIJAB overlay precisely fitting this cute GIRL head. Keep exact original full square canvas and head position/scale as guide, but remove ALL head/skin/nose/neck/ears from final output to real transparency. ONLY scarf, no face under it. Snug rounded upper dome y=.12, sides cover ears, open face window follows girl's oval forehead/cheeks/chin: x=.255..755 y=.275..69. Leave all central face area transparent, with no fabric over eyes at y=.43 or smiley=.59. Fabric wraps under chin at y=.70 and falls neatly over shoulders y=.85. Warm-brown outlines and 2-tone dusty rose shading, cute simple storybook illustration, no realism. No recenter/crop/zoom. Need feminine oval opening, not a large masculine round face opening."
+    },
+    {
+      "key": "headwear-cap",
+      "file": "headwear-cap.png",
+      "references": [
+        "docs/skins/2026-09-28/character-master.png"
+      ],
+      "prompt": "Generate only a cute muted-sage BASEBALL CAP with cream brim underside and tiny embroidered palm patch, fitting the head of this cartoon. SAME FULL square canvas and head size/position. True transparent alpha everywhere else, no head, face, hair, skin, ears, body or background. Cap top at y=.015, crown x=.18..80 y=.035..24, gently curved cap band at y=.24, broad playful brim angled toward viewer-right extending x=.28..89 and ending no lower than y=.31 so eyebrows/eyes remain visible. Cap covers upper hair of original reference, original forehead below brim transparent. Soft warm brown outlines, rounded 2D cartoon folds and 2-tone shading, funny cozy illustrated sticker, no realistic fabric or text. Do not center, crop or zoom; big empty bottom canvas."
+    },
+    {
+      "key": "accessory-sunglasses",
+      "file": "accessory-sunglasses.png",
+      "references": [
+        "docs/skins/2026-09-28/character-master.png"
+      ],
+      "prompt": "ONE pair of cute chunky rounded-square SUNGLASSES as an isolated object centered on true transparent square alpha canvas. Match reference soft 2D storybook cartoon style only. Sage green thick frames, charcoal opaque lenses with small cream diagonal glints, simple bridge, tiny temples. No face or person, no eyes or skin, no hair/background, no lettering. Glasses horizontal front view, symmetrical readable shape, occupy width84 percent, height36percent, centered at x=.5 y=.5. Minimal detail, playful rounded corners. No emoji face, only sunglasses accessory."
+    },
+    {
+      "key": "accessory-flower",
+      "file": "accessory-flower.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "ONE cute little FLOWER HAIR CLIP isolated centered on true transparent square alpha canvas. A cream daisy with five plump rounded petals, warm yellow center and tiny sage-green leaf, mounted on small muted gold barrette subtly visible behind. Match reference cozy warm-brown outline 2D cartoon style, gentle 2-tone shading, no realism, no face/person/head/hair/hands. Occupy80percent of canvas with even margins. A cheerful charming accessory, no words or background."
+    },
+    {
+      "key": "girl-outfit-casual-fit",
+      "file": "girl-outfit-casual.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png",
+        "assets/skins/v1/girl-outfit-casual.png"
+      ],
+      "prompt": "Fix ONLY the NECK OPENING fit of the peach blouse with cream scalloped collar in SECOND reference, using the faceless girl HEAD in FIRST reference as fitting guide. The current neckline opening is too wide at the TOP corners so background shows through between the narrower neck and shirt. Fill those exposed gaps with garment material: bring TOP INNER COLLAR corners inward to x=.405 and x=.595 at y=.72, then curve down to center x=.5 y=.79. The narrow upper-neck opening must fit fully INSIDE the first reference's skin-neck silhouette. Keep original full square canvas and overall shoulder/chest coordinates and design. Add cloth above existing shoulders as needed up to y=.70 at collar, never change neck/head geometry. No face/head/skin/hair/mannequin in output: ONLY corrected garment layer with truly transparent upper canvas and narrower neckline opening. Same cute 2D cartoon illustration; no crop, recenter or zoom. Keep garment color and embroidery/collar style. Essential: hole's visible area must always be backed by the FIRST reference's neck skin, no transparent crescent gaps on either side of neck."
+    },
+    {
+      "key": "girl-outfit-abaya-fit",
+      "file": "girl-outfit-abaya.png",
+      "references": [
+        "assets/skins/v1/girl-head-warm.png",
+        "assets/skins/v1/girl-outfit-abaya.png"
+      ],
+      "prompt": "Fix ONLY the NECK OPENING fit of the black abaya with gold floral embroidery in SECOND reference, using the faceless girl HEAD in FIRST reference as fitting guide. The current neckline opening is too wide at the TOP corners so background shows through between the narrower neck and shirt. Fill those exposed gaps with garment material: bring TOP INNER COLLAR corners inward to x=.405 and x=.595 at y=.72, then curve down to center x=.5 y=.79. The narrow upper-neck opening must fit fully INSIDE the first reference's skin-neck silhouette. Keep original full square canvas and overall shoulder/chest coordinates and design. Add cloth above existing shoulders as needed up to y=.70 at collar, never change neck/head geometry. No face/head/skin/hair/mannequin in output: ONLY corrected garment layer with truly transparent upper canvas and narrower neckline opening. Same cute 2D cartoon illustration; no crop, recenter or zoom. Keep garment color and embroidery/collar style. Essential: hole's visible area must always be backed by the FIRST reference's neck skin, no transparent crescent gaps on either side of neck."
+    }
+  ]
+}

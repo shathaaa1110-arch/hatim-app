@@ -8,7 +8,9 @@ from hatim.core.db import connect, initialize
 from hatim.features.groups.models import Skin
 
 HOST = Skin(persona="host", outfit="thobe").model_dump()
-LATE = Skin(persona="on_way", outfit="abaya", color="rose", accessory="glasses").model_dump()
+LATE = Skin(
+    persona="on_way", gender="girl", outfit="abaya", color="rose", accessory="glasses"
+).model_dump()
 CHOOSER = Skin(persona="you_choose", expression="side_eye", phrase="extra").model_dump()
 
 
@@ -173,6 +175,8 @@ def test_concurrent_cosmetic_edits_do_not_silently_overwrite(client, scope):
         {"skin": {"persona": "host", "version": 2}, "expected": None},
         {"skin": {"persona": "host", "headwear": "crown"}, "expected": None},
         {"skin": {"persona": "host", "tone": "blue"}, "expected": None},
+        {"skin": {"persona": "host", "gender": "unknown"}, "expected": None},
+        {"skin": {"persona": "host", "accessory": "unknown"}, "expected": None},
         {"skin": None},
         {"expected": None},
     ],
@@ -223,3 +227,46 @@ def test_headwear_is_independent_and_legacy_abaya_keeps_its_cover(client):
     shemagh = Skin(persona="host", outfit="casual", headwear="shemagh", tone="tan").model_dump()
     saved = skin(client, owner, circle, shemagh, uncovered).json()["me"]["skin"]
     assert saved == shemagh
+
+
+def test_legacy_gender_normalizes_without_inference_or_false_conflict(client):
+    owner, circle = setup_circle(client)
+    trip = outing(client, owner, circle)
+    legacy = {k: v for k, v in LATE.items() if k != "gender"}
+    with connect() as db:
+        db.execute(
+            "UPDATE circle_members SET skin=%s WHERE circle_id=%s",
+            (Jsonb(legacy), circle["id"]),
+        )
+    shown = client.get(f"/api/v2/groups/{circle['id']}", headers=owner).json()["me"]["skin"]
+    # Never infer the person's gender from name, abaya or hijab.
+    assert shown == {**legacy, "gender": "boy"}
+    assert read(client, owner, trip)["participants"][0]["skin"] == shown
+    changed = skin(client, owner, circle, LATE, legacy)
+    assert changed.status_code == 200
+    assert changed.json()["me"]["skin"] == LATE
+    assert read(client, owner, trip)["participants"][0]["skin"] == LATE
+    # A genuinely stale boy baseline must still be rejected.
+    assert skin(client, owner, circle, HOST, shown).status_code == 409
+
+
+@pytest.mark.parametrize("gender", ["girl", "boy"])
+@pytest.mark.parametrize("accessory", ["sunglasses", "flower"])
+def test_playful_accessories_and_cap_roundtrip(client, gender, accessory):
+    owner, circle = setup_circle(client)
+    value = Skin(persona="host", gender=gender, headwear="cap", accessory=accessory).model_dump()
+    assert skin(client, owner, circle, value).json()["me"]["skin"] == value
+
+
+def test_girl_wardrobe_repairs_earlier_boy_garments_and_expected(client):
+    owner, circle = setup_circle(client)
+    legacy = {**HOST, "gender": "girl", "headwear": "shemagh"}
+    with connect() as db:
+        db.execute(
+            "UPDATE circle_members SET skin=%s WHERE circle_id=%s", (Jsonb(legacy), circle["id"])
+        )
+    shown = client.get(f"/api/v2/groups/{circle['id']}", headers=owner).json()["me"]["skin"]
+    assert shown == {**legacy, "outfit": "casual", "headwear": "none"}
+    value = {**shown, "headwear": "cap", "accessory": "sunglasses"}
+    assert skin(client, owner, circle, value, legacy).json()["me"]["skin"] == value
+    assert Skin(persona="host", gender="girl", outfit="abaya", headwear="hijab").headwear == "hijab"

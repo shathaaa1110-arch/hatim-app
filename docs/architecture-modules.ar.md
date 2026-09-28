@@ -58,7 +58,7 @@ src/
     planning/                        الخطة والرفقة والدعوة وإعداد الخطة والتخزين وapi
     groups/                          القروب والطلعة والتصويت والإدارة وapi
     skins/                           تركيب صور الشخصية ومنتقيها ومحررها وقيمها
-      artwork.ts                     ربط قيم Skin بملفات الصور المحلية
+      artwork.ts                     ربط الشكل بنت/ولد وبقية قيم Skin بالصور المحلية
     quickDecision/                   شاشة القرار السريع وapi وindex
     planSharing/                     محرر الدعوة وبطاقتها العامة وPDF حسب المنصة وapi
   shared/
@@ -117,6 +117,8 @@ flowchart TD
 تحديث28سبتمبر2026: الدعوة العامة صارت تعرض شخصية صاحبها، وplanSharing لا يستطيع الاستيراد من groups لأن groups → planning → planSharing يصنع دورة. لذلك نُقلت `catalog.ts` و`SkinAvatar.tsx` و`SkinEditor.tsx` (مع SkinPicker) إلى ميزة مستقلة `src/features/skins` بمدخل index.ts. الميزة لا تعتمد على ميزة أخرى؛ groups وplanSharing يعتمدان عليها، وهذا معلن في architecture.json. `SkinPeople.tsx` بقي في groups لأنه يعرف الحضور والجولة. في الخادم لم تتغير الحدود: plan_sharing كان يعتمد على groups، ويستورد Skin من `groups/__init__.py`. [الفصل22](learning-python-postgres/22-expressive-skins.ar.md).
 
 تحديث الرسومات اللاحق في28سبتمبر2026 يستبدل SVG للشخصية بـ20 طبقة PNG شفافة مولّدة مسبقًا. `artwork.ts` يربط الخيارات بالصور، وSkinAvatar يركبها عبر Image على إحداثيات مشتركة، وSkinPicker يعرض قسمًا واحدًا من الخيارات ومعاينة حية. زر الحفظ ثابت في SkinEditor. نفس المكوّن يخدم القروب والخطة والقرعة والدعوة؛ لا خدمة AI أثناء التشغيل، ولا اعتماد جديد بين الوحدات. [الفصل23 مع مسار البيانات والتحقق](learning-python-postgres/23-layered-character-art.ar.md).
+
+إضافة بنت/ولد بعد `bb0f139`: خمس عشرة طبقة جديدة ترفع العدد إلى35: رأس البنت بخمس درجات، ثلاث ملامح، شعر وكاجوال وعباية وحجاب، وقبعة ونظارة شمسية ومشبك وردة. `catalog.ts` يملك أسماء الخيارين وpersonaName لتأنيث «المعزّبة»، وتصدر الدالة عبر index.ts إلى SkinPeople وInvitationCard. `artworkFor(skin)` يختار رأس البنت وملامحها ولبسها وشعرها وحجابها المستقلة. `fitSkin` وSkin.girl_wardrobe يضبطان الثوب والغطاء غير المناسبين عند اختيار بنت، وoutfitsFor/headwearsFor يحددان قائمة المحرر. القبعة ترسم فوق الشعر؛ الإكسسوار طبقة مستقلة واحدة. SkinPicker يعرض الاختيار فوق المعاينة، وSkinAvatar يطبقه في جميع مواضع العرض. الخادم يضيف gender إلى Skin في groups/models.py، ويورّثه إلى plan_sharing عبر مدخل groups العام الحالي. لا اعتماد جديد يستلزم تغيير architecture.json؛ نجح check:architecture. [الفصل25](learning-python-postgres/25-girl-boy-skins.ar.md).
 
 في الخادم، `features/groups/skins.py` يملك مساري تعديل الشخصية مع نماذجهما في models.py. domain.py يحسب الشخصية المعروضة، وoutings.py يلتقط اختياراتها عند الإغلاق. وحدة groups تملك أعمدة skin وskin_override وskin_snapshot المضافة في الترحيل005؛ نفس ترتيب الأقفال circle ثم outing، والتعديل التجميلي لا يستدعي invalidate. اللقطة تحفظ القيم، لا صورة بكسلات ثابتة؛ الرسوم الجديدة تظهر للاختيارات القديمة أيضًا. لم تتغير الجداول أو المعاملات أو ERD في تحديث الصور. [التفاصيل والعقد والاختبارات](learning-python-postgres/19-outing-skins.ar.md).
 

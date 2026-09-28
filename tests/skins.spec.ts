@@ -113,7 +113,7 @@ test("mobile skins customize, sync to companions, override an outing and freeze 
     await choose(page, "غطاء الرأس", "شماغ");
     await choose(page, "الخلفية", "زعفران");
     await choose(page, "التعبير", "غمزة");
-    await choose(page, "النظارة", "نظارة");
+    await choose(page, "الإكسسوار", "نظارة");
     await choose(page, "العبارة", "الحلى عليّ… مين قال شبعتوا؟");
     // Actual layered images replace emoji; all choices still have spoken labels.
     await button(page, "تعديل اللبس").click();
@@ -365,7 +365,14 @@ test("generated layers load, each part stays independent and narrow-screen edits
   expect(dressed.filter((source) => !darker.includes(source))).toHaveLength(1);
   expect(dressed.some((source) => source.includes("head-deep."))).toBe(true);
 
-  for (const cover of ["حجاب", "شماغ", "غترة", "طاقية", "بدون غطاء"]) {
+  for (const cover of [
+    "حجاب",
+    "شماغ",
+    "غترة",
+    "طاقية",
+    "بدون غطاء",
+    "قبعة كاجوال",
+  ]) {
     await choose(page, "غطاء الرأس", cover);
     await artworkReady(page);
     await avatar.scrollIntoViewIfNeeded();
@@ -373,9 +380,17 @@ test("generated layers load, each part stays independent and narrow-screen edits
       path: `test-results/layered-cover-${cover}.png`,
     });
   }
+  await choose(page, "الإكسسوار", "نظارة شمسية");
+  await expect(avatar.locator('img[src*="accessory-sunglasses."]')).toHaveCount(
+    1,
+  );
+  await avatar.screenshot({ path: "test-results/boy-cap-sunglasses.png" });
+  await choose(page, "الإكسسوار", "مشبك وردة");
+  await expect(avatar.locator('img[src*="accessory-flower."]')).toHaveCount(1);
+  await avatar.screenshot({ path: "test-results/boy-flower.png" });
   await choose(page, "غطاء الرأس", "حجاب");
   await choose(page, "التعبير", "نظرة جانبية");
-  await choose(page, "النظارة", "نظارة");
+  await choose(page, "الإكسسوار", "نظارة");
   await artworkReady(page);
   await avatar.scrollIntoViewIfNeeded();
   await page.screenshot({ path: "test-results/layered-editor-320.png" });
@@ -398,4 +413,132 @@ test("generated layers load, each part stays independent and narrow-screen edits
   await choose(page, "اللبس", "كاجوال");
   const updated = await save(page, "groups");
   expect(updated.me.skin).toEqual({ ...group.me.skin, outfit: "casual" });
+});
+
+test("girl and boy choices change artwork, keep personal choices and persist across scopes", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 393, height: 852 });
+  const { owner, circle } = await seed(request);
+  await visit(page, owner.token, circle.invite_code);
+  await button(page, "شخصيتي في القروب").click();
+  await expect(button(page, "بنت")).toBeInViewport();
+  await expect(button(page, "ولد")).toHaveAttribute("aria-pressed", "true");
+  await choose(page, "اللبس", "ثوب");
+  await choose(page, "غطاء الرأس", "شماغ");
+  await button(page, "بنت").click();
+  await button(page, "تعديل اللبس").click();
+  await expect(button(page, "ثوب")).toHaveCount(0);
+  await expect(button(page, "كاجوال")).toHaveAttribute("aria-pressed", "true");
+  await button(page, "تعديل غطاء الرأس").click();
+  await expect(button(page, "شماغ")).toHaveCount(0);
+  await expect(button(page, "بدون غطاء")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const avatar = page
+    .getByRole("dialog")
+    .getByRole("img", { name: "أمل · المعزّبة", exact: true });
+  const sources = () =>
+    avatar
+      .locator("img")
+      .evaluateAll((images) =>
+        images.map((image) => (image as HTMLImageElement).src),
+      );
+  await artworkReady(page);
+  const girl = await sources();
+  for (const file of [
+    "girl-hair.",
+    "girl-face-smile.",
+    "girl-outfit-casual.",
+  ]) {
+    expect(girl.some((src) => src.includes(file))).toBe(true);
+  }
+  await button(page, "بنت").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "test-results/girl-editor-mobile.png" });
+  await avatar.screenshot({ path: "test-results/girl-casual.png" });
+  // Both covered and uncovered faces use the selected character's expressions.
+  for (const [label, key] of [
+    ["غمزة", "wink"],
+    ["نظرة جانبية", "side_eye"],
+    ["ابتسامة", "smile"],
+  ]) {
+    await choose(page, "التعبير", label);
+    await artworkReady(page);
+    expect(
+      (await sources()).some((src) => src.includes(`girl-face-${key}.`)),
+    ).toBe(true);
+    await avatar.screenshot({ path: `test-results/girl-${key}.png` });
+  }
+  await choose(page, "غطاء الرأس", "قبعة كاجوال");
+  await choose(page, "الإكسسوار", "نظارة شمسية");
+  await artworkReady(page);
+  expect((await sources()).some((src) => src.includes("headwear-cap."))).toBe(
+    true,
+  );
+  await expect(avatar.locator('img[src*="accessory-sunglasses."]')).toHaveCount(
+    1,
+  );
+  await avatar.screenshot({ path: "test-results/girl-cap-sunglasses.png" });
+  await choose(page, "غطاء الرأس", "بدون غطاء");
+  await choose(page, "الإكسسوار", "مشبك وردة");
+  await artworkReady(page);
+  await avatar.screenshot({ path: "test-results/girl-flower.png" });
+  await choose(page, "الإكسسوار", "نظارة");
+  await avatar.screenshot({ path: "test-results/girl-glasses.png" });
+  await choose(page, "الإكسسوار", "بدون إكسسوار");
+  await choose(page, "البشرة", "أسمر");
+  await choose(page, "اللبس", "عباية");
+  await artworkReady(page);
+  await avatar.screenshot({ path: "test-results/girl-abaya-uncovered.png" });
+  await choose(page, "غطاء الرأس", "حجاب");
+  await artworkReady(page);
+  const covered = await sources();
+  expect(covered.some((src) => src.includes("girl-hair."))).toBe(false);
+  expect(covered.some((src) => src.includes("girl-headwear-hijab."))).toBe(
+    true,
+  );
+  await avatar.screenshot({ path: "test-results/girl-hijab.png" });
+  await button(page, "ولد").click();
+  await button(page, "بنت").click();
+  await button(page, "فاجئني").click();
+  await expect(button(page, "بنت")).toHaveAttribute("aria-pressed", "true");
+  const group = await save(page, "groups");
+  expect(group.me.skin).toMatchObject({
+    gender: "girl",
+    tone: "deep",
+    outfit: "abaya",
+    headwear: "hijab",
+  });
+  await page.reload();
+  await button(page, "شخصيتي في القروب").click();
+  await expect(button(page, "بنت")).toHaveAttribute("aria-pressed", "true");
+  await save(page, "groups");
+  const trip = await (
+    await request.post(`/api/v2/groups/${circle.id}/outings`, {
+      headers: auth(owner.token),
+      data: { title: "طلعة الأشكال", slots: 1 },
+    })
+  ).json();
+  await button(page, "افتح طلعة طلعة الأشكال").click();
+  await button(page, "شخصيتي لهذه الطلعة").click();
+  await expect(button(page, "بنت")).toHaveAttribute("aria-pressed", "true");
+  await button(page, "ولد").click();
+  const outing = await save(page, "outings");
+  expect(
+    outing.participants.find(
+      (p: { member_id: string }) => p.member_id === circle.me.id,
+    ).skin,
+  ).toEqual({ ...group.me.skin, gender: "boy" });
+  expect(
+    (
+      await (
+        await request.get(`/api/v2/groups/${circle.id}`, {
+          headers: auth(owner.token),
+        })
+      ).json()
+    ).me.skin,
+  ).toEqual(group.me.skin);
+  expect(trip.id).toBeTruthy();
 });

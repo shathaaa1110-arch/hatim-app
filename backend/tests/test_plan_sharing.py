@@ -245,10 +245,17 @@ def test_invitation_character_is_the_senders_optional_choice(client):
     plain = save(client, path, auth).json()
     public_path = f"/api/shared-plans/{plain['code']}"
     assert client.get(public_path).json()["details"]["character"] is None
-    character = {"persona": "on_way", "outfit": "abaya", "headwear": "hijab", "tone": "deep"}
+    character = {
+        "persona": "on_way",
+        "gender": "girl",
+        "outfit": "abaya",
+        "headwear": "hijab",
+        "tone": "deep",
+    }
     saved = save(client, path, auth, plain["revision"], character=character).json()
     shown = client.get(public_path).json()["details"]["character"]
     assert shown["persona"] == "on_way" and shown["headwear"] == "hijab"
+    assert shown["gender"] == "girl"
     assert saved["details"]["character"] == shown
     removed = save(client, path, auth, saved["revision"], character=None)
     assert removed.status_code == 200

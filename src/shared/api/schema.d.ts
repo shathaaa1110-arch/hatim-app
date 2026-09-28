@@ -1640,6 +1640,12 @@ export interface components {
        */
       persona: "host" | "on_way" | "you_choose";
       /**
+       * Gender
+       * @default boy
+       * @enum {string}
+       */
+      gender: "girl" | "boy";
+      /**
        * Tone
        * @default warm
        * @enum {string}
@@ -1656,7 +1662,7 @@ export interface components {
        * @default none
        * @enum {string}
        */
-      headwear: "none" | "shemagh" | "ghutra" | "taqiyah" | "hijab";
+      headwear: "none" | "shemagh" | "ghutra" | "taqiyah" | "hijab" | "cap";
       /**
        * Color
        * @default palm
@@ -1668,7 +1674,7 @@ export interface components {
        * @default none
        * @enum {string}
        */
-      accessory: "none" | "glasses";
+      accessory: "none" | "glasses" | "sunglasses" | "flower";
       /**
        * Expression
        * @default smile

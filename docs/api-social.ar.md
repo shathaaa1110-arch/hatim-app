@@ -126,11 +126,12 @@ stateDiagram-v2
 |---|---|---|
 | version | 1 | 1 |
 | persona | host / on_way / you_choose | مطلوب |
+| gender | girl / boy | boy للتوافق مع الرسم السابق |
 | tone | fair / light / warm / tan / deep | warm |
 | outfit | thobe / abaya / casual | casual |
-| headwear | none / shemagh / ghutra / taqiyah / hijab | none، أو hijab للعباية المحفوظة قبل الحقل |
+| headwear | none / shemagh / ghutra / taqiyah / hijab / cap | none، أو hijab للعباية المحفوظة قبل الحقل |
 | color | palm / saffron / rose / sky | palm |
-| accessory | none / glasses | none |
+| accessory | none / glasses / sunglasses / flower | none |
 | expression | smile / wink / side_eye | smile |
 | phrase | classic / extra | classic |
 
@@ -140,7 +141,9 @@ stateDiagram-v2
 
 skin=null في القروب تعني إزالة الشخصية الافتراضية. في الطلعة تعني إزالة التخصيص والعودة لشخصية القروب؛ لا تعني إخفاء شخصية موروثة. القروب الآخر له اختيار مستقل. عند إغلاق الطلعة تحفظ الشخصية الفعلية في skin_snapshot، وتبقى null لقطة صحيحة لعدم اختيار شخصية. تغيير شخصية القروب لاحقًا لا يغير الأرشيف، وإعادة الإغلاق لا تستبدل اللقطة. الشخصية لا تغيّر الحضور أو الحساسية أو الميزانية أو التصويت أو planning_revision، ولا تشغّل invalidate.
 
-تحديث الصور28سبتمبر2026: نفس عقد Skin(version=1) يختار طبقات PNG محلية؛ لا يقبل API ملف صورة أو رابطها، ولا يستدعي توليدًا. color يختار لون الخلفية، بينما لون الثوب/الحجاب ثابت داخل كل صورة. غطاء الرأس والتعبير والنظارة قطع مستقلة. skin_snapshot يجمّد الاختيارات فقط؛ قد تتجدد طريقة رسمها مع تحديث التطبيق. لا تغيير في الطلبات أو الردود أو expected أو قاعدة البيانات أو OpenAPI.
+تحديث الصور28سبتمبر2026: Skin(version=1) يختار طبقات PNG محلية؛ لا يقبل API ملف صورة أو رابطها، ولا يستدعي توليدًا. color يختار لون الخلفية، بينما لون الثوب/الحجاب ثابت داخل كل صورة. غطاء الرأس والتعبير والنظارة قطع مستقلة. skin_snapshot يجمّد الاختيارات فقط؛ قد تتجدد طريقة رسمها مع تحديث التطبيق.
+
+إضافة «بنت / ولد» اللاحقة: `gender` حقل تجميلي داخل Skin، لا داخل الحساب أو Preferences. الطلب القديم الذي لا يرسله يُقرأ كـboy للحفاظ على رسمه السابق، حتى لو كان اللبس عباية؛ لا نخمن من الاسم أو اللبس. الرد يعيد الحقل. للبنت كاجوال أو عباية، وبدون غطاء أو حجاب أو قبعة cap. عند اختيار girl يُضبط ثوب سابق إلى casual، والشماغ/الغترة/الطاقية إلى none؛ لا تتغير البشرة وبقية الخيارات. يطبق النموذج هذه القاعدة أيضًا على البيانات القديمة وعلى expected حتى لا يحدث تعارض كاذب. sunglasses نظارة شمسية وflower مشبك وردة؛ يختار المستخدم إكسسوارًا واحدًا، ويمكن جمعه مع القبعة. القيم غير المعروفة تُرفض بـ422. مثال: `{"skin":{"persona":"host","gender":"girl","outfit":"casual","headwear":"none"},"expected":null}`. مقارنة expected تمر بالنموذج نفسه، فينجح تحديث JSONB قديم بلا تعارض كاذب، ويُرفض تعديل متقادم فعليًا. OpenAPI وأنواع الواجهة محدثة؛ لا مسارات أو ترحيل SQL جديد. [الفصل25 والأدلة](learning-python-postgres/25-girl-boy-skins.ar.md).
 
 التحقق: [اختبارات الخادم](../backend/tests/test_skins.py) للصلاحيات والتزامن والميراث والأرشفة والقيود، و[اختبارات المتصفح](../tests/skins.spec.ts) للتحرير والمشاركة وإعادة المحاولة وتحميل طبقات الصور واستقلال الأجزاء بعرض320. شرح التخزين في [الفصل19](learning-python-postgres/19-outing-skins.ar.md)، وتركيب الصور في [الفصل23](learning-python-postgres/23-layered-character-art.ar.md).
 

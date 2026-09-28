@@ -8,17 +8,20 @@ import {
   accessories,
   defaultSkin,
   expressions,
-  headwears,
-  outfits,
+  genders,
+  headwearsFor,
+  outfitsFor,
+  fitSkin,
   palettes,
   personas,
+  personaName,
   skinPhrase,
   surprise,
   tones,
   type Skin,
 } from "./catalog";
 import { SkinAvatar } from "./SkinAvatar";
-import { clothes } from "./artwork";
+import { artworkFor } from "./artwork";
 
 const parts = {
   persona: "الشخصية",
@@ -26,7 +29,7 @@ const parts = {
   outfit: "اللبس",
   headwear: "غطاء الرأس",
   expression: "التعبير",
-  accessory: "النظارة",
+  accessory: "الإكسسوار",
   color: "الخلفية",
   phrase: "العبارة",
 } as const;
@@ -44,6 +47,7 @@ export function SkinPicker({
   disabled?: boolean;
 }) {
   const [part, setPart] = useState<keyof typeof parts>("persona");
+  const { clothes } = artworkFor(draft);
   const preview = (change: Partial<Skin>, bare = true) => (
     <SkinAvatar
       decorative
@@ -127,7 +131,7 @@ export function SkinPicker({
         "persona",
         Object.entries(personas).map(([key, p]) => ({
           value: key as Skin["persona"],
-          label: p.name,
+          label: personaName({ ...draft, persona: key as Skin["persona"] }),
           detail: p.detail,
           look: preview({ persona: key as Skin["persona"] }, false),
         })),
@@ -144,7 +148,7 @@ export function SkinPicker({
     outfit: () =>
       choices(
         "outfit",
-        Object.entries(outfits).map(([key, label]) => ({
+        Object.entries(outfitsFor(draft)).map(([key, label]) => ({
           value: key as Skin["outfit"],
           label,
           look: (
@@ -171,7 +175,7 @@ export function SkinPicker({
     headwear: () =>
       choices(
         "headwear",
-        Object.entries(headwears).map(([key, label]) => ({
+        Object.entries(headwearsFor(draft)).map(([key, label]) => ({
           value: key as Skin["headwear"],
           label,
           look: preview({ headwear: key as Skin["headwear"] }),
@@ -228,6 +232,45 @@ export function SkinPicker({
   };
   return (
     <View style={{ gap: 16 }}>
+      <View style={{ gap: 8 }}>
+        <T weight="semibold">شكل شخصيتك</T>
+        <View style={{ flexDirection: "row-reverse", gap: 10 }}>
+          {Object.entries(genders).map(([value, label]) => {
+            const selected = (draft.gender ?? "boy") === value;
+            return (
+              <Pressable
+                key={value}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+                accessibilityState={{ selected, disabled: busy }}
+                aria-pressed={selected}
+                disabled={busy}
+                onPress={() =>
+                  onChange(
+                    fitSkin({ ...draft, gender: value as Skin["gender"] }),
+                  )
+                }
+                style={{
+                  flex: 1,
+                  minHeight: 48,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 16,
+                  borderWidth: 2,
+                  borderColor: selected ? c.green : c.line,
+                  backgroundColor: selected ? c.sage : c.white,
+                  opacity: busy ? 0.65 : 1,
+                }}
+              >
+                <T weight="semibold">{label}</T>
+              </Pressable>
+            );
+          })}
+        </View>
+        <T style={s.muted}>
+          لكل شكل لبسه وتسريحته. تبديل الشكل يضبط القطع المناسبة له.
+        </T>
+      </View>
       <View
         style={{
           alignItems: "center",
@@ -239,7 +282,7 @@ export function SkinPicker({
       >
         <SkinAvatar skin={draft} name={name} size={184} />
         <T weight="semibold" style={{ fontSize: 19 }}>
-          {name} · {personas[draft.persona].name}
+          {name} · {personaName(draft)}
         </T>
         <T style={{ textAlign: "center", color: c.ink }}>
           «{skinPhrase(draft)}»
@@ -320,10 +363,12 @@ export function SkinEditor({
 }) {
   // Baseline is frozen while editing; polling must not replace a user's draft.
   const [expected] = useState(initial);
-  const [draft, setDraft] = useState<Skin>(() => ({
-    ...defaultSkin,
-    ...(initial ?? effective),
-  }));
+  const [draft, setDraft] = useState<Skin>(() =>
+    fitSkin({
+      ...defaultSkin,
+      ...(initial ?? effective),
+    }),
+  );
   const [busy, setBusy] = useState(false);
   const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);

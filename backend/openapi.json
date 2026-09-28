@@ -5148,6 +5148,15 @@
             ],
             "title": "Persona"
           },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "girl",
+              "boy"
+            ],
+            "title": "Gender",
+            "default": "boy"
+          },
           "tone": {
             "type": "string",
             "enum": [
@@ -5177,7 +5186,8 @@
               "shemagh",
               "ghutra",
               "taqiyah",
-              "hijab"
+              "hijab",
+              "cap"
             ],
             "title": "Headwear",
             "default": "none"
@@ -5197,7 +5207,9 @@
             "type": "string",
             "enum": [
               "none",
-              "glasses"
+              "glasses",
+              "sunglasses",
+              "flower"
             ],
             "title": "Accessory",
             "default": "none"

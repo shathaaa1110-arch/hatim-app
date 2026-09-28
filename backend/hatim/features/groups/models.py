@@ -9,11 +9,13 @@ from hatim.domain.models import OutingContext, Plan, Preferences, Settings
 class Skin(Model):
     version: Literal[1] = 1
     persona: Literal["host", "on_way", "you_choose"]
+    # Avatar appearance only. Old skins retain the existing boy artwork.
+    gender: Literal["girl", "boy"] = "boy"
     tone: Literal["fair", "light", "warm", "tan", "deep"] = "warm"
     outfit: Literal["thobe", "abaya", "casual"] = "casual"
-    headwear: Literal["none", "shemagh", "ghutra", "taqiyah", "hijab"] = "none"
+    headwear: Literal["none", "shemagh", "ghutra", "taqiyah", "hijab", "cap"] = "none"
     color: Literal["palm", "saffron", "rose", "sky"] = "palm"
-    accessory: Literal["none", "glasses"] = "none"
+    accessory: Literal["none", "glasses", "sunglasses", "flower"] = "none"
     expression: Literal["smile", "wink", "side_eye"] = "smile"
     phrase: Literal["classic", "extra"] = "classic"
 
@@ -25,6 +27,17 @@ class Skin(Model):
         if isinstance(data, dict) and "headwear" not in data:
             return {**data, "headwear": "hijab" if data.get("outfit") == "abaya" else "none"}
         return data
+
+    @model_validator(mode="after")
+    def girl_wardrobe(self):
+        # The earlier editor allowed boy garments on girl avatars. Normalize both
+        # saved JSON and expected values so fixing that look does not cause 409s.
+        if self.gender == "girl":
+            if self.outfit == "thobe":
+                self.outfit = "casual"
+            if self.headwear in {"shemagh", "ghutra", "taqiyah"}:
+                self.headwear = "none"
+        return self
 
 
 class SkinChange(Model):

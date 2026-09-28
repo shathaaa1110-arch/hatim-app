@@ -5,7 +5,7 @@ import { Button, Chip, Notice, Row, T } from "../../shared/ui/primitives";
 import { Panel, s } from "../../shared/ui/layout";
 import { ar, colors as c, photos } from "../../shared/theme";
 import { experiencesApi, type GoogleRating } from "../experiences";
-import { SkinAvatar, personas, skinPhrase } from "../skins";
+import { SkinAvatar, personaName, skinPhrase } from "../skins";
 import type { InvitationDetails, SharedPlan, SharedExperience } from "./api";
 import { contexts, stamp, themeFor } from "./presentation";
 
@@ -168,7 +168,7 @@ export function InvitationCard({
                     textAlign: "center",
                   }}
                 >
-                  {personas[details.character.persona].name} · «
+                  {personaName(details.character)} · «
                   {skinPhrase(details.character)}»
                 </T>
               )}

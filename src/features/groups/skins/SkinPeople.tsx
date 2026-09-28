@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { T } from "../../../shared/ui/primitives";
 import { Panel, s } from "../../../shared/ui/layout";
-import { SkinAvatar, personas, skinPhrase, type Mood } from "../../skins";
+import { SkinAvatar, personaName, skinPhrase, type Mood } from "../../skins";
 import type { Outing, Round } from "../api";
 
 /**
@@ -53,7 +53,7 @@ export function SkinPeople({
             {p.skin && (
               <>
                 <T style={{ textAlign: "center", fontSize: 12 }}>
-                  {personas[p.skin.persona].name}
+                  {personaName(p.skin)}
                 </T>
                 <T style={{ textAlign: "center", fontSize: 11 }}>
                   «{skinPhrase(p.skin)}»
