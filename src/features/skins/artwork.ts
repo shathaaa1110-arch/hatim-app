@@ -35,6 +35,11 @@ export const covers = {
 export const glasses =
   require("../../../assets/skins/v1/accessory-glasses.png") as ImageSourcePropType;
 
+export const girlGlasses =
+  require("../../../assets/skins/v1/girl-accessory-glasses.png") as ImageSourcePropType;
+export const boySunglasses =
+  require("../../../assets/skins/v1/boy-accessory-sunglasses.png") as ImageSourcePropType;
+
 export const sunglasses =
   require("../../../assets/skins/v1/accessory-sunglasses.png") as ImageSourcePropType;
 export const flower =
@@ -52,32 +57,53 @@ const girlFaces = {
   side_eye: require("../../../assets/skins/v1/girl-face-side_eye.png"),
 } satisfies Record<Skin["expression"], ImageSourcePropType>;
 
-const looks = {
-  boy: { heads, faces, clothes, covers },
-  girl: {
-    heads: {
-      fair: require("../../../assets/skins/v1/girl-head-fair.png"),
-      light: require("../../../assets/skins/v1/girl-head-light.png"),
-      warm: require("../../../assets/skins/v1/girl-head-warm.png"),
-      tan: require("../../../assets/skins/v1/girl-head-tan.png"),
-      deep: require("../../../assets/skins/v1/girl-head-deep.png"),
-    },
-    faces: girlFaces,
-    clothes: {
-      // Old clients may still send a thobe; it uses the same safe fallback as Skin.
-      thobe: require("../../../assets/skins/v1/girl-outfit-casual.png"),
-      abaya: require("../../../assets/skins/v1/girl-outfit-abaya.png"),
-      casual: require("../../../assets/skins/v1/girl-outfit-casual.png"),
-    },
-    covers: {
-      ...covers,
-      none: require("../../../assets/skins/v1/girl-hair.png"),
-      hijab: require("../../../assets/skins/v1/girl-headwear-hijab.png"),
-    },
+// The girl's head, neck and garment are one connected drawing. Selecting an
+// outfit or skin tone swaps this base; facial expressions and accessories stay separate.
+const girlBases = {
+  casual: {
+    fair: require("../../../assets/skins/v1/girl-base-casual-fair.png"),
+    light: require("../../../assets/skins/v1/girl-base-casual-light.png"),
+    warm: require("../../../assets/skins/v1/girl-base-casual-warm.png"),
+    tan: require("../../../assets/skins/v1/girl-base-casual-tan.png"),
+    deep: require("../../../assets/skins/v1/girl-base-casual-deep.png"),
   },
+  abaya: {
+    fair: require("../../../assets/skins/v1/girl-base-abaya-fair.png"),
+    light: require("../../../assets/skins/v1/girl-base-abaya-light.png"),
+    warm: require("../../../assets/skins/v1/girl-base-abaya-warm.png"),
+    tan: require("../../../assets/skins/v1/girl-base-abaya-tan.png"),
+    deep: require("../../../assets/skins/v1/girl-base-abaya-deep.png"),
+  },
+} satisfies Record<
+  "casual" | "abaya",
+  Record<Skin["tone"], ImageSourcePropType>
+>;
+const girlCovers = {
+  ...covers,
+  none: require("../../../assets/skins/v1/girl-hair.png"),
+  hijab: require("../../../assets/skins/v1/girl-headwear-hijab.png"),
+  cap: require("../../../assets/skins/v1/girl-headwear-cap.png"),
 };
+
+export function outfitArtwork(skin: Skin, outfit: Skin["outfit"]) {
+  return skin.gender === "girl"
+    ? girlBases[outfit === "abaya" ? "abaya" : "casual"][skin.tone ?? "warm"]
+    : clothes[outfit];
+}
 
 /** One lookup shared by the editor, plan, roulette and invitation avatars. */
 export function artworkFor(skin: Skin | null | undefined) {
-  return looks[skin?.gender ?? "boy"];
+  return skin?.gender === "girl"
+    ? {
+        base: outfitArtwork(skin, skin.outfit),
+        garment: null,
+        faces: girlFaces,
+        covers: girlCovers,
+      }
+    : {
+        base: heads[skin?.tone ?? "warm"],
+        garment: clothes[skin?.outfit ?? "casual"],
+        faces,
+        covers,
+      };
 }

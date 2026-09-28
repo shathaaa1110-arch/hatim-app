@@ -84,18 +84,40 @@ export const accessories = {
 export function outfitsFor(skin: Skin) {
   return skin.gender === "girl"
     ? { casual: outfits.casual, abaya: outfits.abaya }
-    : outfits;
+    : { casual: outfits.casual, thobe: outfits.thobe };
 }
 
 export function headwearsFor(skin: Skin) {
   return skin.gender === "girl"
     ? { none: headwears.none, hijab: headwears.hijab, cap: headwears.cap }
-    : headwears;
+    : {
+        none: headwears.none,
+        shemagh: headwears.shemagh,
+        ghutra: headwears.ghutra,
+        taqiyah: headwears.taqiyah,
+        cap: headwears.cap,
+      };
 }
 
-/** Same compatibility rule as Skin.girl_wardrobe on the server. */
+export function accessoriesFor(skin: Skin) {
+  return skin.gender === "girl"
+    ? accessories
+    : {
+        none: accessories.none,
+        glasses: accessories.glasses,
+        sunglasses: accessories.sunglasses,
+      };
+}
+
+/** Same compatibility rule as Skin.matching_wardrobe on the server. */
 export function fitSkin(skin: Skin): Skin {
-  if (skin.gender !== "girl") return skin;
+  if (skin.gender !== "girl")
+    return {
+      ...skin,
+      outfit: skin.outfit === "abaya" ? "casual" : skin.outfit,
+      headwear: skin.headwear === "hijab" ? "none" : skin.headwear,
+      accessory: skin.accessory === "flower" ? "none" : skin.accessory,
+    };
   return {
     ...skin,
     outfit: skin.outfit === "thobe" ? "casual" : skin.outfit,
@@ -134,7 +156,7 @@ export function skinPhrase(skin: Skin) {
   return personas[skin.persona].phrases[skin.phrase ?? "classic"];
 }
 
-const any = <T extends string>(values: Record<T, unknown>) => {
+const any = <T extends string>(values: Partial<Record<T, unknown>>) => {
   const keys = Object.keys(values) as T[];
   return keys[Math.floor(Math.random() * keys.length)];
 };
@@ -149,7 +171,7 @@ export function surprise(skin: Skin): Skin {
     persona: any(personas),
     color: any(palettes),
     expression: any(expressions),
-    accessory: any(accessories),
+    accessory: any(accessoriesFor(skin)),
     phrase: any({ classic: 0, extra: 0 }),
   };
 }

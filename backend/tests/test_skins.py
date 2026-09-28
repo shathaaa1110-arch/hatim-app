@@ -240,7 +240,7 @@ def test_legacy_gender_normalizes_without_inference_or_false_conflict(client):
         )
     shown = client.get(f"/api/v2/groups/{circle['id']}", headers=owner).json()["me"]["skin"]
     # Never infer the person's gender from name, abaya or hijab.
-    assert shown == {**legacy, "gender": "boy"}
+    assert shown == {**legacy, "gender": "boy", "outfit": "casual", "headwear": "none"}
     assert read(client, owner, trip)["participants"][0]["skin"] == shown
     changed = skin(client, owner, circle, LATE, legacy)
     assert changed.status_code == 200
@@ -250,8 +250,9 @@ def test_legacy_gender_normalizes_without_inference_or_false_conflict(client):
     assert skin(client, owner, circle, HOST, shown).status_code == 409
 
 
-@pytest.mark.parametrize("gender", ["girl", "boy"])
-@pytest.mark.parametrize("accessory", ["sunglasses", "flower"])
+@pytest.mark.parametrize(
+    "gender,accessory", [("girl", "sunglasses"), ("girl", "flower"), ("boy", "sunglasses")]
+)
 def test_playful_accessories_and_cap_roundtrip(client, gender, accessory):
     owner, circle = setup_circle(client)
     value = Skin(persona="host", gender=gender, headwear="cap", accessory=accessory).model_dump()
@@ -270,3 +271,33 @@ def test_girl_wardrobe_repairs_earlier_boy_garments_and_expected(client):
     value = {**shown, "headwear": "cap", "accessory": "sunglasses"}
     assert skin(client, owner, circle, value, legacy).json()["me"]["skin"] == value
     assert Skin(persona="host", gender="girl", outfit="abaya", headwear="hijab").headwear == "hijab"
+
+
+@pytest.mark.parametrize("scope", ["groups", "outings"])
+def test_boy_repairs_saved_girl_garments_and_flower_without_false_conflict(client, scope):
+    owner, circle = setup_circle(client)
+    entity = circle if scope == "groups" else outing(client, owner, circle)
+    legacy = {**HOST, "outfit": "abaya", "headwear": "hijab", "accessory": "flower"}
+    with connect() as db:
+        if scope == "groups":
+            db.execute(
+                "UPDATE circle_members SET skin=%s WHERE circle_id=%s",
+                (Jsonb(legacy), circle["id"]),
+            )
+        else:
+            db.execute(
+                "UPDATE outing_participants SET skin_override=%s WHERE outing_id=%s",
+                (Jsonb(legacy), entity["id"]),
+            )
+    shown = client.get(f"/api/v2/{scope}/{entity['id']}", headers=owner).json()
+    current = shown["me"]["skin"] if scope == "groups" else shown["participants"][0]["skin"]
+    assert current == {**HOST, "outfit": "casual", "headwear": "none", "accessory": "none"}
+    # Both an older client's baseline and submitted choices are normalized.
+    saved = skin(client, owner, entity, legacy, legacy, scope=scope)
+    assert saved.status_code == 200
+    value = (
+        saved.json()["me"]["skin"] if scope == "groups" else saved.json()["participants"][0]["skin"]
+    )
+    assert value == current
+    assert skin(client, owner, entity, HOST, legacy, scope=scope).status_code == 200
+    assert skin(client, owner, entity, current, legacy, scope=scope).status_code == 409

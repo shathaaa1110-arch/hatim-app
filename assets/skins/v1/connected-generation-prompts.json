@@ -1,0 +1,69 @@
+{
+  "sourceRevision": "df5aab9",
+  "date": "2026-09-28",
+  "purpose": "Connected girl head, neck and outfit bases, replacing the separate girl-head and girl-outfit layers.",
+  "assets": [
+    {
+      "key": "girl-base-casual-warm",
+      "file": "girl-base-casual-warm.png",
+      "references": [
+        "docs/skins/2026-09-28/girl-boy/girl-character-master.png"
+      ],
+      "prompt": "Edit this EXACT coherent girl cartoon portrait to produce ONE connected HEAD+NECK+SHOULDERS+CLOTHING BASE for a modular avatar. Keep the existing girl's gently oval facial silhouette, chin, ears, small nose, rosy cheeks, complete neck and peach blouse with cream collar ALL CONNECTED as in original. Preserve original full square canvas, exact original positions, scale and shoulder crop. Very important: DO NOT separate neck from clothing or reshape it; keep original natural neck-to-collar transition from source portrait. Remove ONLY the hair, eyebrows, eyes and mouth. Fill removed areas ON skin with matching smooth warm peach skin, including smooth bald scalp under hair. Reconstruct modest blouse shoulders hidden by hair to same garment; no empty gaps at neck/shoulders. Head+neck+clothes must form one continuous painted silhouette. Remove background to true transparent alpha. NO eyes, brows, mouth, hair or accessories; keep small nose and cheek blush. Cute feminine head anatomy and simple 2D storybook style exactly original; no realism, no mannequin features, no recenter/crop/zoom. Do not stretch the head, neck or garment. It is a faceless bald girl bust with natural connected torso, not a floating head or detached blouse."
+    },
+    {
+      "key": "girl-base-abaya-warm",
+      "file": "girl-base-abaya-warm.png",
+      "references": ["assets/skins/v1/girl-base-casual-warm.png"],
+      "prompt": "Edit ONLY the blouse garment in this connected girl avatar base into a charcoal-black ABAYA upper chest with small muted-gold floral embroidery on one side, softly rounded black neckline. Preserve HEAD, nose, ears, skin tone, neck and their exact positions completely unchanged. Abaya naturally meets ORIGINAL neck/chest with NO TRANSPARENT GAP at collar edges. Keep original connected bust geometry and neck length; do not narrow/widen neck. Remove cream collar, replace garment with black fabric right against same neck boundary. Same square canvas, exact positions and scale, NO crop/recenter/zoom. No eyes/brows/mouth/hair or head cover. Same faceless bald girl base with naturally attached black abaya body. True transparent background outside character. Simple cute soft 2D illustration matching reference."
+    },
+    {
+      "key": "girl-base-casual-fair",
+      "file": "girl-base-casual-fair.png",
+      "references": ["assets/skins/v1/girl-base-casual-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to light ivory-peach. Keep blush subtle and appropriate. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: peach blouse/cream collar. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-casual-light",
+      "file": "girl-base-casual-light.png",
+      "references": ["assets/skins/v1/girl-base-casual-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to light warm peach. Keep blush subtle and appropriate. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: peach blouse/cream collar. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-casual-tan",
+      "file": "girl-base-casual-tan.png",
+      "references": ["assets/skins/v1/girl-base-casual-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to medium warm golden-brown. Keep blush subtle and appropriate. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: peach blouse/cream collar. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-casual-deep",
+      "file": "girl-base-casual-deep.png",
+      "references": ["assets/skins/v1/girl-base-casual-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to deep rich warm brown. Keep blush subtle and appropriate. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: peach blouse/cream collar. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-abaya-fair",
+      "file": "girl-base-abaya-fair.png",
+      "references": ["assets/skins/v1/girl-base-abaya-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to light ivory-peach. Keep subtle cheek blush. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: charcoal-black abaya with gold floral embroidery. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-abaya-light",
+      "file": "girl-base-abaya-light.png",
+      "references": ["assets/skins/v1/girl-base-abaya-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to light warm peach. Keep subtle cheek blush. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: charcoal-black abaya with gold floral embroidery. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-abaya-tan",
+      "file": "girl-base-abaya-tan.png",
+      "references": ["assets/skins/v1/girl-base-abaya-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to medium warm golden-brown. Keep subtle cheek blush. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: charcoal-black abaya with gold floral embroidery. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    },
+    {
+      "key": "girl-base-abaya-deep",
+      "file": "girl-base-abaya-deep.png",
+      "references": ["assets/skins/v1/girl-base-abaya-warm.png"],
+      "prompt": "Strict color-only edit of this connected girl avatar base. Change ONLY head, ears, nose and neck SKIN color to deep rich warm brown. Keep subtle cheek blush. Leave ALL CLOTHING COLORS and style EXACTLY unchanged: charcoal-black abaya with gold floral embroidery. No changes to head silhouette, nose, neck geometry, collar connection, positions, proportions, canvas or alpha. All neck/skin must remain naturally connected to clothing with no transparent gaps. No eyes, mouth, eyebrows, hair or accessories. Exact original full square canvas, no recenter/crop/zoom. Same simple cute 2D style and transparent background."
+    }
+  ]
+}

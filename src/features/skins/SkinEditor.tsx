@@ -5,7 +5,7 @@ import { Button, Notice, Sheet, T } from "../../shared/ui/primitives";
 import { ErrorNotice, s } from "../../shared/ui/layout";
 import { colors as c } from "../../shared/theme";
 import {
-  accessories,
+  accessoriesFor,
   defaultSkin,
   expressions,
   genders,
@@ -21,7 +21,7 @@ import {
   type Skin,
 } from "./catalog";
 import { SkinAvatar } from "./SkinAvatar";
-import { artworkFor } from "./artwork";
+import { outfitArtwork } from "./artwork";
 
 const parts = {
   persona: "الشخصية",
@@ -47,7 +47,6 @@ export function SkinPicker({
   disabled?: boolean;
 }) {
   const [part, setPart] = useState<keyof typeof parts>("persona");
-  const { clothes } = artworkFor(draft);
   const preview = (change: Partial<Skin>, bare = true) => (
     <SkinAvatar
       decorative
@@ -155,7 +154,7 @@ export function SkinPicker({
             // Focus the thumbnail on the garment; full-canvas padding is for assembly.
             <View style={{ width: 70, height: 54, overflow: "hidden" }}>
               <Image
-                source={clothes[key as Skin["outfit"]]}
+                source={outfitArtwork(draft, key as Skin["outfit"])}
                 accessible={false}
                 aria-hidden
                 resizeMode="contain"
@@ -165,7 +164,7 @@ export function SkinPicker({
                   width: 126,
                   height: 126,
                   left: -28,
-                  top: -77,
+                  top: draft.gender === "girl" ? -88 : -77,
                 }}
               />
             </View>
@@ -193,7 +192,7 @@ export function SkinPicker({
     accessory: () =>
       choices(
         "accessory",
-        Object.entries(accessories).map(([key, a]) => ({
+        Object.entries(accessoriesFor(draft)).map(([key, a]) => ({
           value: key as Skin["accessory"],
           label: a.name,
           look: preview({ accessory: key as Skin["accessory"] }),

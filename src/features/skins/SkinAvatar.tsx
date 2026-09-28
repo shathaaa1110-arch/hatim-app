@@ -10,7 +10,15 @@ import {
   type Mood,
   type Skin,
 } from "./catalog";
-import { artworkFor, glasses, sunglasses, flower, props } from "./artwork";
+import {
+  artworkFor,
+  glasses,
+  girlGlasses,
+  sunglasses,
+  boySunglasses,
+  flower,
+  props,
+} from "./artwork";
 
 /** All positions use one 160-unit canvas, regardless of the avatar's size. */
 function Layer({
@@ -65,7 +73,7 @@ export function SkinAvatar({
     ? `${name} · ${personaName(skin)}`
     : `${name} · بدون شخصية`;
   const palette = palettes[skin?.color ?? "palm"];
-  const { heads, clothes, covers, faces } = artworkFor(skin);
+  const { base, garment, covers, faces } = artworkFor(skin);
   const girl = skin?.gender === "girl";
   const face =
     mood === "win"
@@ -97,18 +105,12 @@ export function SkinAvatar({
       >
         {skin ? (
           <>
-            <Layer source={heads[skin.tone ?? "warm"]} size={size} />
-            <Layer
-              source={clothes[skin.outfit ?? "casual"]}
-              size={size}
-              frame={
-                girl && skin.outfit === "abaya" ? [0, -38, 160, 198] : undefined
-              }
-            />
+            <Layer source={base} size={size} />
+            {garment && <Layer source={garment} size={size} />}
             <Layer
               source={faces[face]}
               size={size}
-              frame={girl ? [0, -10, 160, 160] : [19, 9, 124, 124]}
+              frame={girl ? [9, -5, 142, 142] : [19, 9, 124, 124]}
             />
             {skin.headwear === "cap" && (
               <Layer source={covers.none} size={size} />
@@ -118,7 +120,9 @@ export function SkinAvatar({
               size={size}
               frame={
                 skin.headwear === "cap"
-                  ? [0, -8, 160, 160]
+                  ? girl
+                    ? [0, -20, 160, 160]
+                    : [0, -8, 160, 160]
                   : skin.headwear === "shemagh" || skin.headwear === "ghutra"
                     ? [0, -6, 160, 160]
                     : [0, 0, 160, 160]
@@ -126,16 +130,16 @@ export function SkinAvatar({
             />
             {skin.accessory === "glasses" && (
               <Layer
-                source={glasses}
+                source={girl ? girlGlasses : glasses}
                 size={size}
-                frame={girl ? [0, 0, 160, 160] : [15, 5, 125, 125]}
+                frame={girl ? [-8, -12, 172, 172] : [15, 5, 125, 125]}
               />
             )}
             {skin.accessory === "sunglasses" && (
               <Layer
-                source={sunglasses}
+                source={girl ? sunglasses : boySunglasses}
                 size={size}
-                frame={girl ? [40, 25, 84, 84] : [44, 26, 74, 74]}
+                frame={girl ? [40, 25, 84, 84] : [-2, -11, 160, 160]}
               />
             )}
             {skin.accessory === "flower" && (

@@ -29,14 +29,20 @@ class Skin(Model):
         return data
 
     @model_validator(mode="after")
-    def girl_wardrobe(self):
-        # The earlier editor allowed boy garments on girl avatars. Normalize both
-        # saved JSON and expected values so fixing that look does not cause 409s.
+    def matching_wardrobe(self):
+        # Normalize saved JSON and expected values consistently for both looks.
         if self.gender == "girl":
             if self.outfit == "thobe":
                 self.outfit = "casual"
             if self.headwear in {"shemagh", "ghutra", "taqiyah"}:
                 self.headwear = "none"
+        else:
+            if self.outfit == "abaya":
+                self.outfit = "casual"
+            if self.headwear == "hijab":
+                self.headwear = "none"
+            if self.accessory == "flower":
+                self.accessory = "none"
         return self
 
 
