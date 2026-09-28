@@ -111,6 +111,8 @@ def test_invitation_concurrent_edits_and_invalid_input(client):
         {"title": " "},
         {"message": "x" * 201},
         {"when_label": "x" * 81},
+        {"character": {"persona": "host", "headwear": "crown"}},
+        {"character": {"persona": "host", "member_id": "x"}},
     ):
         assert save(client, path, auth, **details).status_code == 422
     assert client.get("/api/plan-invitations/anything/id", headers=auth).status_code == 422
@@ -235,3 +237,19 @@ def test_google_failures_are_unavailable_not_fake_ratings(client, monkeypatch, p
     monkeypatch.setattr(ratings, "provider_request", provider)
     assert ratings.fetch_rating(real).status == "unavailable"
     ratings._requests.clear()
+
+
+def test_invitation_character_is_the_senders_optional_choice(client):
+    group, auth = create(client)
+    path = f"/api/plan-invitations/plan/{group['id']}"
+    plain = save(client, path, auth).json()
+    public_path = f"/api/shared-plans/{plain['code']}"
+    assert client.get(public_path).json()["details"]["character"] is None
+    character = {"persona": "on_way", "outfit": "abaya", "headwear": "hijab", "tone": "deep"}
+    saved = save(client, path, auth, plain["revision"], character=character).json()
+    shown = client.get(public_path).json()["details"]["character"]
+    assert shown["persona"] == "on_way" and shown["headwear"] == "hijab"
+    assert saved["details"]["character"] == shown
+    removed = save(client, path, auth, saved["revision"], character=None)
+    assert removed.status_code == 200
+    assert client.get(public_path).json()["details"]["character"] is None

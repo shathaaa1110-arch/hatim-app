@@ -9,12 +9,22 @@ from hatim.domain.models import OutingContext, Plan, Preferences, Settings
 class Skin(Model):
     version: Literal[1] = 1
     persona: Literal["host", "on_way", "you_choose"]
-    tone: Literal["light", "warm", "deep"] = "warm"
+    tone: Literal["fair", "light", "warm", "tan", "deep"] = "warm"
     outfit: Literal["thobe", "abaya", "casual"] = "casual"
+    headwear: Literal["none", "shemagh", "ghutra", "taqiyah", "hijab"] = "none"
     color: Literal["palm", "saffron", "rose", "sky"] = "palm"
     accessory: Literal["none", "glasses"] = "none"
     expression: Literal["smile", "wink", "side_eye"] = "smile"
     phrase: Literal["classic", "extra"] = "classic"
+
+    @model_validator(mode="before")
+    @classmethod
+    def legacy_headwear(cls, data):
+        # Before headwear existed the abaya drew a head cover; stored and archived
+        # appearances must keep looking the same instead of silently uncovering.
+        if isinstance(data, dict) and "headwear" not in data:
+            return {**data, "headwear": "hijab" if data.get("outfit") == "abaya" else "none"}
+        return data
 
 
 class SkinChange(Model):

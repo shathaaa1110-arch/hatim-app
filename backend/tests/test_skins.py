@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
+from psycopg.types.json import Jsonb
 from test_social import account, go, join, outing, setup_circle, start
 
 from hatim.core.db import connect, initialize
@@ -170,6 +171,8 @@ def test_concurrent_cosmetic_edits_do_not_silently_overwrite(client, scope):
         {"skin": {"persona": "host", "url": "https://example.test/a"}, "expected": None},
         {"skin": {"persona": "host", "phrase": "arbitrary text"}, "expected": None},
         {"skin": {"persona": "host", "version": 2}, "expected": None},
+        {"skin": {"persona": "host", "headwear": "crown"}, "expected": None},
+        {"skin": {"persona": "host", "tone": "blue"}, "expected": None},
         {"skin": None},
         {"expected": None},
     ],
@@ -198,3 +201,25 @@ def test_migration_preserves_existing_members_and_closed_outings(client):
     skin(client, owner, circle, HOST)
     assert read(client, owner, trip)["participants"][0]["skin"] is None
     assert read(client, owner, trip)["plan"] == trip["plan"]
+
+
+def test_headwear_is_independent_and_legacy_abaya_keeps_its_cover(client):
+    owner, circle = setup_circle(client)
+    trip = outing(client, owner, circle)
+    # Values saved before headwear existed: the abaya drew the head cover.
+    legacy = {k: v for k, v in LATE.items() if k != "headwear"}
+    with connect() as db:
+        db.execute(
+            "UPDATE circle_members SET skin=%s WHERE circle_id=%s",
+            (Jsonb(legacy), circle["id"]),
+        )
+    shown = client.get(f"/api/v2/groups/{circle['id']}", headers=owner).json()["me"]["skin"]
+    assert shown == {**legacy, "headwear": "hijab"}
+    assert read(client, owner, trip)["participants"][0]["skin"]["headwear"] == "hijab"
+    # The normalized legacy value is a valid baseline, not a false conflict.
+    uncovered = {**shown, "headwear": "none", "tone": "fair"}
+    assert skin(client, owner, circle, uncovered, legacy).status_code == 200
+    assert Skin.model_validate({"persona": "host", "outfit": "thobe"}).headwear == "none"
+    shemagh = Skin(persona="host", outfit="casual", headwear="shemagh", tone="tan").model_dump()
+    saved = skin(client, owner, circle, shemagh, uncovered).json()["me"]["skin"]
+    assert saved == shemagh

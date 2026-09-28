@@ -4,6 +4,7 @@ from pydantic import Field
 
 from hatim.core.models import Model
 from hatim.domain.models import OutingContext
+from hatim.features.groups import Skin
 
 SourceKind = Literal["plan", "outing"]
 
@@ -14,6 +15,8 @@ class InvitationDetails(Model):
     when_label: str = Field(default="", max_length=80)
     meeting_note: str = Field(default="", max_length=100)
     theme: Literal["palm", "saffron", "rose"] = "palm"
+    # The sender's own cosmetic choice; never read from members or participants.
+    character: Skin | None = None
 
 
 class InvitationChange(Model):

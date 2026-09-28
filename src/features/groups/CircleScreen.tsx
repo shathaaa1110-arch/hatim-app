@@ -28,8 +28,7 @@ import { PUBLIC_ORIGIN } from "../../shared/api/http";
 import { ar, colors as c } from "../../shared/theme";
 import { groupsApi, type CircleMember } from "./api";
 import { useRemote } from "../../shared/useRemote";
-import { SkinAvatar } from "./skins/SkinAvatar";
-import { SkinEditor } from "./skins/SkinEditor";
+import { SkinAvatar, SkinEditor } from "../skins";
 import {
   ConfirmationContent,
   type Confirmation,
@@ -386,7 +385,10 @@ export function CircleScreen({
               name={group.me.name}
               initial={group.me.skin ?? null}
               effective={group.me.skin ?? null}
-              scope="circle"
+              title="شخصيتي في القروب"
+              note="شخصيتك المحفوظة لطلعات هذا القروب. تقدر تغيّرها لطلعة واحدة."
+              notice="شخصية للمزح تختارها بنفسك؛ ما تعطيك صلاحيات، وما تغيّر ذوقك أو صوتك. عبارتها جزء من الشخصية وليست تحديثًا عن موقعك."
+              clearLabel="بدون شخصية"
               close={() => setSkinEditing(false)}
               save={(value, expected) =>
                 update(() => groupsApi.skin(token, id, value, expected))

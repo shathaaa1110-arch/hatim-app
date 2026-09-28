@@ -3,9 +3,10 @@
     "accounts": [],
     "experiences": [],
     "planning": ["accounts", "experiences", "planSharing"],
-    "groups": ["accounts", "experiences", "planning"],
+    "groups": ["accounts", "experiences", "planning", "skins"],
     "quickDecision": ["experiences", "planning"],
-    "planSharing": ["experiences"]
+    "planSharing": ["experiences", "skins"],
+    "skins": []
   },
   "backend": {
     "accounts": [],

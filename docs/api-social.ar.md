@@ -126,14 +126,17 @@ stateDiagram-v2
 |---|---|---|
 | version | 1 | 1 |
 | persona | host / on_way / you_choose | مطلوب |
-| tone | light / warm / deep | warm |
+| tone | fair / light / warm / tan / deep | warm |
 | outfit | thobe / abaya / casual | casual |
+| headwear | none / shemagh / ghutra / taqiyah / hijab | none، أو hijab للعباية المحفوظة قبل الحقل |
 | color | palm / saffron / rose / sky | palm |
 | accessory | none / glasses | none |
 | expression | smile / wink / side_eye | smile |
 | phrase | classic / extra | classic |
 
 مثال اختيار المعزّب لأول مرة: `{"skin":{"persona":"host","outfit":"thobe"},"expected":null}`. استجابة CircleMember تضيف skin؛ استجابة Participant تضيف skin الفعلية وskin_override. كلاهما null افتراضيًا للتوافق. الأسماء والعبارات الثابتة والرسومات في الواجهة، وليست HTML أو رابط صورة مخزنًا. بيانات الشكل عامة للأعضاء الذين لهم حق قراءة القروب، وليست ضمن دعوة الزائر العامة أو Preferences.
+
+تحديث28سبتمبر2026: غطاء الرأس حقل مستقل عن اللبس. الشكل المخزن قبل الحقل كانت العباية فيه ترسم غطاء الرأس؛ لذلك إذا غاب headwear يملؤه النموذج بـhijab للعباية وnone لغيرها، فلا يتغير شكل عضو أو أرشيف بصمت. الرد يعيد القيمة المكتملة، ويمكن إرسالها كـexpected دون تعارض كاذب. لا ترحيل جديد لأن القيم JSONB. ردة الفعل بعد نتيجة الجولة (🎉/😒/🎲) تُحسب في الواجهة من my_vote وresult_id ولا تُخزن؛ لم يتغير RoundView ولا تنكشف أصوات الآخرين.
 
 skin=null في القروب تعني إزالة الشخصية الافتراضية. في الطلعة تعني إزالة التخصيص والعودة لشخصية القروب؛ لا تعني إخفاء شخصية موروثة. القروب الآخر له اختيار مستقل. عند إغلاق الطلعة تحفظ الشخصية الفعلية في skin_snapshot، وتبقى null لقطة صحيحة لعدم اختيار شخصية. تغيير شخصية القروب لاحقًا لا يغير الأرشيف، وإعادة الإغلاق لا تستبدل اللقطة. الشخصية لا تغيّر الحضور أو الحساسية أو الميزانية أو التصويت أو planning_revision، ولا تشغّل invalidate.
 

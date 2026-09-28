@@ -21,11 +21,13 @@
 | [groups/outings.py](../../backend/hatim/features/groups/outings.py) | حفظ لقطة الشخصية عند إغلاق الطلعة |
 | [groups/__init__.py](../../backend/hatim/features/groups/__init__.py) | ضم مساري الشخصيات إلى router القروبات |
 | [groups/api.ts](../../src/features/groups/api.ts) | طلبات الواجهة وعقد Skin المولد |
-| [skins/catalog.ts](../../src/features/groups/skins/catalog.ts) | الشخصيات والعبارات ولوحات الألوان والقيم الابتدائية |
-| [skins/SkinAvatar.tsx](../../src/features/groups/skins/SkinAvatar.tsx) | رسم الشخصية من اختيارات صغيرة |
-| [skins/SkinEditor.tsx](../../src/features/groups/skins/SkinEditor.tsx) | المعاينة ومسودة التعديل والحفظ |
+| [skins/catalog.ts](../../src/features/skins/catalog.ts) | الشخصيات والعبارات ولوحات الألوان والقيم الابتدائية |
+| [skins/SkinAvatar.tsx](../../src/features/skins/SkinAvatar.tsx) | رسم الشخصية من اختيارات صغيرة |
+| [skins/SkinEditor.tsx](../../src/features/skins/SkinEditor.tsx) | المعاينة ومسودة التعديل والحفظ |
 | [skins/SkinPeople.tsx](../../src/features/groups/skins/SkinPeople.tsx) | عرض شخصيات الحاضرين وأسمائهم |
 | [CircleScreen](../../src/features/groups/CircleScreen.tsx)، [OutingScreen](../../src/features/groups/OutingScreen.tsx)، [RoundPanel](../../src/features/groups/RoundPanel.tsx) | تركيب المحرر والعرض داخل مسار الاستخدام |
+
+> ملاحظة28سبتمبر2026: هذا الفصل يشرح نسخة24سبتمبر. بعده نُقلت catalog وSkinAvatar وSkinEditor إلى ميزة `src/features/skins` وتغيّر الرسم والمحرر؛ الروابط أعلاه تشير لمكانها الحالي، والشرح الجديد في [الفصل22](22-expressive-skins.ar.md).
 
 لم نضف حزمة جديدة؛ react-native-svg موجودة أصلًا. لم نغيّر اعتماد الوحدات في architecture.json لأن الملفات تتعاون داخل groups نفسها. لا ننقل قواعد الشخصية وألقابها إلى shared لمجرد أن أكثر من شاشة داخل القروبات تحتاجها. [خريطة المعمارية](../architecture-modules.ar.md) توضح الحدود، و[المعمارية وقاعدة البيانات](../architecture-python-postgres.ar.md) توضح العلاقات.
 

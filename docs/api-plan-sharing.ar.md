@@ -22,13 +22,14 @@
     "message": "لكم مكان على الطاولة.",
     "when_label": "الخميس، ٨ مساءً بتوقيت الرياض",
     "meeting_note": "عند المدخل",
-    "theme": "saffron"
+    "theme": "saffron",
+    "character": null
   },
   "expected_revision": null
 }
 ```
 
-العنوان1–60 حرفًا، الرسالة حتى200، الموعد حتى80، التجمع حتى100. theme أحد palm/saffron/rose. التاريخ نص للعرض، ليس حجزًا ولا تقويمًا. expected_revision حقل مطلوب: null لأول نشر، ثم الرقم المعاد من الخادم. التعارض409؛ المدخل غير الصحيح422. التعديل يبقي نفس code. مراجعة الدعوة تأتي من sequence عام؛ الإلغاء ثم الإنشاء لا يعيدان استعمال المراجعة القديمة، فلا تنجح كتابة جهاز يحمل نسخة ملغاة. لا تفترضي أن الأرقام متتالية.
+العنوان1–60 حرفًا، الرسالة حتى200، الموعد حتى80، التجمع حتى100. theme أحد palm/saffron/rose. character اختياري (افتراضيًا null): Skin يختاره صاحب الدعوة لنفسه بنفس قيم [عقد الشخصيات](api-social.ar.md)، ويظهر أعلى البطاقة لكل من معه الرابط. لا يُقرأ من شخصيات أعضاء القروب ولا يضيف بيانات عنهم، والحقول الإضافية داخله تُرفض بـ422. نسخة PDF لا ترسم الشخصية حاليًا. التاريخ نص للعرض، ليس حجزًا ولا تقويمًا. expected_revision حقل مطلوب: null لأول نشر، ثم الرقم المعاد من الخادم. التعارض409؛ المدخل غير الصحيح422. التعديل يبقي نفس code. مراجعة الدعوة تأتي من sequence عام؛ الإلغاء ثم الإنشاء لا يعيدان استعمال المراجعة القديمة، فلا تنجح كتابة جهاز يحمل نسخة ملغاة. لا تفترضي أن الأرقام متتالية.
 
 رد المنظّم `InvitationEditor`: details، plan، code nullable، revision nullable. رد العام `PublicInvitation`: details، plan، read_at، created_at؛ لا يرجع رقم المراجعة أو مفاتيح الإدارة. shared plan تحتوي context، entries، consumed، available، unfilled، anchor_unavailable، archived. كل entry: id، title، venue، neighborhood، cuisine، image، price، minutes، priority، reason تحريري عام، dishes، options العامة، is_demo، maps_url، maps_verified.
 

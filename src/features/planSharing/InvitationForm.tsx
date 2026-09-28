@@ -1,6 +1,7 @@
 import { View } from "react-native";
-import { Chip, T } from "../../shared/ui/primitives";
+import { Button, Chip, T } from "../../shared/ui/primitives";
 import { Field, s } from "../../shared/ui/layout";
+import { defaultSkin, SkinPicker } from "../skins";
 import type { InvitationDetails } from "./api";
 import { themes } from "./presentation";
 
@@ -66,6 +67,35 @@ export function InvitationForm({
       <T style={s.muted}>
         اتركي الموعد والمكان فارغين إذا ما اتفقتوا بعد. يظهر فقط اللي تكتبينه.
       </T>
+      <View style={{ gap: 12 }}>
+        <T weight="semibold">شخصيتك في الدعوة (اختياري)</T>
+        <T style={s.muted}>
+          تظهر أعلى الدعوة لكل من معه الرابط. ما نضيف شخصيات الرفقة أو بياناتهم؛
+          هذه اختيارك أنت فقط.
+        </T>
+        <Button
+          small
+          secondary
+          label={
+            value.character ? "إزالة الشخصية من الدعوة" : "أضف شخصيتك للدعوة"
+          }
+          disabled={disabled}
+          onPress={() =>
+            onChange({
+              ...value,
+              character: value.character ? null : defaultSkin,
+            })
+          }
+        />
+        {value.character && (
+          <SkinPicker
+            name="صاحب الدعوة"
+            value={value.character}
+            onChange={(character) => onChange({ ...value, character })}
+            disabled={disabled}
+          />
+        )}
+      </View>
     </View>
   );
 }

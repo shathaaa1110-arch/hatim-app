@@ -3717,6 +3717,16 @@
             ],
             "title": "Theme",
             "default": "palm"
+          },
+          "character": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Skin"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -5078,8 +5088,10 @@
           "tone": {
             "type": "string",
             "enum": [
+              "fair",
               "light",
               "warm",
+              "tan",
               "deep"
             ],
             "title": "Tone",
@@ -5094,6 +5106,18 @@
             ],
             "title": "Outfit",
             "default": "casual"
+          },
+          "headwear": {
+            "type": "string",
+            "enum": [
+              "none",
+              "shemagh",
+              "ghutra",
+              "taqiyah",
+              "hijab"
+            ],
+            "title": "Headwear",
+            "default": "none"
           },
           "color": {
             "type": "string",

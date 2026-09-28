@@ -28,8 +28,7 @@ import { ar, colors as c, photos } from "../../shared/theme";
 import { groupsApi, type Outing } from "./api";
 import { RoundPanel } from "./RoundPanel";
 import { OutingManagement } from "./OutingManagement";
-import { SkinAvatar } from "./skins/SkinAvatar";
-import { SkinEditor } from "./skins/SkinEditor";
+import { SkinAvatar, SkinEditor } from "../skins";
 import { SkinPeople } from "./skins/SkinPeople";
 import { useRemote } from "../../shared/useRemote";
 import {
@@ -225,7 +224,10 @@ export function OutingScreen({
               name={me.name}
               initial={me.skin_override ?? null}
               effective={me.skin ?? null}
-              scope="outing"
+              title="شخصيتي لهذه الطلعة"
+              note="تغيير هنا يخص هذه الطلعة فقط. شخصيتك المحفوظة للقروب تبقى مثل ما هي."
+              notice="شخصية للمزح تختارها بنفسك؛ ما تعطيك صلاحيات، وما تغيّر ذوقك أو صوتك. عبارتها جزء من الشخصية وليست تحديثًا عن موقعك."
+              clearLabel="استخدام شخصية القروب"
               close={() => setSkinEditing(false)}
               save={(value, expected) =>
                 update(() => groupsApi.outingSkin(token, id, value, expected))

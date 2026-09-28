@@ -1139,6 +1139,7 @@ export interface components {
        * @enum {string}
        */
       theme: "palm" | "saffron" | "rose";
+      character?: components["schemas"]["Skin"] | null;
     };
     /** InvitationEditor */
     InvitationEditor: {
@@ -1626,13 +1627,19 @@ export interface components {
        * @default warm
        * @enum {string}
        */
-      tone: "light" | "warm" | "deep";
+      tone: "fair" | "light" | "warm" | "tan" | "deep";
       /**
        * Outfit
        * @default casual
        * @enum {string}
        */
       outfit: "thobe" | "abaya" | "casual";
+      /**
+       * Headwear
+       * @default none
+       * @enum {string}
+       */
+      headwear: "none" | "shemagh" | "ghutra" | "taqiyah" | "hijab";
       /**
        * Color
        * @default palm

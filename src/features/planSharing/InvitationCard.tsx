@@ -5,6 +5,7 @@ import { Button, Chip, Notice, Row, T } from "../../shared/ui/primitives";
 import { Panel, s } from "../../shared/ui/layout";
 import { ar, colors as c, photos } from "../../shared/theme";
 import { experiencesApi, type GoogleRating } from "../experiences";
+import { SkinAvatar, personas, skinPhrase } from "../skins";
 import type { InvitationDetails, SharedPlan, SharedExperience } from "./api";
 import { contexts, stamp, themeFor } from "./presentation";
 
@@ -152,7 +153,29 @@ export function InvitationCard({
           <T style={{ fontSize: 12, color: theme.ink }}>
             حــاتم · {contexts[plan.context.kind ?? "any"]}
           </T>
-          {!compact && <Utensils size={24} color={theme.ink} />}
+          {details.character ? (
+            <View style={{ alignItems: "center", gap: 6 }}>
+              <SkinAvatar
+                name="صاحب الدعوة"
+                skin={details.character}
+                size={compact ? 72 : 120}
+              />
+              {!compact && (
+                <T
+                  style={{
+                    fontSize: 13,
+                    color: theme.ink,
+                    textAlign: "center",
+                  }}
+                >
+                  {personas[details.character.persona].name} · «
+                  {skinPhrase(details.character)}»
+                </T>
+              )}
+            </View>
+          ) : (
+            !compact && <Utensils size={24} color={theme.ink} />
+          )}
           <T
             weight="bold"
             style={{

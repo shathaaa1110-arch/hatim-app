@@ -98,7 +98,11 @@ export function RoundPanel({
           </View>
         </Row>
       </Panel>
-      <SkinPeople participants={o.participants} choosing />
+      <SkinPeople
+        participants={o.participants}
+        choosing
+        round={spinning ? null : round}
+      />
       {round?.status === "invalidated" && (
         <Notice
           warning

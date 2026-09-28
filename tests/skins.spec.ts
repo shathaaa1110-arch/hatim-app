@@ -81,13 +81,22 @@ test("mobile skins customize, sync to companions, override an outing and freeze 
     await button(companion, "الأعضاء والطرد").click();
     await visit(page, owner.token, circle.invite_code);
     await button(page, "شخصيتي في القروب").click();
+    // The dice shuffles playful parts; explicit choices below still win.
+    await button(page, "فاجئني").click();
     await button(page, "شخصية المعزّب").click();
     await button(page, "ثوب").click();
-    await button(page, "حنطي").click();
+    await button(page, "قمحي غامق").click();
+    await button(page, "شماغ").click();
     await button(page, "زعفران").click();
     await button(page, "غمزة").click();
     await button(page, "نظارة").click();
     await button(page, "الحلى عليّ… مين قال شبعتوا؟").click();
+    // Choices are swatches, emoji and previews; their spoken labels keep the words.
+    await page
+      .getByRole("dialog")
+      .getByText("👕 اللبس", { exact: true })
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({ path: "test-results/skins-choices-mobile.png" });
     // Scroll back to the artwork before capturing the mobile editor.
     await page
       .getByRole("dialog")
@@ -97,7 +106,8 @@ test("mobile skins customize, sync to companions, override an outing and freeze 
     const group = await save(page, "groups");
     expect(group.me.skin).toMatchObject({
       ...host,
-      tone: "warm",
+      tone: "tan",
+      headwear: "shemagh",
       color: "saffron",
       expression: "wink",
       accessory: "glasses",
@@ -225,4 +235,79 @@ test("editor preserves drafts on failure and rejects stale edits from another de
   await expect(
     page.getByRole("img", { name: "أمل · بدون شخصية", exact: true }),
   ).toBeVisible();
+});
+
+test("result reactions show my own vote privately and a shared dice for draws", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 393, height: 852 });
+  const { owner, circle } = await seed(request);
+  const guest = await account(request, "سارة");
+  await request.post(`/api/v2/invites/${circle.invite_code}/join`, {
+    headers: auth(guest.token),
+    data: { preferences: { name: "سارة" } },
+  });
+  for (const [token, skin] of [
+    [owner.token, host],
+    [guest.token, late],
+  ] as const)
+    await request.put(`/api/v2/groups/${circle.id}/me/skin`, {
+      headers: auth(token),
+      data: { skin, expected: null },
+    });
+  const trip = await (
+    await request.post(`/api/v2/groups/${circle.id}/outings`, {
+      headers: auth(owner.token),
+      data: { title: "عشاء النتيجة", slots: 3 },
+    })
+  ).json();
+  await request.put(`/api/v2/outings/${trip.id}/me/attendance`, {
+    headers: auth(guest.token),
+    data: { attendance: "going", budget_override: null },
+  });
+  const round = async (mode: "vote" | "draw") =>
+    (
+      await (
+        await request.post(`/api/v2/outings/${trip.id}/rounds`, {
+          headers: auth(owner.token),
+          data: { mode, experience_ids: ["fire", "sushi"] },
+        })
+      ).json()
+    ).round.id;
+  const vote = await round("vote");
+  for (const token of [owner.token, guest.token])
+    await request.put(`/api/v2/rounds/${vote}/my-vote`, {
+      headers: auth(token),
+      data: { experience_id: "fire" },
+    });
+  await request.post(`/api/v2/rounds/${vote}/resolve`, {
+    headers: auth(owner.token),
+  });
+  await visit(page, owner.token, circle.invite_code);
+  await button(page, "افتح طلعة عشاء النتيجة").click();
+  await button(page, "الاختيار").click();
+  await expect(
+    page.getByRole("img", { name: "أمل · المعزّب · فاز اختيارك", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/شخصيتك تحتفل/)).toBeVisible();
+  // Another member's ballot is secret, so their face never reacts here.
+  await expect(
+    page.getByRole("img", { name: "سارة · عند الإشارة", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByText("شخصياتكم حول الاختيار", { exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "test-results/skins-reaction-mobile.png" });
+  const draw = await round("draw");
+  await request.post(`/api/v2/rounds/${draw}/draw`, {
+    headers: auth(owner.token),
+  });
+  await expect(
+    page.getByRole("img", {
+      name: "سارة · عند الإشارة · القرعة حسمت",
+      exact: true,
+    }),
+  ).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(/شخصيتك تحتفل/)).toHaveCount(0);
 });

@@ -52,6 +52,11 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
   await sheet
     .getByRole("textbox", { name: "رسالتك للرفقة", exact: true })
     .fill("الكل معزوم");
+  // The sender may add their own character; nobody else's appearance is shared.
+  await button(page, "أضف شخصيتك للدعوة").click();
+  await button(page, "شخصية عند الإشارة").click();
+  await button(page, "حجاب").click();
+  await button(page, "أسمر").click();
   await expect(button(page, "مشاركة الدعوة")).toHaveCount(0);
   await button(page, "حفظ التعديلات").click();
   await expect(button(page, "مشاركة الدعوة")).toBeEnabled();
@@ -67,6 +72,9 @@ test("designed guest invitation stays live, exports Arabic PDF, and revokes", as
     viewer.getByText("خميسنا على سفرة", { exact: true }),
   ).toBeVisible();
   await expect(viewer.getByText("الكل معزوم", { exact: true })).toBeVisible();
+  await expect(
+    viewer.getByRole("img", { name: "صاحب الدعوة · عند الإشارة", exact: true }),
+  ).toBeVisible();
   await expect(viewer.getByText("وش نطلب؟", { exact: true })).toHaveCount(3);
   await expect(viewer.getByText("PRIVATE_OWNER")).toHaveCount(0);
   await expect(viewer.getByRole("textbox")).toHaveCount(0);

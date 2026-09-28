@@ -57,6 +57,7 @@ src/
     experiences/                     Discover + ExperienceCard + api + index
     planning/                        الخطة والرفقة والدعوة وإعداد الخطة والتخزين وapi
     groups/                          القروب والطلعة والتصويت والإدارة وapi
+    skins/                           رسم الشخصية ومنتقيها ومحررها وقيمها
     quickDecision/                   شاشة القرار السريع وapi وindex
     planSharing/                     محرر الدعوة وبطاقتها العامة وPDF حسب المنصة وapi
   shared/
@@ -84,6 +85,9 @@ flowchart TD
     App --> PS[planSharing]
     P --> PS
     PS --> E
+    PS --> SK[skins]
+    G --> SK
+    SK --> S
     PS --> S
     Q --> E
     Q --> P
@@ -105,7 +109,9 @@ flowchart TD
 
 ## الخادم: مسؤولية كل مجلد
 
-إضافة الشخصيات24سبتمبر2026 تبقى داخل groups: المجلد `src/features/groups/skins` يضم `catalog.ts` لأسماء وعبارات وألوان الشخصيات، `SkinAvatar.tsx` لطبقات SVG، `SkinEditor.tsx` لمسودة التعديل وحفظها، و`SkinPeople.tsx` لعرض الحاضرين في الخطة والاختيار. CircleScreen وOutingScreen يملكان الاتصال عبر groups/api.ts. هذه رسومات ومعانٍ خاصة بالقروبات؛ لم ننقلها إلى shared ولم نضف اعتمادًا بين ميزتين في architecture.json.
+إضافة الشخصيات24سبتمبر2026 تبقى داخل groups: المجلد `src/features/groups/skins` يضم `catalog.ts` لأسماء وعبارات وألوان الشخصيات وألوان البشرة وإيموجي الاختيارات، `SkinAvatar.tsx` لطبقات SVG، `SkinEditor.tsx` لمسودة التعديل وحفظها، و`SkinPeople.tsx` لعرض الحاضرين في الخطة والاختيار. CircleScreen وOutingScreen يملكان الاتصال عبر groups/api.ts. هذه رسومات ومعانٍ خاصة بالقروبات؛ لم ننقلها إلى shared ولم نضف اعتمادًا بين ميزتين في architecture.json.
+
+تحديث28سبتمبر2026: الدعوة العامة صارت تعرض شخصية صاحبها، وplanSharing لا يستطيع الاستيراد من groups لأن groups → planning → planSharing يصنع دورة. لذلك نُقلت `catalog.ts` و`SkinAvatar.tsx` و`SkinEditor.tsx` (مع SkinPicker) إلى ميزة مستقلة `src/features/skins` بمدخل index.ts. الميزة لا تعتمد على ميزة أخرى؛ groups وplanSharing يعتمدان عليها، وهذا معلن في architecture.json. `SkinPeople.tsx` بقي في groups لأنه يعرف الحضور والجولة. في الخادم لم تتغير الحدود: plan_sharing كان يعتمد على groups، ويستورد Skin من `groups/__init__.py`. [الفصل22](learning-python-postgres/22-expressive-skins.ar.md).
 
 في الخادم، `features/groups/skins.py` يملك مساري تعديل الشخصية مع نماذجهما في models.py. domain.py يحسب الشخصية المعروضة، وoutings.py يلتقط شكلها عند الإغلاق. وحدة groups تملك أعمدة skin وskin_override وskin_snapshot المضافة في الترحيل005؛ نفس ترتيب الأقفال circle ثم outing، والتعديل التجميلي لا يستدعي invalidate. [التفاصيل والعقد والاختبارات](learning-python-postgres/19-outing-skins.ar.md).
 
